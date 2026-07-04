@@ -1,5 +1,6 @@
 package com.training.system.info.entity;
 
+import com.training.system.info.annotation.ExcelColumn;
 import java.time.LocalDateTime;
 
 /**
@@ -9,11 +10,23 @@ import java.time.LocalDateTime;
 public class Teacher {
 
     private Long teacherId;
+
+    @ExcelColumn(index = 0, header = "工号")
     private String teacherNo;
+
+    @ExcelColumn(index = 1, header = "姓名")
     private String teacherName;
+
+    @ExcelColumn(index = 2, header = "教研室")
     private String office;
+
+    @ExcelColumn(index = 3, header = "职称")
     private String title;
+
+    @ExcelColumn(index = 4, header = "手机号")
     private String phone;
+
+    @ExcelColumn(index = 5, header = "邮箱")
     private String email;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

@@ -122,6 +122,38 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    public List<Student> getAllStudents() {
+        return studentMapper.selectPage(null, null, 0, Integer.MAX_VALUE)
+                .stream().map(vo -> studentMapper.selectById(vo.getStudentId())).toList();
+    }
+
+    @Override
+    @Transactional
+    public void importStudents(List<Student> students) {
+        for (Student student : students) {
+            if (studentMapper.selectByStudentNo(student.getStudentNo()) != null) continue;
+            if (student.getPhone() != null && student.getPhone().length() != 11) continue;
+            studentMapper.insert(student);
+            UserAccount account = new UserAccount();
+            account.setUsername(student.getStudentNo());
+            account.setPassword(encoder.encode("123456"));
+            account.setRole("STUDENT");
+            account.setRelatedId(student.getStudentId());
+            account.setStatus(1);
+            userAccountMapper.insert(account);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateSelfPassword(Long studentId, String oldPwd, String newPwd) {
+        UserAccount account = userAccountMapper.selectByRelatedIdAndRole(studentId, "STUDENT");
+        if (account == null) throw new BusinessException(ResultCode.NOT_FOUND, "学生账号不存在");
+        if (!encoder.matches(oldPwd, account.getPassword())) throw new BusinessException(ResultCode.BAD_REQUEST, "原密码错误");
+        userAccountMapper.updatePassword(account.getUserId(), encoder.encode(newPwd));
+    }
+
+    @Override
     public long count() {
         return studentMapper.countPage(null, null);
     }

@@ -3,10 +3,17 @@ package com.training.system.info.controller;
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
 import com.training.system.info.dto.TeacherCreateDTO;
+import com.training.system.info.entity.Teacher;
 import com.training.system.info.service.TeacherService;
+import com.training.system.info.util.ExcelUtil;
 import com.training.system.info.vo.TeacherVO;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/teachers")
@@ -52,6 +59,26 @@ public class TeacherController {
     @DeleteMapping("/{teacherId}")
     public Result<Void> delete(@PathVariable Long teacherId) {
         teacherService.deleteTeacher(teacherId);
+        return Result.success();
+    }
+
+    @GetMapping("/export")
+    public void export(HttpServletResponse response) {
+        try {
+            List<Teacher> list = teacherService.getAllTeachers();
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            String encoded = URLEncoder.encode("教师信息.xlsx", StandardCharsets.UTF_8).replace("+", "%20");
+            response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encoded);
+            ExcelUtil.writeXlsx(list, Teacher.class, response.getOutputStream(), "教师信息");
+        } catch (Exception e) {
+            throw new RuntimeException("导出失败: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public Result<Void> changePassword(@RequestParam String oldPwd, @RequestParam String newPwd,
+                                        @RequestParam Long teacherId) {
+        teacherService.updateSelfPassword(teacherId, oldPwd, newPwd);
         return Result.success();
     }
 }

@@ -137,6 +137,22 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    public List<Teacher> getAllTeachers() {
+        return teacherMapper.selectPage(null, 0, Integer.MAX_VALUE)
+                .stream().map(vo -> teacherMapper.selectById(vo.getTeacherId())).toList();
+    }
+
+    @Override
+    @Transactional
+    public void updateSelfPassword(Long teacherId, String oldPwd, String newPwd) {
+        UserAccount account = userAccountMapper.selectByRelatedIdAndRole(teacherId, "TEACHER");
+        if (account == null) account = userAccountMapper.selectByRelatedIdAndRole(teacherId, "ADMIN");
+        if (account == null) throw new BusinessException(ResultCode.NOT_FOUND, "教师账号不存在");
+        if (!encoder.matches(oldPwd, account.getPassword())) throw new BusinessException(ResultCode.BAD_REQUEST, "原密码错误");
+        userAccountMapper.updatePassword(account.getUserId(), encoder.encode(newPwd));
+    }
+
+    @Override
     public long count() {
         return teacherMapper.countPage(null);
     }
