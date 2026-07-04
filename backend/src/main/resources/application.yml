@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: training-selection-system
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/training_selection_system?characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: wbl
+    password: wbl1124
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+topic:
+  file:
+    upload-dir: ./uploads/topic
+
+file:
+  upload:
+    dir: ./uploads
+
+backup:
+  cron: "0 0 2 * * ?"
+  dir: ./backup
+  retention-days: 30
+
+logging:
+  level:
+    com.training.system: debug

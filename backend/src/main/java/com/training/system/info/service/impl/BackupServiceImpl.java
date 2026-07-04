@@ -3,7 +3,7 @@ package com.training.system.info.service.impl;
 import com.training.system.common.PageResult;
 import com.training.system.common.ResultCode;
 import com.training.system.info.entity.DataBackup;
-import com.training.system.info.exception.BusinessException;
+import com.training.system.exception.BusinessException;
 import com.training.system.info.mapper.DataBackupMapper;
 import com.training.system.info.service.BackupService;
 import com.training.system.info.vo.BackupVO;

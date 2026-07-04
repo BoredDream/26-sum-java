@@ -1,5 +1,7 @@
 ﻿USE training_selection_system;
 
+SET NAMES utf8mb4;
+
 -- 最小测试数据 V1
 -- 密码字段使用占位哈希，正式开发时由登录模块统一加密生成。
 
