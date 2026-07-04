@@ -84,7 +84,7 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public NoticeVO getNoticeDetail(Long noticeId) {
-        NoticeVO vo = noticeMapper.selectById(noticeId);
+        NoticeVO vo = noticeMapper.selectVOById(noticeId);
         if (vo == null) {
             throw new BusinessException(ResultCode.NOT_FOUND, "公告不存在");
         }
