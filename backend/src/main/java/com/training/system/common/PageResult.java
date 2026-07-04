@@ -1,4 +1,4 @@
-﻿package com.training.system.common;
+package com.training.system.common;
 
 import java.util.List;
 
