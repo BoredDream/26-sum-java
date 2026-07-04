@@ -35,6 +35,6 @@
     </select>
 
     <select id="selectByTimeBefore" resultType="com.training.system.info.entity.DataBackup">
-        SELECT * FROM data_backup WHERE backup_time < #{cutoff}
+        SELECT * FROM data_backup WHERE backup_time &lt; #{cutoff}
     </select>
 </mapper>
