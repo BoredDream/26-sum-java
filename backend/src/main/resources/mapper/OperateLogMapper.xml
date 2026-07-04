@@ -43,6 +43,6 @@
     </select>
 
     <delete id="deleteByTimeBefore">
-        DELETE FROM operate_log WHERE operate_time < #{cutoff}
+        DELETE FROM operate_log WHERE operate_time &lt; #{cutoff}
     </delete>
 </mapper>
