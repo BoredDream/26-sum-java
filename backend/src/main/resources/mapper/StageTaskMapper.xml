@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.score.mapper.StageTaskMapper">
+
+    <insert id="insert" parameterType="com.training.system.score.entity.StageTask"
+            useGeneratedKeys="true" keyProperty="stageId">
+        INSERT INTO stage_task (
+            stage_name, stage_desc, start_time, end_time, deliverables,
+            scoring_criteria, weight, teacher_id, status
+        ) VALUES (
+            #{stageName}, #{stageDesc}, #{startTime}, #{endTime}, #{deliverables},
+            #{scoringCriteria}, #{weight}, #{teacherId}, #{status}
+        )
+    </insert>
+
+    <select id="selectById" resultType="com.training.system.score.entity.StageTask">
+        SELECT * FROM stage_task WHERE stage_id = #{stageId}
+    </select>
+
+    <select id="selectPage" resultType="com.training.system.score.vo.StageTaskVO">
+        SELECT st.stage_id, st.stage_name, st.stage_desc, st.start_time, st.end_time,
+               st.deliverables, st.scoring_criteria, st.weight, st.teacher_id,
+               t.teacher_name, st.status, st.create_time
+        FROM stage_task st
+        LEFT JOIN teacher t ON st.teacher_id = t.teacher_id
+        WHERE 1 = 1
+        <if test="keyword != null and keyword != ''">
+            AND st.stage_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="teacherId != null">
+            AND st.teacher_id = #{teacherId}
+        </if>
+        <if test="status != null">
+            AND st.status = #{status}
+        </if>
+        ORDER BY st.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*)
+        FROM stage_task st
+        WHERE 1 = 1
+        <if test="keyword != null and keyword != ''">
+            AND st.stage_name LIKE CONCAT('%', #{keyword}, '%')
+        </if>
+        <if test="teacherId != null">
+            AND st.teacher_id = #{teacherId}
+        </if>
+        <if test="status != null">
+            AND st.status = #{status}
+        </if>
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM stage_task
+    </select>
+</mapper>
+
