@@ -16,7 +16,7 @@ public interface NoticeService {
 
     NoticeVO updateNotice(Long noticeId, NoticeUpdateDTO dto, MultipartFile file);
 
-    void deleteNotice(Long noticeId);
+    void deleteNotice(Long noticeId, Long operatorId, boolean isAdmin);
 
     NoticeVO getNoticeDetail(Long noticeId);
 
@@ -25,4 +25,6 @@ public interface NoticeService {
     void toggleTop(Long noticeId);
 
     String getAttachmentPath(Long noticeId);
+
+    long count();
 }

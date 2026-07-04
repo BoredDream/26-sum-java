@@ -22,4 +22,8 @@
     <update id="updateStatus">
         UPDATE user_account SET status=#{status} WHERE user_id=#{userId}
     </update>
+
+    <update id="updateRole">
+        UPDATE user_account SET role=#{role} WHERE user_id=#{userId}
+    </update>
 </mapper>

@@ -1,11 +1,16 @@
 package com.training.system.info.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * 新增教师请求参数
  */
 public class TeacherCreateDTO {
 
+    @NotBlank(message = "工号不能为空")
     private String teacherNo;
+
+    @NotBlank(message = "姓名不能为空")
     private String teacherName;
     private String office;
     private String title;

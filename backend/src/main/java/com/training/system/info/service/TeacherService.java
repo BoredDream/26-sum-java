@@ -21,5 +21,7 @@ public interface TeacherService {
 
     void toggleRole(Long teacherId);
 
+    void deleteTeacher(Long teacherId);
+
     long count();
 }

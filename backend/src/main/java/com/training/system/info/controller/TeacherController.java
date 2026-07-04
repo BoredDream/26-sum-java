@@ -48,4 +48,10 @@ public class TeacherController {
         teacherService.toggleRole(teacherId);
         return Result.success();
     }
+
+    @DeleteMapping("/{teacherId}")
+    public Result<Void> delete(@PathVariable Long teacherId) {
+        teacherService.deleteTeacher(teacherId);
+        return Result.success();
+    }
 }

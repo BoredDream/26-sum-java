@@ -114,8 +114,26 @@ public class TeacherServiceImpl implements TeacherService {
             throw new BusinessException(ResultCode.NOT_FOUND, "教师账号不存在");
         }
         String newRole = "ADMIN".equals(account.getRole()) ? "TEACHER" : "ADMIN";
-        account.setRole(newRole);
-        userAccountMapper.updateStatus(account.getUserId(), account.getStatus());
+        userAccountMapper.updateRole(account.getUserId(), newRole);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTeacher(Long teacherId) {
+        Teacher teacher = teacherMapper.selectById(teacherId);
+        if (teacher == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "教师不存在");
+        }
+        UserAccount account = userAccountMapper.selectByRelatedIdAndRole(teacherId, "TEACHER");
+        if (account == null) {
+            account = userAccountMapper.selectByRelatedIdAndRole(teacherId, "ADMIN");
+        }
+        if (account != null && "ADMIN".equals(account.getRole())) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "不允许删除管理员账号");
+        }
+        if (account != null) {
+            userAccountMapper.updateStatus(account.getUserId(), 0);
+        }
     }
 
     @Override

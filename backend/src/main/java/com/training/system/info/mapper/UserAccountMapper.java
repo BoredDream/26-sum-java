@@ -16,4 +16,6 @@ public interface UserAccountMapper {
     int updatePassword(@Param("userId") Long userId, @Param("password") String password);
 
     int updateStatus(@Param("userId") Long userId, @Param("status") Integer status);
+
+    int updateRole(@Param("userId") Long userId, @Param("role") String role);
 }

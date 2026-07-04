@@ -9,6 +9,7 @@ import com.training.system.info.entity.Notice;
 import com.training.system.exception.BusinessException;
 import com.training.system.info.mapper.NoticeMapper;
 import com.training.system.info.service.NoticeService;
+import com.training.system.info.util.FileValidator;
 import com.training.system.info.vo.NoticeVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +45,8 @@ public class NoticeServiceImpl implements NoticeService {
         notice.setPublisherId(publisherId);
 
         if (file != null && !file.isEmpty()) {
+            String msg = FileValidator.validate(file);
+            if (msg != null) throw new BusinessException(ResultCode.BAD_REQUEST, msg);
             notice.setAttachPath(saveFile(file));
         }
 
@@ -64,6 +67,8 @@ public class NoticeServiceImpl implements NoticeService {
         if (dto.getTopFlag() != null) notice.setTopFlag(dto.getTopFlag());
 
         if (file != null && !file.isEmpty()) {
+            String msg = FileValidator.validate(file);
+            if (msg != null) throw new BusinessException(ResultCode.BAD_REQUEST, msg);
             if (notice.getAttachPath() != null) deleteFile(notice.getAttachPath());
             notice.setAttachPath(saveFile(file));
         }
@@ -74,10 +79,16 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public void deleteNotice(Long noticeId) {
+    public void deleteNotice(Long noticeId, Long operatorId, boolean isAdmin) {
         Notice notice = noticeMapper.selectById(noticeId);
         if (notice == null) {
             throw new BusinessException(ResultCode.NOT_FOUND, "公告不存在");
+        }
+        if (!isAdmin && !notice.getPublisherId().equals(operatorId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "您只能删除自己发布的公告");
+        }
+        if (notice.getAttachPath() != null) {
+            deleteFile(notice.getAttachPath());
         }
         noticeMapper.deleteById(noticeId);
     }
@@ -108,6 +119,11 @@ public class NoticeServiceImpl implements NoticeService {
         }
         int newFlag = notice.getTopFlag() == 1 ? 0 : 1;
         noticeMapper.updateTopFlag(noticeId, newFlag);
+    }
+
+    @Override
+    public long count() {
+        return noticeMapper.countPage(null, null);
     }
 
     @Override
