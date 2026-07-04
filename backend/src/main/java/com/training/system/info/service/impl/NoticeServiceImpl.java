@@ -6,7 +6,7 @@ import com.training.system.info.dto.NoticeCreateDTO;
 import com.training.system.info.dto.NoticeQueryDTO;
 import com.training.system.info.dto.NoticeUpdateDTO;
 import com.training.system.info.entity.Notice;
-import com.training.system.info.exception.BusinessException;
+import com.training.system.exception.BusinessException;
 import com.training.system.info.mapper.NoticeMapper;
 import com.training.system.info.service.NoticeService;
 import com.training.system.info.vo.NoticeVO;

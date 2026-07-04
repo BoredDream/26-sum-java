@@ -7,6 +7,7 @@ CREATE DATABASE IF NOT EXISTS training_selection_system
   DEFAULT COLLATE utf8mb4_unicode_ci;
 
 USE training_selection_system;
+SET NAMES utf8mb4;
 
 SET FOREIGN_KEY_CHECKS = 0;
 

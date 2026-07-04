@@ -5,7 +5,7 @@ import com.training.system.info.dto.LoginDTO;
 import com.training.system.info.entity.Student;
 import com.training.system.info.entity.Teacher;
 import com.training.system.info.entity.UserAccount;
-import com.training.system.info.exception.BusinessException;
+import com.training.system.exception.BusinessException;
 import com.training.system.info.mapper.StudentMapper;
 import com.training.system.info.mapper.TeacherMapper;
 import com.training.system.info.mapper.UserAccountMapper;
