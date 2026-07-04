@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.score.mapper.StageEvaluationMapper">
+
+    <insert id="insert" parameterType="com.training.system.score.entity.StageEvaluation"
+            useGeneratedKeys="true" keyProperty="evaluationId">
+        INSERT INTO stage_evaluation (
+            stage_id, team_id, related_document_id, doc_score, completion_score,
+            innovation_score, tech_score, total_score, comment, result,
+            teacher_id, is_late, late_days
+        ) VALUES (
+            #{stageId}, #{teamId}, #{relatedDocumentId}, #{docScore}, #{completionScore},
+            #{innovationScore}, #{techScore}, #{totalScore}, #{comment}, #{result},
+            #{teacherId}, #{isLate}, #{lateDays}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.training.system.score.entity.StageEvaluation">
+        UPDATE stage_evaluation SET
+            related_document_id = #{relatedDocumentId},
+            doc_score = #{docScore},
+            completion_score = #{completionScore},
+            innovation_score = #{innovationScore},
+            tech_score = #{techScore},
+            total_score = #{totalScore},
+            comment = #{comment},
+            result = #{result},
+            teacher_id = #{teacherId},
+            is_late = #{isLate},
+            late_days = #{lateDays}
+        WHERE evaluation_id = #{evaluationId}
+    </update>
+
+    <select id="selectByStageAndTeam" resultType="com.training.system.score.entity.StageEvaluation">
+        SELECT * FROM stage_evaluation
+        WHERE stage_id = #{stageId}
+          AND team_id = #{teamId}
+        LIMIT 1
+    </select>
+</mapper>
+
