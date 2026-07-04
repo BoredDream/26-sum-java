@@ -109,6 +109,19 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
+    @Transactional
+    public void deleteStudent(Long studentId) {
+        Student student = studentMapper.selectById(studentId);
+        if (student == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "学生不存在");
+        }
+        UserAccount account = userAccountMapper.selectByRelatedIdAndRole(studentId, "STUDENT");
+        if (account != null) {
+            userAccountMapper.updateStatus(account.getUserId(), 0);
+        }
+    }
+
+    @Override
     public long count() {
         return studentMapper.countPage(null, null);
     }

@@ -50,4 +50,10 @@ public class StudentController {
         studentService.toggleStatus(studentId);
         return Result.success();
     }
+
+    @DeleteMapping("/{studentId}")
+    public Result<Void> delete(@PathVariable Long studentId) {
+        studentService.deleteStudent(studentId);
+        return Result.success();
+    }
 }

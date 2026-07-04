@@ -58,8 +58,11 @@ public class NoticeController {
     }
 
     @DeleteMapping("/{noticeId}")
-    public Result<Void> delete(@PathVariable Long noticeId) {
-        noticeService.deleteNotice(noticeId);
+    public Result<Void> delete(@PathVariable Long noticeId, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+        boolean isAdmin = "ADMIN".equals(role);
+        noticeService.deleteNotice(noticeId, userId, isAdmin);
         return Result.success();
     }
 

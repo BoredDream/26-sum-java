@@ -21,5 +21,7 @@ public interface StudentService {
 
     void toggleStatus(Long studentId);
 
+    void deleteStudent(Long studentId);
+
     long count();
 }
