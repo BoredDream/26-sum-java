@@ -1,4 +1,4 @@
-﻿package com.training.system.exception;
+package com.training.system.exception;
 
 import com.training.system.common.ResultCode;
 

@@ -1,4 +1,4 @@
-﻿package com.training.system.common;
+package com.training.system.common;
 
 public class Result<T> {
     private int code;

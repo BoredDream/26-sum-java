@@ -1,4 +1,4 @@
-﻿package com.training.system.config;
+package com.training.system.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

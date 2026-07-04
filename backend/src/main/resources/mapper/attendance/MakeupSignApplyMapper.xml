@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.attendance.mapper.MakeupSignApplyMapper">
+
+    <sql id="baseJoin">
+        FROM makeup_sign_apply m
+        JOIN attendance_task t ON m.task_id = t.task_id
+        JOIN student s ON m.student_id = s.student_id
+        LEFT JOIN teacher tm ON m.audit_teacher_id = tm.teacher_id
+    </sql>
+
+    <sql id="baseWhere">
+        <where>
+            <if test="taskId != null">AND m.task_id = #{taskId}</if>
+            <if test="auditStatus != null">AND m.audit_status = #{auditStatus}</if>
+            <if test="studentId != null">AND m.student_id = #{studentId}</if>
+            <if test="teacherId != null">AND t.teacher_id = #{teacherId}</if>
+        </where>
+    </sql>
+
+    <select id="countByCondition" resultType="long">
+        SELECT COUNT(*)
+        <include refid="baseJoin"/>
+        <include refid="baseWhere"/>
+    </select>
+
+    <select id="selectPage" resultType="com.training.system.attendance.vo.MakeupApplyVO">
+        SELECT m.apply_id, m.task_id, t.task_title, m.record_id, m.student_id, s.student_no, s.student_name,
+               m.apply_reason, m.proof_file_path, m.audit_status, m.audit_teacher_id,
+               tm.teacher_name AS audit_teacher_name, m.audit_comment, m.audit_time, m.create_time
+        <include refid="baseJoin"/>
+        <include refid="baseWhere"/>
+        ORDER BY m.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+</mapper>

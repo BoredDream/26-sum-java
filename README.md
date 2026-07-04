@@ -1,4 +1,4 @@
-﻿# 基于 Java 的综合实训选题系统
+# 基于 Java 的综合实训选题系统
 
 本仓库用于《基于 Java 的综合实训选题系统》的统一开发。所有成员必须基于同一个仓库、同一个后端骨架、同一套数据库 V1 开发。
 
@@ -18,16 +18,16 @@
 
 ## 2. 技术栈
 
-| 类型 | 技术 |
-|---|---|
-| 后端语言 | Java |
-| JDK | JDK 18 |
+| 类型   | 技术          |
+| ---- | ----------- |
+| 后端语言 | Java        |
+| JDK  | JDK 21      |
 | 后端框架 | Spring Boot |
-| 数据库 | MySQL |
-| 持久层 | MyBatis |
-| 构建工具 | Maven |
-| 前端 | Vue，后续统一整合 |
-| 协作 | GitHub |
+| 数据库  | MySQL       |
+| 持久层  | MyBatis     |
+| 构建工具 | Maven       |
+| 前端   | Vue，后续统一整合  |
+| 协作   | GitHub      |
 
 ## 3. 当前已完成
 
@@ -79,13 +79,13 @@ GET http://localhost:8080/api/health
 
 ## 5. 模块开发边界
 
-| 模块 | 包路径 | 负责人开发范围 |
-|---|---|---|
-| 出题管理模块 | `com.training.system.topic` | 题目、资料、审核、题库管理 |
-| 选题管理模块 | `com.training.system.selection` | 团队、选题、过程文档、开发日志 |
-| 学生考勤管理模块 | `com.training.system.attendance` | 签到、补签、考勤统计 |
-| 信息管理模块 | `com.training.system.info` | 账号、学生、教师、公告、日志 |
-| 成绩评估与过程分析模块 | `com.training.system.score` | 成绩、贡献度、AI 报告、Git 分析 |
+| 模块          | 包路径                              | 负责人开发范围             |
+| ----------- | -------------------------------- | ------------------- |
+| 出题管理模块      | `com.training.system.topic`      | 题目、资料、审核、题库管理       |
+| 选题管理模块      | `com.training.system.selection`  | 团队、选题、过程文档、开发日志     |
+| 学生考勤管理模块    | `com.training.system.attendance` | 签到、补签、考勤统计          |
+| 信息管理模块      | `com.training.system.info`       | 账号、学生、教师、公告、日志      |
+| 成绩评估与过程分析模块 | `com.training.system.score`      | 成绩、贡献度、AI 报告、Git 分析 |
 
 ## 6. 开发前要求
 

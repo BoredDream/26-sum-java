@@ -1,4 +1,4 @@
-﻿package com.training.system;
+package com.training.system;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
