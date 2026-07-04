@@ -1,6 +1,6 @@
 ﻿# 后端项目骨架
 
-技术栈：Java 18、Spring Boot、MyBatis、MySQL、Maven。
+技术栈：Java 21、Spring Boot、MyBatis、MySQL、Maven。
 
 ## 本地启动
 
