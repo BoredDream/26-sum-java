@@ -1,4 +1,4 @@
-﻿package com.training.system.config;
+package com.training.system.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.training.system.common.Result;

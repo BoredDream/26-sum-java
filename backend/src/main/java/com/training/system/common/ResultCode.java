@@ -1,4 +1,4 @@
-﻿package com.training.system.common;
+package com.training.system.common;
 
 public enum ResultCode {
     SUCCESS(200, "操作成功"),
