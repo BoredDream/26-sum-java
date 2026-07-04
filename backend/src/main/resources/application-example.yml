@@ -9,11 +9,20 @@ spring:
     url: jdbc:mysql://localhost:3306/training_selection_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: your_password
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+# 出题管理模块-文件上传目录
+topic:
+  file:
+    upload-dir: ./uploads/topic
 
 logging:
   level:

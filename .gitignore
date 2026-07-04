@@ -24,3 +24,6 @@ Thumbs.db
 # Database backups
 *.sql.bak
 *.dump
+
+# Uploaded files
+uploads/

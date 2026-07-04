@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.topic.mapper.TopicFileMapper">
+
+    <!-- 文件VO结果映射（关联user_account表获取上传人姓名） -->
+    <resultMap id="TopicFileVOMap" type="com.training.system.topic.vo.TopicFileVO">
+        <id property="fileId" column="file_id"/>
+        <result property="topicId" column="topic_id"/>
+        <result property="fileName" column="file_name"/>
+        <result property="fileType" column="file_type"/>
+        <result property="fileSize" column="file_size"/>
+        <result property="fileDesc" column="file_desc"/>
+        <result property="uploadTime" column="upload_time"/>
+        <result property="uploadUserName" column="upload_user_name"/>
+    </resultMap>
+
+    <!-- ==================== 新增 ==================== -->
+    <insert id="insert" parameterType="com.training.system.topic.entity.TopicFile"
+            useGeneratedKeys="true" keyProperty="fileId">
+        INSERT INTO topic_file (
+            topic_id, file_name, file_path, file_type, file_size,
+            upload_user_id, file_desc
+        ) VALUES (
+            #{topicId}, #{fileName}, #{filePath}, #{fileType}, #{fileSize},
+            #{uploadUserId}, #{fileDesc}
+        )
+    </insert>
+
+    <!-- ==================== 逻辑删除 ==================== -->
+    <update id="deleteById">
+        UPDATE topic_file SET is_deleted = 1 WHERE file_id = #{fileId}
+    </update>
+
+    <!-- ==================== 根据ID查询 ==================== -->
+    <select id="selectById" resultType="com.training.system.topic.entity.TopicFile">
+        SELECT * FROM topic_file WHERE file_id = #{fileId}
+    </select>
+
+    <!-- ==================== 查询题目下的文件列表 ==================== -->
+    <select id="selectByTopicId" resultMap="TopicFileVOMap">
+        SELECT tf.file_id, tf.topic_id, tf.file_name, tf.file_type,
+               tf.file_size, tf.file_desc, tf.upload_time,
+               COALESCE(t.teacher_name, s.student_name, '未知用户') AS upload_user_name
+        FROM topic_file tf
+        LEFT JOIN user_account ua ON tf.upload_user_id = ua.user_id
+        LEFT JOIN teacher t ON ua.related_id = t.teacher_id AND ua.role = 'TEACHER'
+        LEFT JOIN student s ON ua.related_id = s.student_id AND ua.role = 'STUDENT'
+        WHERE tf.topic_id = #{topicId} AND tf.is_deleted = 0
+        ORDER BY tf.upload_time DESC
+    </select>
+
+</mapper>

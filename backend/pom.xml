@@ -17,7 +17,7 @@
     <description>基于 Java 的综合实训选题系统后端</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <mybatis.spring.boot.version>3.0.3</mybatis.spring.boot.version>
     </properties>
 
