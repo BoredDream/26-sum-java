@@ -30,7 +30,11 @@
         UPDATE notice SET is_deleted=1, delete_time=NOW() WHERE notice_id=#{noticeId}
     </update>
 
-    <select id="selectById" resultMap="NoticeVOMap">
+    <select id="selectById" resultType="com.training.system.info.entity.Notice">
+        SELECT * FROM notice WHERE notice_id=#{noticeId} AND is_deleted=0
+    </select>
+
+    <select id="selectVOById" resultMap="NoticeVOMap">
         SELECT n.*, t.teacher_name AS publisher_name FROM notice n
         LEFT JOIN teacher t ON n.publisher_id = t.teacher_id
         WHERE n.notice_id=#{noticeId} AND n.is_deleted=0

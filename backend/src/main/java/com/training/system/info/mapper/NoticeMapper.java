@@ -18,6 +18,8 @@ public interface NoticeMapper {
 
     Notice selectById(@Param("noticeId") Long noticeId);
 
+    NoticeVO selectVOById(@Param("noticeId") Long noticeId);
+
     List<NoticeVO> selectPage(@Param("keyword") String keyword, @Param("type") String type,
                               @Param("offset") int offset, @Param("size") int size);
 
