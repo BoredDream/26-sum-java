@@ -108,6 +108,17 @@ class AttendanceTaskServiceImplTest {
         }
 
         @Test
+        @DisplayName("taskType 非法值 → 参数校验失败")
+        void shouldRejectInvalidTaskType() {
+            AttendanceTaskCreateDTO dto = buildValidDTO();
+            dto.setTaskType(99);
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.createTask(dto, teacherUser));
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("签到类型"));
+        }
+
+        @Test
         @DisplayName("按班级签到未指定班级 → 参数校验失败")
         void shouldRejectClassScopeWithoutValue() {
             AttendanceTaskCreateDTO dto = buildValidDTO();
@@ -129,6 +140,43 @@ class AttendanceTaskServiceImplTest {
                     () -> service.createTask(dto, teacherUser));
             assertEquals(400, ex.getResultCode().getCode());
             assertTrue(ex.getMessage().contains("团队"));
+        }
+
+        @Test
+        @DisplayName("团队ID不存在 → 参数校验失败")
+        void shouldRejectMissingTeam() {
+            AttendanceTaskCreateDTO dto = buildValidDTO();
+            dto.setScopeType(2);
+            dto.setScopeValue("30");
+            when(teamMemberMapper.countTeamById(30L)).thenReturn(0);
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.createTask(dto, teacherUser));
+
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("团队不存在"));
+            verify(attendanceTaskMapper, never()).insert(any());
+        }
+
+        @Test
+        @DisplayName("教师发布团队签到 → 成功创建")
+        void shouldCreateTaskForTeam() {
+            AttendanceTaskCreateDTO dto = buildValidDTO();
+            dto.setScopeType(2);
+            dto.setScopeValue("30");
+
+            when(teamMemberMapper.countTeamById(30L)).thenReturn(1);
+            when(teamMemberMapper.selectStudentIdsByTeamId(30L)).thenReturn(List.of(100L, 101L));
+            doAnswer(invocation -> {
+                AttendanceTask t = invocation.getArgument(0);
+                t.setTaskId(66L);
+                return 1;
+            }).when(attendanceTaskMapper).insert(any(AttendanceTask.class));
+
+            Long taskId = service.createTask(dto, teacherUser);
+
+            assertEquals(66L, taskId);
+            verify(attendanceRecordMapper, times(2)).insertInitRecord(eq(66L), anyLong());
         }
 
         @Test

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -134,6 +135,24 @@ class MakeupSignApplyControllerTest {
                             .content(objectMapper.writeValueAsString(dto)))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.code").value(200));
+        }
+    }
+
+    @Nested
+    @DisplayName("POST /api/attendance/makeup/upload - 上传证明")
+    class Upload {
+
+        @Test
+        @DisplayName("非学生上传证明 → 403")
+        void shouldRejectNonStudentUpload() throws Exception {
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "proof.pdf", "application/pdf", "test".getBytes());
+
+            mockMvc.perform(multipart("/api/attendance/makeup/upload")
+                            .file(file)
+                            .session(teacherSession))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(403));
         }
     }
 

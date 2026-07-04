@@ -67,7 +67,11 @@ public class MakeupSignApplyController {
     }
 
     @PostMapping("/upload")
-    public Result<String> upload(@RequestParam("file") MultipartFile file) throws IOException {
+    public Result<String> upload(@RequestParam("file") MultipartFile file, HttpSession session) throws IOException {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        if (!user.isStudent()) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "仅学生可上传补签证明材料");
+        }
         if (file.isEmpty()) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "上传文件不能为空");
         }

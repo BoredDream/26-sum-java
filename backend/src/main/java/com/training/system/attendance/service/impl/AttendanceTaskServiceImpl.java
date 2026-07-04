@@ -70,6 +70,10 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
         if (!dto.getEndTime().isAfter(dto.getStartTime())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "结束时间必须晚于开始时间");
         }
+        if (dto.getTaskType() == null || (dto.getTaskType() != AttendanceTaskTypeEnum.DAILY.getCode()
+                && dto.getTaskType() != AttendanceTaskTypeEnum.STAGE.getCode())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "签到类型不正确");
+        }
 
         // 适用范围校验
         Integer scopeType = dto.getScopeType();
@@ -197,6 +201,9 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
                     teamId = Long.valueOf(scopeValue);
                 } catch (NumberFormatException e) {
                     throw new BusinessException(ResultCode.BAD_REQUEST, "团队ID格式不正确");
+                }
+                if (teamMemberMapper.countTeamById(teamId) == 0) {
+                    throw new BusinessException(ResultCode.BAD_REQUEST, "适用范围中的团队不存在");
                 }
                 yield teamMemberMapper.selectStudentIdsByTeamId(teamId);
             }

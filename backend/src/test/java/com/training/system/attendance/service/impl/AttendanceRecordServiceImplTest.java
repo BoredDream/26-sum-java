@@ -6,6 +6,7 @@ import com.training.system.attendance.dto.CurrentUserDTO;
 import com.training.system.attendance.entity.AttendanceRecord;
 import com.training.system.attendance.entity.AttendanceTask;
 import com.training.system.attendance.enums.AttendanceSignStatusEnum;
+import com.training.system.attendance.enums.AttendanceTaskStatusEnum;
 import com.training.system.attendance.mapper.AttendanceRecordMapper;
 import com.training.system.attendance.mapper.AttendanceTaskMapper;
 import com.training.system.attendance.utils.ScopeValidator;
@@ -139,6 +140,23 @@ class AttendanceRecordServiceImplTest {
                     () -> service.sign(dto, studentUser));
             assertEquals(400, ex.getResultCode().getCode());
             assertTrue(ex.getMessage().contains("签到时间"));
+        }
+
+        @Test
+        @DisplayName("任务已手动结束 → 拒绝签到")
+        void shouldRejectWhenTaskFinished() {
+            activeTask.setStatus(AttendanceTaskStatusEnum.FINISHED.getCode());
+            when(attendanceTaskMapper.selectById(1L)).thenReturn(activeTask);
+            when(scopeValidator.isStudentInScope(activeTask, 100L)).thenReturn(true);
+
+            AttendanceSignDTO dto = new AttendanceSignDTO();
+            dto.setTaskId(1L);
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.sign(dto, studentUser));
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("已结束"));
+            verify(attendanceRecordMapper, never()).selectByTaskAndStudent(anyLong(), anyLong());
         }
 
         @Test
@@ -297,6 +315,19 @@ class AttendanceRecordServiceImplTest {
 
             assertNotNull(result);
             assertEquals(1, result.size());
+        }
+
+        @Test
+        @DisplayName("学生导出考勤报表 → 拒绝")
+        void shouldRejectStudentExport() {
+            AttendanceRecordQueryDTO dto = new AttendanceRecordQueryDTO();
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.listForExport(dto, studentUser));
+
+            assertEquals(403, ex.getResultCode().getCode());
+            verify(attendanceRecordMapper, never())
+                    .selectListForExport(any(), any(), any(), any(), any(), any(), any());
         }
     }
 

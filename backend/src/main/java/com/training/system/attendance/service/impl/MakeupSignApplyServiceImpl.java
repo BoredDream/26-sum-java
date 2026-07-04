@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MakeupSignApplyServiceImpl implements MakeupSignApplyService {
+
+    private static final String PROOF_PATH_PREFIX = "attendance/";
+    private static final Set<String> ALLOWED_PROOF_EXTENSIONS = Set.of("pdf", "png", "jpg", "jpeg", "doc", "docx");
 
     private final MakeupSignApplyMapper makeupSignApplyMapper;
     private final AttendanceRecordMapper attendanceRecordMapper;
@@ -74,6 +78,7 @@ public class MakeupSignApplyServiceImpl implements MakeupSignApplyService {
         if (pending != null) {
             throw new BusinessException(ResultCode.CONFLICT, "该签到任务已有待审核补签申请");
         }
+        validateProofFilePath(dto);
 
         MakeupSignApply apply = new MakeupSignApply();
         BeanUtils.copyProperties(dto, apply);
@@ -135,6 +140,32 @@ public class MakeupSignApplyServiceImpl implements MakeupSignApplyService {
                 attendanceRecordMapper.update(record);
             }
         }
+    }
+
+    private void validateProofFilePath(MakeupApplyDTO dto) {
+        String proofFilePath = dto.getProofFilePath();
+        if (proofFilePath == null || proofFilePath.isBlank()) {
+            dto.setProofFilePath(null);
+            return;
+        }
+        String normalized = proofFilePath.trim().replace('\\', '/');
+        if (normalized.startsWith("/") || normalized.contains(":") || normalized.contains("../")
+                || normalized.contains("/..") || !normalized.startsWith(PROOF_PATH_PREFIX)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "证明材料路径不合法");
+        }
+        String fileName = normalized.substring(PROOF_PATH_PREFIX.length());
+        if (fileName.isBlank() || fileName.contains("/")) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "证明材料路径不合法");
+        }
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex < 1 || dotIndex == fileName.length() - 1) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "证明材料格式不支持");
+        }
+        String extension = fileName.substring(dotIndex + 1).toLowerCase();
+        if (!ALLOWED_PROOF_EXTENSIONS.contains(extension)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "证明材料格式不支持");
+        }
+        dto.setProofFilePath(normalized);
     }
 
     @Override

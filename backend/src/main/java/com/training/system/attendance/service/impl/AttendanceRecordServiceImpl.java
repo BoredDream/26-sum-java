@@ -6,6 +6,7 @@ import com.training.system.attendance.dto.CurrentUserDTO;
 import com.training.system.attendance.entity.AttendanceRecord;
 import com.training.system.attendance.entity.AttendanceTask;
 import com.training.system.attendance.enums.AttendanceSignStatusEnum;
+import com.training.system.attendance.enums.AttendanceTaskStatusEnum;
 import com.training.system.attendance.mapper.AttendanceRecordMapper;
 import com.training.system.attendance.mapper.AttendanceTaskMapper;
 import com.training.system.attendance.service.AttendanceRecordService;
@@ -59,6 +60,9 @@ public class AttendanceRecordServiceImpl implements AttendanceRecordService {
         if (!scopeValidator.isStudentInScope(task, studentId)) {
             throw new BusinessException(ResultCode.FORBIDDEN, "您不在本次签到范围内");
         }
+        if (Integer.valueOf(AttendanceTaskStatusEnum.FINISHED.getCode()).equals(task.getStatus())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前签到任务已结束");
+        }
 
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(task.getStartTime()) || now.isAfter(task.getEndTime())) {
@@ -107,12 +111,13 @@ public class AttendanceRecordServiceImpl implements AttendanceRecordService {
 
     @Override
     public List<AttendanceRecordVO> listForExport(AttendanceRecordQueryDTO dto, CurrentUserDTO user) {
+        if (!user.isTeacher() && !user.isAdmin()) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "无权限导出考勤报表");
+        }
         Long teacherId = user.isTeacher() ? user.getRelatedId() : null;
-        Long studentId = user.isStudent() ? user.getRelatedId() : null;
-        Long queryStudentId = user.isStudent() ? studentId : dto.getStudentId();
 
         List<AttendanceRecordVO> list = attendanceRecordMapper.selectListForExport(
-                dto.getTaskId(), queryStudentId, dto.getSignStatus(), dto.getKeyword(),
+                dto.getTaskId(), dto.getStudentId(), dto.getSignStatus(), dto.getKeyword(),
                 dto.getStartDate(), dto.getEndDate(), teacherId);
         fillRecordVoNames(list);
         return list;

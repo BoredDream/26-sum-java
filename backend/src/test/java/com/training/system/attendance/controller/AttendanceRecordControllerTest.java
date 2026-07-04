@@ -31,6 +31,7 @@ class AttendanceRecordControllerTest {
     private ObjectMapper objectMapper;
     private AttendanceRecordService attendanceRecordService;
     private MockHttpSession session;
+    private MockHttpSession teacherSession;
 
     @BeforeEach
     void setUp() {
@@ -47,6 +48,11 @@ class AttendanceRecordControllerTest {
         session.setAttribute("userId", 2L);
         session.setAttribute("role", "STUDENT");
         session.setAttribute("relatedId", 100L);
+
+        teacherSession = new MockHttpSession();
+        teacherSession.setAttribute("userId", 1L);
+        teacherSession.setAttribute("role", "TEACHER");
+        teacherSession.setAttribute("relatedId", 10L);
     }
 
     @Nested
@@ -126,7 +132,7 @@ class AttendanceRecordControllerTest {
     }
 
     @Nested
-    @DisplayName("GET /api/attendance/record/export")
+    @DisplayName("GET /api/attendance/export")
     class Export {
 
         @Test
@@ -142,10 +148,21 @@ class AttendanceRecordControllerTest {
 
             when(attendanceRecordService.listForExport(any(), any())).thenReturn(List.of(vo));
 
-            mockMvc.perform(get("/api/attendance/record/export").session(session))
+            mockMvc.perform(get("/api/attendance/export").session(teacherSession))
                     .andExpect(status().isOk())
                     .andExpect(header().string("Content-Disposition",
                             org.hamcrest.Matchers.containsString("attachment")))
+                    .andExpect(content().contentType(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        }
+
+        @Test
+        @DisplayName("兼容旧导出路径 → 返回 xlsx")
+        void shouldKeepOldExportPath() throws Exception {
+            when(attendanceRecordService.listForExport(any(), any())).thenReturn(Collections.emptyList());
+
+            mockMvc.perform(get("/api/attendance/record/export").session(teacherSession))
+                    .andExpect(status().isOk())
                     .andExpect(content().contentType(
                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
         }

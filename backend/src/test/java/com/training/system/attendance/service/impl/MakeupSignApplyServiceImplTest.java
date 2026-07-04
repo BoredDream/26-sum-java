@@ -147,6 +147,29 @@ class MakeupSignApplyServiceImplTest {
         }
 
         @Test
+        @DisplayName("证明材料路径不合法 → 拒绝提交")
+        void shouldRejectInvalidProofFilePath() {
+            AttendanceRecord record = new AttendanceRecord();
+            record.setRecordId(1L);
+            record.setSignStatus(AttendanceSignStatusEnum.ABSENT.getCode());
+
+            when(attendanceRecordMapper.selectByTaskAndStudent(1L, 100L)).thenReturn(record);
+            when(makeupSignApplyMapper.selectPendingByTaskAndStudent(1L, 100L)).thenReturn(null);
+
+            MakeupApplyDTO dto = new MakeupApplyDTO();
+            dto.setTaskId(1L);
+            dto.setApplyReason("因病未能及时签到");
+            dto.setProofFilePath("../secret.exe");
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.applyMakeup(dto, studentUser));
+
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("证明材料"));
+            verify(makeupSignApplyMapper, never()).insert(any());
+        }
+
+        @Test
         @DisplayName("缺勤学生提交补签 → 成功创建申请")
         void shouldCreateMakeupApplyForAbsentStudent() {
             AttendanceRecord record = new AttendanceRecord();

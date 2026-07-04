@@ -27,7 +27,7 @@ import java.util.List;
  * 考勤记录 Controller
  */
 @RestController
-@RequestMapping("/api/attendance/record")
+@RequestMapping("/api/attendance")
 public class AttendanceRecordController {
 
     private final AttendanceRecordService attendanceRecordService;
@@ -36,21 +36,21 @@ public class AttendanceRecordController {
         this.attendanceRecordService = attendanceRecordService;
     }
 
-    @PostMapping("/sign")
+    @PostMapping("/record/sign")
     public Result<AttendanceRecordVO> sign(@Valid @RequestBody AttendanceSignDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);
         AttendanceRecordVO vo = attendanceRecordService.sign(dto, user);
         return Result.success(vo);
     }
 
-    @GetMapping("/page")
+    @GetMapping("/record/page")
     public Result<PageResult<AttendanceRecordVO>> page(AttendanceRecordQueryDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);
         PageResult<AttendanceRecordVO> pageResult = attendanceRecordService.page(dto, user);
         return Result.success(pageResult);
     }
 
-    @GetMapping("/export")
+    @GetMapping({"/export", "/record/export"})
     public void export(AttendanceRecordQueryDTO dto, HttpSession session, HttpServletResponse response) throws IOException {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);
         List<AttendanceRecordVO> list = attendanceRecordService.listForExport(dto, user);
