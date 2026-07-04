@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.info.mapper.TeacherMapper">
+
+    <resultMap id="TeacherVOMap" type="com.training.system.info.vo.TeacherVO">
+        <id property="teacherId" column="teacher_id"/>
+        <result property="teacherNo" column="teacher_no"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="office" column="office"/>
+        <result property="title" column="title"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="role" column="role"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.training.system.info.entity.Teacher" useGeneratedKeys="true" keyProperty="teacherId">
+        INSERT INTO teacher (teacher_no, teacher_name, office, title, phone, email)
+        VALUES (#{teacherNo}, #{teacherName}, #{office}, #{title}, #{phone}, #{email})
+    </insert>
+
+    <update id="update" parameterType="com.training.system.info.entity.Teacher">
+        UPDATE teacher SET teacher_name=#{teacherName}, office=#{office}, title=#{title},
+            phone=#{phone}, email=#{email}, update_time=NOW() WHERE teacher_id=#{teacherId}
+    </update>
+
+    <select id="selectById" resultType="com.training.system.info.entity.Teacher">
+        SELECT * FROM teacher WHERE teacher_id=#{teacherId}
+    </select>
+
+    <select id="selectByTeacherNo" resultType="com.training.system.info.entity.Teacher">
+        SELECT * FROM teacher WHERE teacher_no=#{teacherNo}
+    </select>
+
+    <select id="selectPage" resultMap="TeacherVOMap">
+        SELECT t.*, ua.role FROM teacher t
+        LEFT JOIN user_account ua ON t.teacher_id = ua.related_id AND (ua.role='TEACHER' OR ua.role='ADMIN')
+        WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (t.teacher_no LIKE CONCAT('%',#{keyword},'%') OR t.teacher_name LIKE CONCAT('%',#{keyword},'%')
+            OR t.office LIKE CONCAT('%',#{keyword},'%') OR t.title LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+        ORDER BY t.create_time DESC LIMIT #{offset},#{size}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*) FROM teacher WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (teacher_no LIKE CONCAT('%',#{keyword},'%') OR teacher_name LIKE CONCAT('%',#{keyword},'%')
+            OR office LIKE CONCAT('%',#{keyword},'%') OR title LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+    </select>
+</mapper>

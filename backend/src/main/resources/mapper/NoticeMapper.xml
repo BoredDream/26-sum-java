@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.info.mapper.NoticeMapper">
+
+    <resultMap id="NoticeVOMap" type="com.training.system.info.vo.NoticeVO">
+        <id property="noticeId" column="notice_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="type" column="type"/>
+        <result property="attachPath" column="attach_path"/>
+        <result property="topFlag" column="top_flag"/>
+        <result property="publisherId" column="publisher_id"/>
+        <result property="publisherName" column="publisher_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.training.system.info.entity.Notice" useGeneratedKeys="true" keyProperty="noticeId">
+        INSERT INTO notice (title, content, type, attach_path, top_flag, publisher_id)
+        VALUES (#{title}, #{content}, #{type}, #{attachPath}, #{topFlag}, #{publisherId})
+    </insert>
+
+    <update id="update" parameterType="com.training.system.info.entity.Notice">
+        UPDATE notice SET title=#{title}, content=#{content}, type=#{type},
+            attach_path=#{attachPath}, top_flag=#{topFlag}, update_time=NOW()
+        WHERE notice_id=#{noticeId} AND is_deleted=0
+    </update>
+
+    <update id="deleteById">
+        UPDATE notice SET is_deleted=1, delete_time=NOW() WHERE notice_id=#{noticeId}
+    </update>
+
+    <select id="selectById" resultMap="NoticeVOMap">
+        SELECT n.*, t.teacher_name AS publisher_name FROM notice n
+        LEFT JOIN teacher t ON n.publisher_id = t.teacher_id
+        WHERE n.notice_id=#{noticeId} AND n.is_deleted=0
+    </select>
+
+    <select id="selectPage" resultMap="NoticeVOMap">
+        SELECT n.*, t.teacher_name AS publisher_name FROM notice n
+        LEFT JOIN teacher t ON n.publisher_id = t.teacher_id
+        WHERE n.is_deleted=0
+        <if test="keyword != null and keyword != ''">
+            AND (n.title LIKE CONCAT('%',#{keyword},'%') OR n.content LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="type != null and type != ''">
+            AND n.type=#{type}
+        </if>
+        ORDER BY n.top_flag DESC, n.create_time DESC LIMIT #{offset},#{size}
+    </select>
+
+    <select id="countPage" resultType="long">
+        SELECT COUNT(*) FROM notice WHERE is_deleted=0
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%',#{keyword},'%') OR content LIKE CONCAT('%',#{keyword},'%'))
+        </if>
+        <if test="type != null and type != ''">AND type=#{type}</if>
+    </select>
+
+    <update id="updateTopFlag">
+        UPDATE notice SET top_flag=#{topFlag}, update_time=NOW() WHERE notice_id=#{noticeId}
+    </update>
+</mapper>
