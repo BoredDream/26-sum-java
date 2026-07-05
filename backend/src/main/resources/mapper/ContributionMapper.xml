@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.score.mapper.ContributionMapper">
+
+    <insert id="insert" parameterType="com.training.system.score.entity.Contribution"
+            useGeneratedKeys="true" keyProperty="contributionId">
+        INSERT INTO contribution (
+            team_id, stage_id, student_id, evaluator_id, evaluation_type,
+            contribution_score, workload_ratio, work_description, comment
+        ) VALUES (
+            #{teamId}, #{stageId}, #{studentId}, #{evaluatorId}, #{evaluationType},
+            #{contributionScore}, #{workloadRatio}, #{workDescription}, #{comment}
+        )
+    </insert>
+</mapper>
+
