@@ -119,6 +119,36 @@ const router = createRouter({
           name: 'TopicManage',
           component: () => import('@/views/topic/TopicManageView.vue'),
         },
+        {
+          path: '/admin/notices',
+          name: 'AdminNotices',
+          component: () => import('@/views/info/NoticeView.vue'),
+        },
+        {
+          path: '/notices',
+          name: 'Notices',
+          component: () => import('@/views/info/NoticeView.vue'),
+        },
+        {
+          path: '/admin/students',
+          name: 'StudentManage',
+          component: () => import('@/views/info/StudentManageView.vue'),
+        },
+        {
+          path: '/admin/teachers',
+          name: 'TeacherManage',
+          component: () => import('@/views/info/TeacherManageView.vue'),
+        },
+        {
+          path: '/admin/backups',
+          name: 'BackupManage',
+          component: () => import('@/views/info/BackupView.vue'),
+        },
+        {
+          path: '/admin/logs',
+          name: 'LogManage',
+          component: () => import('@/views/info/LogManageView.vue'),
+        },
       ],
     },
     {
