@@ -212,16 +212,14 @@ public class TopicController {
 
     /**
      * 从 Session 获取当前登录用户信息
-     * TODO: 登录功能完成后统一改为从 Interceptor 注入
      */
     private UserSession getUserSession(HttpSession session) {
         Object userId = session.getAttribute("userId");
         Object role = session.getAttribute("role");
         Object relatedId = session.getAttribute("relatedId");
 
-        // 开发阶段：如果 Session 中没有用户信息，返回默认测试用户（教师）
-        if (userId == null) {
-            return new UserSession(1L, "TEACHER", 1L);
+        if (userId == null || role == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "用户未登录");
         }
 
         return new UserSession(
