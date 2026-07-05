@@ -7,6 +7,12 @@ import java.util.List;
 
 @Mapper
 public interface TeamMemberMapper {
+    @Select("SELECT COUNT(1) FROM team_member WHERE team_id = #{teamId}")
+    int countTeamById(@Param("teamId") Long teamId);
+
+    @Select("SELECT student_id FROM team_member WHERE team_id = #{teamId} AND active = 1")
+    List<Long> selectStudentIdsByTeamId(@Param("teamId") Long teamId);
+
     @Select("SELECT * FROM team_member WHERE student_id = #{studentId} AND active = 1 LIMIT 1")
     TeamMemberEntity findActiveByStudentId(@Param("studentId") Long studentId);
 

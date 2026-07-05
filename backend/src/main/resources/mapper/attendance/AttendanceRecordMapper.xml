@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.attendance.mapper.AttendanceRecordMapper">
+
+    <sql id="baseJoin">
+        FROM attendance_record r
+        JOIN attendance_task t ON r.task_id = t.task_id
+        JOIN student s ON r.student_id = s.student_id
+    </sql>
+
+    <sql id="baseWhere">
+        <where>
+            <if test="taskId != null">AND r.task_id = #{taskId}</if>
+            <if test="studentId != null">AND r.student_id = #{studentId}</if>
+            <if test="signStatus != null">AND r.sign_status = #{signStatus}</if>
+            <if test="teacherId != null">AND t.teacher_id = #{teacherId}</if>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    s.student_name LIKE CONCAT('%', #{keyword}, '%')
+                    OR s.student_no LIKE CONCAT('%', #{keyword}, '%')
+                    OR t.task_title LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE(t.start_time) &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(t.end_time) &lt;= #{endDate}
+            </if>
+        </where>
+    </sql>
+
+    <select id="countByCondition" resultType="long">
+        SELECT COUNT(*)
+        <include refid="baseJoin"/>
+        <include refid="baseWhere"/>
+    </select>
+
+    <select id="selectPage" resultType="com.training.system.attendance.vo.AttendanceRecordVO">
+        SELECT r.record_id, r.task_id, t.task_title, r.student_id, s.student_no, s.student_name, s.class_name,
+               r.sign_time, r.sign_status, r.is_makeup, r.remark, r.create_time
+        <include refid="baseJoin"/>
+        <include refid="baseWhere"/>
+        ORDER BY r.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="selectListForExport" resultType="com.training.system.attendance.vo.AttendanceRecordVO">
+        SELECT r.record_id, r.task_id, t.task_title, r.student_id, s.student_no, s.student_name, s.class_name,
+               r.sign_time, r.sign_status, r.is_makeup, r.remark, r.create_time
+        <include refid="baseJoin"/>
+        <include refid="baseWhere"/>
+        ORDER BY t.start_time, s.student_no
+    </select>
+
+    <select id="selectListForStatistics" resultType="com.training.system.attendance.vo.AttendanceRecordVO">
+        SELECT DISTINCT r.record_id, r.task_id, r.student_id, r.sign_time, r.sign_status, r.is_makeup
+        FROM attendance_record r
+        JOIN attendance_task t ON r.task_id = t.task_id
+        JOIN student s ON r.student_id = s.student_id
+        <where>
+            <if test="taskId != null">AND r.task_id = #{taskId}</if>
+            <if test="studentId != null">AND r.student_id = #{studentId}</if>
+            <if test="className != null and className != ''">AND s.class_name = #{className}</if>
+            <if test="teamId != null">
+                AND EXISTS (SELECT 1 FROM team_member tm WHERE tm.student_id = s.student_id AND tm.team_id = #{teamId} AND tm.status = 1)
+            </if>
+            <if test="teacherId != null">AND t.teacher_id = #{teacherId}</if>
+            <if test="startDate != null and startDate != ''">
+                AND DATE(t.start_time) &gt;= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND DATE(t.end_time) &lt;= #{endDate}
+            </if>
+        </where>
+    </select>
+
+</mapper>
