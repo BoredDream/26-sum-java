@@ -63,9 +63,7 @@ export interface StudentUpdateDTO {
   email?: string
 }
 
-export interface StudentImportResult {
-  message: string
-}
+export type StudentImportResult = string
 
 export interface TeacherVO {
   teacherId: number
@@ -99,10 +97,6 @@ export interface TeacherUpdateDTO {
   email?: string
 }
 
-export interface TeacherImportResult {
-  message: string
-}
-
 export interface BackupVO {
   backupId: number
   backupTime: string
@@ -127,8 +121,6 @@ export interface OperateLogVO {
 
 export interface OperateLogQuery extends PageQuery {
   operateType?: string
-  startTime?: string
-  endTime?: string
 }
 
 export interface DashboardStatisticsVO {

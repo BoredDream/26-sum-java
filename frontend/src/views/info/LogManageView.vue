@@ -27,16 +27,6 @@
           <el-option label="备份" value="BACKUP" />
           <el-option label="恢复" value="RESTORE" />
         </el-select>
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="YYYY-MM-DD"
-          style="width: 260px"
-          @change="handleSearch"
-        />
         <el-button :icon="Search" @click="handleSearch" />
         <el-button type="danger" :icon="Delete" @click="handleClear">清理日志</el-button>
       </template>
@@ -88,7 +78,6 @@ const pageNum = ref(1)
 const pageSize = ref(20)
 const keyword = ref('')
 const filterType = ref('')
-const dateRange = ref<[string, string] | null>(null)
 
 async function loadLogs() {
   loading.value = true
@@ -99,8 +88,6 @@ async function loadLogs() {
       pageSize: pageSize.value,
       keyword: keyword.value || undefined,
       operateType: filterType.value || undefined,
-      startTime: dateRange.value?.[0],
-      endTime: dateRange.value?.[1],
     })
     logs.value = res.records
     total.value = res.total

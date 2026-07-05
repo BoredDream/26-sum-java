@@ -12,16 +12,11 @@
         />
         <el-button :icon="Search" @click="handleSearch" />
         <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
-        <el-upload
-          ref="uploadRef"
-          action="#"
-          :auto-upload="false"
-          :show-file-list="false"
-          :on-change="handleImport"
-          style="display: inline-block; margin: 0 12px"
-        >
-          <el-button type="warning" :icon="Upload" :loading="importing">导入</el-button>
-        </el-upload>
+        <el-tooltip content="教师批量导入暂不支持" placement="top">
+          <span style="display: inline-block; margin: 0 12px">
+            <el-button type="warning" :icon="Upload" disabled>导入</el-button>
+          </span>
+        </el-tooltip>
         <el-button type="primary" :icon="Plus" @click="openCreate">新增教师</el-button>
       </template>
     </page-header>
@@ -143,7 +138,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance, FormRules, UploadFile, UploadInstance } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
 import { Plus, Search, Download, Upload } from '@element-plus/icons-vue'
 import * as infoApi from '@/api/info'
 import type { TeacherVO, TeacherCreateDTO, TeacherUpdateDTO } from '@/types/info'
@@ -183,23 +178,6 @@ function handleSearch() {
 
 function handleExport() {
   infoApi.exportTeachers()
-}
-
-const importing = ref(false)
-const uploadRef = ref<UploadInstance>()
-async function handleImport(file: UploadFile) {
-  if (!file.raw) return
-  importing.value = true
-  try {
-    const res = await infoApi.importTeachers(file.raw)
-    ElMessage.success(res.message)
-    loadTeachers()
-  } catch (err: any) {
-    ElMessage.error(err?.message || '导入失败')
-  } finally {
-    importing.value = false
-    uploadRef.value?.clearFiles()
-  }
 }
 
 // 表单
@@ -253,6 +231,7 @@ function openEdit(row: TeacherVO) {
     title: row.title || '',
     phone: row.phone || '',
     email: row.email || '',
+    password: '',
   }
   formVisible.value = true
 }

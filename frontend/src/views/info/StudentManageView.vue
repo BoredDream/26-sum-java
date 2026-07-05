@@ -202,7 +202,7 @@ async function handleImport(file: UploadFile) {
   importing.value = true
   try {
     const res = await infoApi.importStudents(file.raw)
-    ElMessage.success(res.message)
+    ElMessage.success(res)
     loadStudents()
   } catch (err: any) {
     ElMessage.error(err?.message || '导入失败')
@@ -265,6 +265,7 @@ function openEdit(row: StudentVO) {
     className: row.className,
     phone: row.phone || '',
     email: row.email || '',
+    password: '',
   }
   formVisible.value = true
 }

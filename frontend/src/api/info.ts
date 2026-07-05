@@ -13,7 +13,6 @@ import type {
   TeacherVO,
   TeacherCreateDTO,
   TeacherUpdateDTO,
-  TeacherImportResult,
   BackupVO,
   BackupCreateDTO,
   OperateLogVO,
@@ -151,12 +150,6 @@ export function toggleTeacherRole(teacherId: number) {
 
 export function exportTeachers() {
   return downloadByUrl('/teachers/export', undefined, '教师信息.xlsx')
-}
-
-export function importTeachers(file: File) {
-  const formData = new FormData()
-  formData.append('file', file)
-  return uploadFile<TeacherImportResult>('/teachers/import', formData)
 }
 
 export function changeTeacherPassword(teacherId: number, oldPwd: string, newPwd: string) {

@@ -133,6 +133,7 @@ async function handleRestore(row: BackupVO) {
   try {
     await infoApi.restoreBackup(row.backupId)
     ElMessage.success('备份恢复成功')
+    loadBackups()
   } catch (err: any) {
     ElMessage.error(err?.message || '备份恢复失败')
   } finally {
