@@ -47,6 +47,7 @@ export interface AttendanceTaskUpdateDTO {
 
 export interface AttendanceTaskQuery extends PageQuery {
   status?: number
+  keyword?: string
 }
 
 export interface AttendanceRecordVO {

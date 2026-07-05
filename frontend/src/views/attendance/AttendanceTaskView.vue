@@ -364,6 +364,8 @@ async function handleSubmit() {
       ElMessage.success('任务发布成功')
       formVisible.value = false
       loadTasks()
+    } catch (err: any) {
+      ElMessage.error(err?.message || '发布失败')
     } finally {
       submitting.value = false
     }
