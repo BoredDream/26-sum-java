@@ -65,4 +65,13 @@ export function uploadFile<T>(url: string, formData: FormData, config?: AxiosReq
     .then((res) => res.data.data)
 }
 
+export function putUploadFile<T>(url: string, formData: FormData, config?: AxiosRequestConfig) {
+  return request
+    .put<Result<T>>(url, formData, {
+      ...config,
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then((res) => res.data.data)
+}
+
 export default request

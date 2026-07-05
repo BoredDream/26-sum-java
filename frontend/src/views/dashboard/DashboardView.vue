@@ -27,7 +27,9 @@
               </el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-value">{{ statistics[item.key as keyof DashboardStatisticsVO] ?? 0 }}</div>
+              <div class="stat-value">
+                {{ statistics[item.key as keyof DashboardStatisticsVO] ?? 0 }}
+              </div>
               <div class="stat-label">{{ item.label }}</div>
             </div>
           </div>

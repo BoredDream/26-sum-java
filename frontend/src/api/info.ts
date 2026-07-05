@@ -1,4 +1,4 @@
-import { get, post, put, del, uploadFile } from '@/utils/request'
+import { get, post, put, del, uploadFile, putUploadFile } from '@/utils/request'
 import { downloadByUrl } from '@/utils/download'
 import type { PageResult } from '@/types/api'
 import type {
@@ -50,7 +50,7 @@ export function updateNotice(noticeId: number, dto: NoticeUpdateDTO, file?: File
   if (dto.type !== undefined) formData.append('type', dto.type)
   if (dto.topFlag !== undefined) formData.append('topFlag', String(dto.topFlag))
   if (file) formData.append('file', file)
-  return uploadFile<NoticeVO>(`/notices/${noticeId}`, formData)
+  return putUploadFile<NoticeVO>(`/notices/${noticeId}`, formData)
 }
 
 export function deleteNotice(noticeId: number) {

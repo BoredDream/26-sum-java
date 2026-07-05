@@ -77,7 +77,11 @@
         </div>
         <div class="notice-content">{{ currentNotice.content }}</div>
         <div v-if="currentNotice.attachPath" class="notice-attachment">
-          <el-button type="primary" text @click="infoApi.downloadNoticeAttachment(currentNotice.noticeId)">
+          <el-button
+            type="primary"
+            text
+            @click="infoApi.downloadNoticeAttachment(currentNotice.noticeId)"
+          >
             下载附件
           </el-button>
         </div>

@@ -246,7 +246,11 @@ async function handleSubmit() {
         const dto: TeacherUpdateDTO = { ...form.value }
         await infoApi.updateTeacher(currentId.value, dto)
       } else {
-        await infoApi.createTeacher(form.value)
+        const dto: TeacherCreateDTO = { ...form.value }
+        if (dto.password === '') {
+          dto.password = undefined
+        }
+        await infoApi.createTeacher(dto)
       }
       ElMessage.success('保存成功')
       formVisible.value = false
