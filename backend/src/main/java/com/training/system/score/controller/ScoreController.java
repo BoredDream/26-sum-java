@@ -2,6 +2,8 @@ package com.training.system.score.controller;
 
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
+import com.training.system.common.ResultCode;
+import com.training.system.exception.BusinessException;
 import com.training.system.score.dto.*;
 import com.training.system.score.service.ScoreService;
 import com.training.system.score.vo.ProgressVO;
@@ -104,8 +106,8 @@ public class ScoreController {
         Object role = session.getAttribute("role");
         Object relatedId = session.getAttribute("relatedId");
 
-        if (userId == null) {
-            return new UserSession(4L, "TEACHER", 1L);
+        if (userId == null || role == null) {
+            throw new BusinessException(ResultCode.UNAUTHORIZED, "用户未登录");
         }
         return new UserSession((Long) userId, (String) role, (Long) relatedId);
     }
