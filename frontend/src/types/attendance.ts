@@ -76,6 +76,7 @@ export interface AttendanceRecordQuery extends PageQuery {
   signStatus?: number
   startDate?: string
   endDate?: string
+  keyword?: string
 }
 
 export interface MakeupApplyVO {
@@ -96,6 +97,8 @@ export interface MakeupApplyVO {
   auditTime?: string
   createTime: string
 }
+
+export type MakeupRequestVO = MakeupApplyVO
 
 export interface MakeupCreateDTO {
   taskId: number

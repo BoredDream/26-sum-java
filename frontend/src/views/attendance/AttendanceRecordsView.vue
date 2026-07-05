@@ -86,6 +86,18 @@
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" show-overflow-tooltip />
+      <el-table-column label="操作" width="120" fixed="right">
+        <template #default="scope">
+          <el-button
+            type="primary"
+            text
+            size="small"
+            @click="openEdit(scope.row as AttendanceRecordVO)"
+          >
+            修改状态
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <div v-if="total > 0" class="pagination-wrapper">
@@ -99,12 +111,47 @@
         @current-change="loadRecords"
       />
     </div>
+
+    <!-- 修改考勤状态 -->
+    <el-dialog v-model="editVisible" title="修改考勤状态" width="450px">
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="学生">
+          <span>{{ currentRecord?.studentName }}</span>
+        </el-form-item>
+        <el-form-item label="当前状态">
+          <status-tag category="attendanceSign" :value="currentRecord?.signStatus ?? 0" />
+        </el-form-item>
+        <el-form-item label="新状态">
+          <el-select v-model="editForm.signStatus" placeholder="请选择状态" style="width: 100%">
+            <el-option label="缺勤" :value="0" />
+            <el-option label="正常" :value="1" />
+            <el-option label="迟到" :value="2" />
+            <el-option label="补签" :value="3" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input
+            v-model="editForm.remark"
+            type="textarea"
+            :rows="2"
+            maxlength="200"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="editVisible = false">取消</el-button>
+        <el-button type="primary" :loading="editSubmitting" @click="handleEditSubmit"
+          >保存</el-button
+        >
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import * as attendanceApi from '@/api/attendance'
 import type {
   AttendanceRecordVO,
@@ -203,7 +250,50 @@ async function handleExport() {
   }
 }
 
-// 修改考勤状态功能已禁用：后端暂无对应接口
+// 修改考勤状态
+const editVisible = ref(false)
+const editSubmitting = ref(false)
+const currentRecord = ref<AttendanceRecordVO | null>(null)
+const editForm = reactive({
+  signStatus: 0,
+  remark: '',
+})
+
+function openEdit(row: AttendanceRecordVO) {
+  currentRecord.value = row
+  editForm.signStatus = row.signStatus
+  editForm.remark = row.remark || ''
+  editVisible.value = true
+}
+
+async function handleEditSubmit() {
+  if (!currentRecord.value) return
+  try {
+    await ElMessageBox.confirm('确认保存修改？', '保存确认', {
+      type: 'warning',
+    })
+  } catch {
+    return
+  }
+  editSubmitting.value = true
+  try {
+    await attendanceApi.updateAttendanceRecordStatus(currentRecord.value.recordId, {
+      signStatus: editForm.signStatus,
+      remark: editForm.remark,
+    })
+    ElMessage.success('保存成功')
+    editVisible.value = false
+    loadRecords()
+  } catch (err: any) {
+    if (err?.response?.status === 404) {
+      ElMessage.warning('该功能暂不可用')
+    } else {
+      ElMessage.error('保存失败')
+    }
+  } finally {
+    editSubmitting.value = false
+  }
+}
 
 onMounted(() => {
   loadRecords()

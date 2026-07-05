@@ -72,11 +72,14 @@
           >
             结束任务
           </el-button>
-          <el-tooltip content="删除任务暂不支持" placement="top">
-            <span>
-              <el-button type="danger" text size="small" disabled>删除</el-button>
-            </span>
-          </el-tooltip>
+          <el-button
+            type="danger"
+            text
+            size="small"
+            @click="handleDelete(scope.row as AttendanceTaskVO)"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -386,6 +389,28 @@ async function handleFinish(row: AttendanceTaskVO) {
     ElMessage.error(err?.message || '操作失败')
   } finally {
     finishId.value = 0
+  }
+}
+
+// 删除任务
+async function handleDelete(row: AttendanceTaskVO) {
+  try {
+    await ElMessageBox.confirm('确认删除该签到任务？删除后不可恢复。', '删除确认', {
+      type: 'warning',
+    })
+  } catch {
+    return
+  }
+  try {
+    await attendanceApi.deleteAttendanceTask(row.taskId)
+    ElMessage.success('删除成功')
+    loadTasks()
+  } catch (err: any) {
+    if (err?.response?.status === 404) {
+      ElMessage.warning('该功能暂不可用')
+    } else {
+      ElMessage.error('删除失败')
+    }
   }
 }
 

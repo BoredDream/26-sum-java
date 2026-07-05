@@ -66,8 +66,10 @@
 
     <el-card v-loading="loading" class="chart-card">
       <template #header><span>考勤分布</span></template>
-      <div ref="chartRef" class="chart-container"></div>
-      <el-empty v-if="!loading && !hasData" description="暂无统计数据" />
+      <div class="chart-container">
+        <div v-show="hasData" ref="chartRef" class="chart-inner"></div>
+        <el-empty v-if="!loading && !hasData" description="暂无统计数据" />
+      </div>
     </el-card>
   </div>
 </template>
@@ -255,8 +257,14 @@ onUnmounted(() => {
 
   .chart-card {
     .chart-container {
+      position: relative;
       width: 100%;
       height: 400px;
+
+      .chart-inner {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
