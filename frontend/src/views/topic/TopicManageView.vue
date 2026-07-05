@@ -7,6 +7,7 @@
           placeholder="搜索题目名称"
           clearable
           style="width: 220px"
+          @clear="handleSearch"
           @keyup.enter="handleSearch"
         />
         <el-select
@@ -168,6 +169,8 @@ async function handleOpen(row: TopicVO) {
     await topicApi.openTopic(row.topicId)
     ElMessage.success('题目已开放')
     loadTopics()
+  } catch (err: any) {
+    console.error('开放题目失败', err)
   } finally {
     actionId.value = 0
   }
@@ -184,6 +187,8 @@ async function handleClose(row: TopicVO) {
     await topicApi.closeTopic(row.topicId)
     ElMessage.success('题目已关闭')
     loadTopics()
+  } catch (err: any) {
+    console.error('关闭题目失败', err)
   } finally {
     actionId.value = 0
   }

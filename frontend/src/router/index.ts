@@ -41,7 +41,7 @@ const router = createRouter({
         },
         {
           path: '/selection/topics',
-          name: 'TopicBrowse',
+          name: 'SelectionTopicBrowse',
           component: () => import('@/views/selection/TopicBrowseView.vue'),
         },
         {

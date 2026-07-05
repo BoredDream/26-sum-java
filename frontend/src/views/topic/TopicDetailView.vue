@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
 import type { TopicVO, TopicFileVO, TopicReviewVO } from '@/types/topic'
@@ -160,22 +160,40 @@ function handleDownload(row: TopicFileVO) {
 }
 
 async function handleOpen(topicId: number) {
+  try {
+    await ElMessageBox.confirm('确认开放该题目？开放后学生可申请选题。', '操作确认', {
+      type: 'warning',
+    })
+  } catch {
+    return
+  }
   actionLoading.value = true
   try {
     await topicApi.openTopic(topicId)
     ElMessage.success('题目已开放')
     loadData()
+  } catch (err: any) {
+    console.error('开放题目失败', err)
   } finally {
     actionLoading.value = false
   }
 }
 
 async function handleClose(topicId: number) {
+  try {
+    await ElMessageBox.confirm('确认关闭该题目？关闭后学生将无法继续申请。', '操作确认', {
+      type: 'warning',
+    })
+  } catch {
+    return
+  }
   actionLoading.value = true
   try {
     await topicApi.closeTopic(topicId)
     ElMessage.success('题目已关闭')
     loadData()
+  } catch (err: any) {
+    console.error('关闭题目失败', err)
   } finally {
     actionLoading.value = false
   }

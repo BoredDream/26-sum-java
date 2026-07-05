@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { UploadInstance, UploadFile } from 'element-plus'
 import * as topicApi from '@/api/topic'
@@ -91,7 +91,13 @@ import { formatDateTime } from '@/utils/format'
 import { downloadByUrl } from '@/utils/download'
 
 const route = useRoute()
+const router = useRouter()
 const topicId = Number(route.params.topicId)
+
+if (!topicId) {
+  ElMessage.error('题目 ID 无效，无法管理资料文件')
+  router.replace('/topic/my-list')
+}
 
 const loading = ref(false)
 const error = ref('')

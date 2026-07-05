@@ -49,7 +49,7 @@
             v-model="form.selectionStartTime"
             type="datetime"
             placeholder="请选择选题开始时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD[T]HH:mm:ss"
             style="width: 100%"
           />
         </el-form-item>
@@ -59,7 +59,7 @@
             v-model="form.selectionEndTime"
             type="datetime"
             placeholder="请选择选题结束时间"
-            value-format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD[T]HH:mm:ss"
             style="width: 100%"
           />
         </el-form-item>
@@ -155,6 +155,22 @@ const rules: FormRules = {
   studentLimit: [{ required: true, message: '请填写限选人数', trigger: 'change' }],
   topicContent: [{ required: true, message: '请输入题目内容', trigger: 'blur' }],
   technicalRoute: [{ required: true, message: '请输入技术路线', trigger: 'blur' }],
+  selectionEndTime: [
+    {
+      validator: (_rule: any, value: string, callback: (error?: Error) => void) => {
+        if (!value) {
+          callback()
+          return
+        }
+        if (form.selectionStartTime && new Date(value) <= new Date(form.selectionStartTime)) {
+          callback(new Error('选题结束时间必须晚于开始时间'))
+          return
+        }
+        callback()
+      },
+      trigger: 'change',
+    },
+  ],
 }
 
 function fillForm(detail: TopicVO) {
@@ -201,6 +217,9 @@ async function handleSubmit() {
       await topicApi.updateTopic(topicId, payload)
       ElMessage.success('修改已保存')
       router.push('/topic/my-list')
+    } catch (err: any) {
+      // 全局拦截器已提示错误，此处仅避免未处理的 Promise 拒绝
+      console.error('修改题目失败', err)
     } finally {
       submitting.value = false
     }

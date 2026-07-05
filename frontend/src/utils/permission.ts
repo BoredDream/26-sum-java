@@ -74,9 +74,24 @@ export const menusByRole: Record<UserRole, MenuItem[]> = {
   ADMIN: menus.filter((m) => m.roles.includes('ADMIN')),
 }
 
+// 不在导航菜单中显示、但需要通过路由守卫的动态路由
+export const hiddenRoutes: { title: string; path: string; roles: UserRole[] }[] = [
+  { title: '题目详情', path: '/topic/:topicId', roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
+  { title: '题目资料', path: '/topic/:topicId/files', roles: ['TEACHER', 'ADMIN'] },
+  { title: '编辑题目', path: '/topic/edit/:topicId', roles: ['TEACHER', 'ADMIN'] },
+]
+
+function pathToRegex(pattern: string): RegExp {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+  const withParam = escaped.replace(/:\\w+/g, '[^/]+')
+  return new RegExp(`^${withParam}$`)
+}
+
 export function hasRoutePermission(path: string, role?: UserRole) {
   if (!role) return false
-  return menusByRole[role].some((m) => path.startsWith(m.path))
+  const allowedMenus = menusByRole[role]
+  if (allowedMenus.some((m) => path.startsWith(m.path))) return true
+  return hiddenRoutes.some((r) => r.roles.includes(role) && pathToRegex(r.path).test(path))
 }
 
 export function getMenuByPath(path: string) {

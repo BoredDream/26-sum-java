@@ -171,6 +171,9 @@ async function handleAudit() {
     ElMessage.success('审核完成')
     auditVisible.value = false
     loadTopics()
+  } catch (err: any) {
+    // 全局拦截器已提示错误，此处仅避免未处理的 Promise 拒绝
+    console.error('审核题目失败', err)
   } finally {
     submitting.value = false
   }
