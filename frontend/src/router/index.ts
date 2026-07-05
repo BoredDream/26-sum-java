@@ -79,6 +79,46 @@ const router = createRouter({
           name: 'TeamDetail',
           component: () => import('@/views/selection/TeamDetailView.vue'),
         },
+        {
+          path: '/topic/browse',
+          name: 'TopicBrowse',
+          component: () => import('@/views/topic/TopicBrowseView.vue'),
+        },
+        {
+          path: '/topic/my-list',
+          name: 'TopicList',
+          component: () => import('@/views/topic/TopicListView.vue'),
+        },
+        {
+          path: '/topic/create',
+          name: 'TopicCreate',
+          component: () => import('@/views/topic/TopicCreateView.vue'),
+        },
+        {
+          path: '/topic/edit/:topicId',
+          name: 'TopicEdit',
+          component: () => import('@/views/topic/TopicEditView.vue'),
+        },
+        {
+          path: '/topic/:topicId',
+          name: 'TopicDetail',
+          component: () => import('@/views/topic/TopicDetailView.vue'),
+        },
+        {
+          path: '/topic/:topicId/files',
+          name: 'TopicFiles',
+          component: () => import('@/views/topic/TopicFilesView.vue'),
+        },
+        {
+          path: '/topic/review',
+          name: 'TopicReview',
+          component: () => import('@/views/topic/TopicReviewView.vue'),
+        },
+        {
+          path: '/topic/manage',
+          name: 'TopicManage',
+          component: () => import('@/views/topic/TopicManageView.vue'),
+        },
       ],
     },
     {
