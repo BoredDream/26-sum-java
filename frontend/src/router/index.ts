@@ -149,6 +149,36 @@ const router = createRouter({
           name: 'LogManage',
           component: () => import('@/views/info/LogManageView.vue'),
         },
+        {
+          path: '/attendance/tasks',
+          name: 'AttendanceTasks',
+          component: () => import('@/views/attendance/AttendanceTaskView.vue'),
+        },
+        {
+          path: '/attendance/records',
+          name: 'AttendanceRecords',
+          component: () => import('@/views/attendance/AttendanceRecordsView.vue'),
+        },
+        {
+          path: '/attendance/records/my',
+          name: 'MyAttendanceRecords',
+          component: () => import('@/views/attendance/AttendanceRecordsMyView.vue'),
+        },
+        {
+          path: '/attendance/makeup',
+          name: 'MakeupManage',
+          component: () => import('@/views/attendance/MakeupManageView.vue'),
+        },
+        {
+          path: '/attendance/makeup/my',
+          name: 'MyMakeup',
+          component: () => import('@/views/attendance/MakeupMyView.vue'),
+        },
+        {
+          path: '/attendance/statistics',
+          name: 'AttendanceStatistics',
+          component: () => import('@/views/attendance/AttendanceStatisticsView.vue'),
+        },
       ],
     },
     {
