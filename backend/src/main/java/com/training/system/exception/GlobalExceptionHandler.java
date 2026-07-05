@@ -3,6 +3,8 @@ package com.training.system.exception;
 import com.training.system.common.Result;
 import com.training.system.common.ResultCode;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
     public Result<Void> handleBusinessException(BusinessException ex) {
@@ -24,6 +27,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handleException(Exception ex) {
+        LOGGER.error("Unhandled exception", ex);
         return Result.fail(ResultCode.ERROR, ex.getMessage());
     }
 }
