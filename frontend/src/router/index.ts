@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { hasRoutePermission } from '@/utils/permission'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -8,29 +9,84 @@ const router = createRouter({
       path: '/login',
       name: 'Login',
       component: () => import('@/views/login/LoginView.vue'),
-      meta: { public: true }
+      meta: { public: true },
     },
     {
       path: '/403',
       name: 'Forbidden',
-      component: () => import('@/views/error/ForbiddenView.vue')
+      component: () => import('@/views/error/ForbiddenView.vue'),
     },
     {
       path: '/500',
       name: 'ServerError',
-      component: () => import('@/views/error/ServerErrorView.vue')
+      component: () => import('@/views/error/ServerErrorView.vue'),
     },
     {
       path: '/',
       component: () => import('@/layouts/BasicLayout.vue'),
-      children: []
+      redirect: (_to) => {
+        const auth = useAuthStore()
+        return auth.getHomePath(auth.role) || '/login'
+      },
+      children: [
+        {
+          path: '/admin/dashboard',
+          name: 'Dashboard',
+          component: () => import('@/views/dashboard/DashboardView.vue'),
+        },
+        {
+          path: '/selection/my-team',
+          name: 'MyTeam',
+          component: () => import('@/views/selection/MyTeamView.vue'),
+        },
+        {
+          path: '/selection/topics',
+          name: 'TopicBrowse',
+          component: () => import('@/views/selection/TopicBrowseView.vue'),
+        },
+        {
+          path: '/selection/my-application',
+          name: 'MyApplication',
+          component: () => import('@/views/selection/MyApplicationView.vue'),
+        },
+        {
+          path: '/selection/applications/pending',
+          name: 'PendingApplications',
+          component: () => import('@/views/selection/PendingApplicationsView.vue'),
+        },
+        {
+          path: '/selection/documents/my',
+          name: 'MyDocuments',
+          component: () => import('@/views/selection/MyDocumentsView.vue'),
+        },
+        {
+          path: '/selection/documents',
+          name: 'DocumentsFeedback',
+          component: () => import('@/views/selection/DocumentsFeedbackView.vue'),
+        },
+        {
+          path: '/selection/logs/my',
+          name: 'MyLogs',
+          component: () => import('@/views/selection/MyLogsView.vue'),
+        },
+        {
+          path: '/selection/logs',
+          name: 'LogsFeedback',
+          component: () => import('@/views/selection/LogsFeedbackView.vue'),
+        },
+        {
+          path: '/selection/teams/:teamId',
+          name: 'TeamDetail',
+          component: () => import('@/views/selection/TeamDetailView.vue'),
+        },
+      ],
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: () => import('@/views/error/NotFoundView.vue')
-    }
-  ]
+      component: () => import('@/views/error/NotFoundView.vue'),
+    },
+  ],
 })
 
 router.beforeEach(async (to, _from, next) => {
@@ -58,6 +114,11 @@ router.beforeEach(async (to, _from, next) => {
   // 403/500 等错误页放行
   if (to.path === '/403' || to.path === '/500') {
     return next()
+  }
+
+  // 校验路由权限
+  if (!hasRoutePermission(to.path, auth.role)) {
+    return next('/403')
   }
 
   return next()

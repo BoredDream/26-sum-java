@@ -5,7 +5,7 @@ import type { Result } from '@/types/api'
 const request = axios.create({
   baseURL: '/api',
   timeout: 15000,
-  withCredentials: true
+  withCredentials: true,
 })
 
 request.interceptors.response.use(
@@ -60,7 +60,7 @@ export function uploadFile<T>(url: string, formData: FormData, config?: AxiosReq
   return request
     .post<Result<T>>(url, formData, {
       ...config,
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
     })
     .then((res) => res.data.data)
 }

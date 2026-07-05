@@ -6,20 +6,9 @@
         <p class="subtitle">请使用账号密码登录</p>
       </div>
 
-      <el-form
-        ref="formRef"
-        :model="form"
-        :rules="rules"
-        size="large"
-        @keyup.enter="handleLogin"
-      >
+      <el-form ref="formRef" :model="form" :rules="rules" size="large" @keyup.enter="handleLogin">
         <el-form-item prop="username">
-          <el-input
-            v-model="form.username"
-            placeholder="用户名"
-            :prefix-icon="User"
-            clearable
-          />
+          <el-input v-model="form.username" placeholder="用户名" :prefix-icon="User" clearable />
         </el-form-item>
 
         <el-form-item prop="password">
@@ -42,12 +31,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            class="login-btn"
-            :loading="auth.loading"
-            @click="handleLogin"
-          >
+          <el-button type="primary" class="login-btn" :loading="auth.loading" @click="handleLogin">
             登录
           </el-button>
         </el-form-item>
@@ -72,13 +56,13 @@ const formRef = ref<FormInstance>()
 const form = reactive<LoginDTO>({
   username: '',
   password: '',
-  role: 'STUDENT'
+  role: 'STUDENT',
 })
 
 const rules: FormRules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  role: [{ required: true, message: '请选择角色', trigger: 'change' }]
+  role: [{ required: true, message: '请选择角色', trigger: 'change' }],
 }
 
 async function handleLogin() {
