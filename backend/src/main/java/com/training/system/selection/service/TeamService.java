@@ -1,5 +1,8 @@
 package com.training.system.selection.service;
 
+import com.training.system.exception.BusinessException;
+import com.training.system.common.ResultCode;
+
 import com.training.system.selection.dto.*;
 import com.training.system.selection.entity.TeamEntity;
 import com.training.system.selection.entity.TeamJoinRequestEntity;
@@ -36,11 +39,11 @@ public class TeamService {
     public TeamVO createTeam(Long userId, String role, CreateTeamDTO dto) {
         requireStudent(role);
         if (teamMemberMapper.findActiveByStudentId(userId) != null) {
-            throw new SelectionBusinessException("当前学生已加入团队，不能重复创建团队");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前学生已加入团队，不能重复创建团队");
         }
         String teamName = dto.getTeamName().trim();
         if (teamMapper.findByName(teamName) != null) {
-            throw new SelectionBusinessException("团队名称已存在");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "团队名称已存在");
         }
 
         TeamEntity team = new TeamEntity();
@@ -82,17 +85,17 @@ public class TeamService {
     public JoinRequestVO applyJoin(Long userId, String role, Long teamId, JoinTeamDTO dto) {
         requireStudent(role);
         if (teamMemberMapper.findActiveByStudentId(userId) != null) {
-            throw new SelectionBusinessException("当前学生已加入团队，不能重复申请加入");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前学生已加入团队，不能重复申请加入");
         }
         TeamEntity team = getTeamById(teamId);
         if (TEAM_SELECTED.equals(team.getStatus())) {
-            throw new SelectionBusinessException("该团队已完成选题，不能再加入成员");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该团队已完成选题，不能再加入成员");
         }
         if (teamMemberMapper.countActiveByTeamId(teamId) >= team.getMaxSize()) {
-            throw new SelectionBusinessException("该团队人数已达到上限");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该团队人数已达到上限");
         }
         if (joinRequestMapper.findPending(teamId, userId) != null) {
-            throw new SelectionBusinessException("已提交过入队申请，请等待负责人审核");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "已提交过入队申请，请等待负责人审核");
         }
         TeamJoinRequestEntity request = new TeamJoinRequestEntity();
         request.setTeamId(teamId);
@@ -113,26 +116,26 @@ public class TeamService {
     public JoinRequestVO auditJoinRequest(Long userId, String role, Long requestId, AuditJoinRequestDTO dto) {
         TeamJoinRequestEntity request = joinRequestMapper.findById(requestId);
         if (request == null) {
-            throw new SelectionBusinessException(404, "入队申请不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "入队申请不存在");
         }
         assertTeamLeader(userId, role, request.getTeamId());
         if (!JOIN_PENDING.equals(request.getStatus())) {
-            throw new SelectionBusinessException("该入队申请已经处理");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该入队申请已经处理");
         }
         if (!Boolean.TRUE.equals(dto.getApproved()) && isBlank(dto.getOpinion())) {
-            throw new SelectionBusinessException("驳回申请时必须填写审核意见");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "驳回申请时必须填写审核意见");
         }
 
         if (Boolean.TRUE.equals(dto.getApproved())) {
             TeamEntity team = getTeamById(request.getTeamId());
             if (TEAM_SELECTED.equals(team.getStatus())) {
-                throw new SelectionBusinessException("团队已完成选题，不能再添加成员");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "团队已完成选题，不能再添加成员");
             }
             if (teamMemberMapper.countActiveByTeamId(team.getId()) >= team.getMaxSize()) {
-                throw new SelectionBusinessException("团队人数已达到上限");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "团队人数已达到上限");
             }
             if (teamMemberMapper.findActiveByStudentId(request.getApplicantId()) != null) {
-                throw new SelectionBusinessException("该学生已加入其他团队");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "该学生已加入其他团队");
             }
             TeamMemberEntity member = new TeamMemberEntity();
             member.setTeamId(team.getId());
@@ -156,7 +159,7 @@ public class TeamService {
         assertTeamLeader(userId, role, teamId);
         TeamMemberEntity member = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
         if (member == null || !Boolean.TRUE.equals(member.getActive())) {
-            throw new SelectionBusinessException(404, "团队成员不存在或已退出");
+            throw new BusinessException(ResultCode.NOT_FOUND, "团队成员不存在或已退出");
         }
         teamMemberMapper.updateWorkContent(teamId, studentId, dto.getWorkContent().trim());
     }
@@ -164,7 +167,7 @@ public class TeamService {
     public TeamEntity getCurrentTeamByStudent(Long studentId) {
         TeamMemberEntity membership = teamMemberMapper.findActiveByStudentId(studentId);
         if (membership == null) {
-            throw new SelectionBusinessException("请先创建或加入团队");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请先创建或加入团队");
         }
         return getTeamById(membership.getTeamId());
     }
@@ -172,7 +175,7 @@ public class TeamService {
     public TeamEntity getTeamById(Long teamId) {
         TeamEntity team = teamMapper.findById(teamId);
         if (team == null) {
-            throw new SelectionBusinessException(404, "团队不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "团队不存在");
         }
         return team;
     }
@@ -189,19 +192,19 @@ public class TeamService {
         requireStudent(role);
         TeamEntity team = getTeamById(teamId);
         if (!team.getLeaderId().equals(userId)) {
-            throw new SelectionBusinessException(403, "仅团队负责人可以执行该操作");
+            throw new BusinessException(ResultCode.FORBIDDEN, "仅团队负责人可以执行该操作");
         }
     }
 
     public void requireStudent(String role) {
         if (!ROLE_STUDENT.equalsIgnoreCase(role)) {
-            throw new SelectionBusinessException(403, "该操作仅限学生角色使用");
+            throw new BusinessException(ResultCode.FORBIDDEN, "该操作仅限学生角色使用");
         }
     }
 
     public void requireTeacherOrAdmin(String role) {
         if (!ROLE_TEACHER.equalsIgnoreCase(role) && !ROLE_ADMIN.equalsIgnoreCase(role)) {
-            throw new SelectionBusinessException(403, "该操作仅限教师或管理员使用");
+            throw new BusinessException(ResultCode.FORBIDDEN, "该操作仅限教师或管理员使用");
         }
     }
 

@@ -1,5 +1,8 @@
 package com.training.system.selection.service;
 
+import com.training.system.exception.BusinessException;
+import com.training.system.common.ResultCode;
+
 import com.training.system.selection.dto.CreateDevelopmentLogDTO;
 import com.training.system.selection.dto.LogFeedbackDTO;
 import com.training.system.selection.entity.DevelopmentLogEntity;
@@ -35,10 +38,10 @@ public class DevelopmentLogService {
         teamService.requireStudent(role);
         TeamEntity team = teamService.getCurrentTeamByStudent(userId);
         if (!TEAM_SELECTED.equals(team.getStatus())) {
-            throw new SelectionBusinessException("请在选题审核通过后再填写开发日志");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请在选题审核通过后再填写开发日志");
         }
         if (logMapper.findByStudentAndDate(userId, dto.getLogDate()) != null) {
-            throw new SelectionBusinessException("当天已经提交过开发日志，请修改已有记录或选择其他日期");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当天已经提交过开发日志，请修改已有记录或选择其他日期");
         }
 
         DevelopmentLogEntity log = new DevelopmentLogEntity();
@@ -68,7 +71,7 @@ public class DevelopmentLogService {
         if (ROLE_ADMIN.equalsIgnoreCase(role)) {
             return logMapper.findAll().stream().map(this::toVO).toList();
         }
-        throw new SelectionBusinessException(403, "无查看权限");
+        throw new BusinessException(ResultCode.FORBIDDEN, "无查看权限");
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -86,7 +89,7 @@ public class DevelopmentLogService {
     private DevelopmentLogEntity getLogById(Long id) {
         DevelopmentLogEntity log = logMapper.findById(id);
         if (log == null) {
-            throw new SelectionBusinessException(404, "开发日志不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "开发日志不存在");
         }
         return log;
     }
@@ -97,11 +100,11 @@ public class DevelopmentLogService {
         }
         TeamEntity team = teamService.getTeamById(teamId);
         if (team.getSelectedTopicId() == null) {
-            throw new SelectionBusinessException("该团队尚未完成选题");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该团队尚未完成选题");
         }
         TopicEntity topic = topicMapper.findById(team.getSelectedTopicId());
         if (topic == null || !userId.equals(topic.getTeacherId())) {
-            throw new SelectionBusinessException(403, "无权反馈该团队的开发日志");
+            throw new BusinessException(ResultCode.FORBIDDEN, "无权反馈该团队的开发日志");
         }
     }
 

@@ -1,5 +1,8 @@
 package com.training.system.selection.service;
 
+import com.training.system.exception.BusinessException;
+import com.training.system.common.ResultCode;
+
 import com.training.system.selection.dto.DocumentFeedbackDTO;
 import com.training.system.selection.entity.ProcessDocumentEntity;
 import com.training.system.selection.entity.TeamEntity;
@@ -56,30 +59,30 @@ public class DocumentService {
                                     String projectStage, MultipartFile file) {
         teamService.requireStudent(role);
         if (isBlank(documentName) || isBlank(documentType) || isBlank(projectStage)) {
-            throw new SelectionBusinessException("文档名称、文档类型和所属阶段不能为空");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "文档名称、文档类型和所属阶段不能为空");
         }
         if (file == null || file.isEmpty()) {
-            throw new SelectionBusinessException("请选择需要上传的文件");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请选择需要上传的文件");
         }
 
         TeamEntity team = teamService.getCurrentTeamByStudent(userId);
         if (!TEAM_SELECTED.equals(team.getStatus()) || team.getSelectedTopicId() == null) {
-            throw new SelectionBusinessException("请在选题审核通过后再提交过程文档");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请在选题审核通过后再提交过程文档");
         }
 
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename() == null ? "" : file.getOriginalFilename());
         if (originalFilename.isBlank() || originalFilename.contains("..")) {
-            throw new SelectionBusinessException("上传文件名不合法");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "上传文件名不合法");
         }
         String extension = extensionOf(originalFilename);
         if (!ALLOWED_EXTENSIONS.contains(extension)) {
-            throw new SelectionBusinessException("仅支持 doc、docx、pdf、xls、xlsx、zip、rar 格式文件");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "仅支持 doc、docx、pdf、xls、xlsx、zip、rar 格式文件");
         }
         String storedFilename = UUID.randomUUID().toString().replace("-", "") + "." + extension;
         try {
             Files.copy(file.getInputStream(), uploadRoot.resolve(storedFilename), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new SelectionBusinessException(500, "文件保存失败，请稍后重试");
+            throw new BusinessException(ResultCode.ERROR, "文件保存失败，请稍后重试");
         }
 
         int version = documentMapper.countSameTypeAndStage(team.getId(), documentType.trim(), projectStage.trim()) + 1;
@@ -110,7 +113,7 @@ public class DocumentService {
         if (ROLE_ADMIN.equalsIgnoreCase(role)) {
             return documentMapper.findAll().stream().map(this::toVO).toList();
         }
-        throw new SelectionBusinessException(403, "无查看权限");
+        throw new BusinessException(ResultCode.FORBIDDEN, "无查看权限");
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -130,14 +133,14 @@ public class DocumentService {
         ProcessDocumentEntity document = getDocumentById(documentId);
         if (ROLE_STUDENT.equalsIgnoreCase(role)) {
             if (!teamService.isTeamMember(document.getTeamId(), userId)) {
-                throw new SelectionBusinessException(403, "只能下载本团队的过程文档");
+                throw new BusinessException(ResultCode.FORBIDDEN, "只能下载本团队的过程文档");
             }
         } else {
             assertTeacherCanAccess(userId, role, document.getTopicId());
         }
         Path file = uploadRoot.resolve(document.getStoredPath()).normalize();
         if (!file.startsWith(uploadRoot) || !Files.exists(file)) {
-            throw new SelectionBusinessException(404, "原始文件不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "原始文件不存在");
         }
         return new FileSystemResource(file);
     }
@@ -145,7 +148,7 @@ public class DocumentService {
     private ProcessDocumentEntity getDocumentById(Long id) {
         ProcessDocumentEntity document = documentMapper.findById(id);
         if (document == null) {
-            throw new SelectionBusinessException(404, "过程文档不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "过程文档不存在");
         }
         return document;
     }
@@ -157,7 +160,7 @@ public class DocumentService {
         teamService.requireTeacherOrAdmin(role);
         TopicEntity topic = topicMapper.findById(topicId);
         if (topic == null || !userId.equals(topic.getTeacherId())) {
-            throw new SelectionBusinessException(403, "无权查看或反馈该课题的过程文档");
+            throw new BusinessException(ResultCode.FORBIDDEN, "无权查看或反馈该课题的过程文档");
         }
     }
 

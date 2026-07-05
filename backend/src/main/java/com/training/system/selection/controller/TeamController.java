@@ -2,7 +2,7 @@ package com.training.system.selection.controller;
 
 import com.training.system.selection.dto.*;
 import com.training.system.selection.service.TeamService;
-import com.training.system.selection.vo.ApiResponse;
+import com.training.system.common.Result;
 import com.training.system.selection.vo.JoinRequestVO;
 import com.training.system.selection.vo.TeamVO;
 import jakarta.validation.Valid;
@@ -20,53 +20,53 @@ public class TeamController {
     }
 
     @PostMapping
-    public ApiResponse<TeamVO> createTeam(@RequestHeader("X-User-Id") Long userId,
+    public Result<TeamVO> createTeam(@RequestHeader("X-User-Id") Long userId,
                                           @RequestHeader("X-Role") String role,
                                           @RequestBody @Valid CreateTeamDTO dto) {
-        return ApiResponse.success("团队创建成功", teamService.createTeam(userId, role, dto));
+        return Result.success(teamService.createTeam(userId, role, dto));
     }
 
     @GetMapping("/my")
-    public ApiResponse<TeamVO> getMyTeam(@RequestHeader("X-User-Id") Long userId,
+    public Result<TeamVO> getMyTeam(@RequestHeader("X-User-Id") Long userId,
                                          @RequestHeader("X-Role") String role) {
-        return ApiResponse.success(teamService.getMyTeam(userId, role));
+        return Result.success(teamService.getMyTeam(userId, role));
     }
 
     @GetMapping("/{teamId}")
-    public ApiResponse<TeamVO> getTeamDetail(@PathVariable Long teamId) {
-        return ApiResponse.success(teamService.getTeamDetail(teamId));
+    public Result<TeamVO> getTeamDetail(@PathVariable Long teamId) {
+        return Result.success(teamService.getTeamDetail(teamId));
     }
 
     @PostMapping("/{teamId}/join-requests")
-    public ApiResponse<JoinRequestVO> applyJoin(@RequestHeader("X-User-Id") Long userId,
+    public Result<JoinRequestVO> applyJoin(@RequestHeader("X-User-Id") Long userId,
                                                  @RequestHeader("X-Role") String role,
                                                  @PathVariable Long teamId,
                                                  @RequestBody @Valid JoinTeamDTO dto) {
-        return ApiResponse.success("入队申请已提交", teamService.applyJoin(userId, role, teamId, dto));
+        return Result.success(teamService.applyJoin(userId, role, teamId, dto));
     }
 
     @GetMapping("/{teamId}/join-requests")
-    public ApiResponse<List<JoinRequestVO>> getPendingJoinRequests(@RequestHeader("X-User-Id") Long userId,
+    public Result<List<JoinRequestVO>> getPendingJoinRequests(@RequestHeader("X-User-Id") Long userId,
                                                                     @RequestHeader("X-Role") String role,
                                                                     @PathVariable Long teamId) {
-        return ApiResponse.success(teamService.listPendingJoinRequests(userId, role, teamId));
+        return Result.success(teamService.listPendingJoinRequests(userId, role, teamId));
     }
 
     @PatchMapping("/join-requests/{requestId}/audit")
-    public ApiResponse<JoinRequestVO> auditJoinRequest(@RequestHeader("X-User-Id") Long userId,
+    public Result<JoinRequestVO> auditJoinRequest(@RequestHeader("X-User-Id") Long userId,
                                                         @RequestHeader("X-Role") String role,
                                                         @PathVariable Long requestId,
                                                         @RequestBody @Valid AuditJoinRequestDTO dto) {
-        return ApiResponse.success("入队申请已处理", teamService.auditJoinRequest(userId, role, requestId, dto));
+        return Result.success(teamService.auditJoinRequest(userId, role, requestId, dto));
     }
 
     @PutMapping("/{teamId}/members/{studentId}/work-content")
-    public ApiResponse<Void> updateMemberWork(@RequestHeader("X-User-Id") Long userId,
+    public Result<Void> updateMemberWork(@RequestHeader("X-User-Id") Long userId,
                                               @RequestHeader("X-Role") String role,
                                               @PathVariable Long teamId,
                                               @PathVariable Long studentId,
                                               @RequestBody @Valid UpdateMemberWorkDTO dto) {
         teamService.updateMemberWork(userId, role, teamId, studentId, dto);
-        return ApiResponse.success("成员分工更新成功", null);
+        return Result.success();
     }
 }

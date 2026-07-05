@@ -1,5 +1,8 @@
 package com.training.system.selection.service;
 
+import com.training.system.exception.BusinessException;
+import com.training.system.common.ResultCode;
+
 import com.training.system.selection.dto.AuditSelectionDTO;
 import com.training.system.selection.dto.SubmitSelectionDTO;
 import com.training.system.selection.entity.TeamEntity;
@@ -54,10 +57,10 @@ public class SelectionService {
         TeamEntity team = teamService.getCurrentTeamByStudent(userId);
         teamService.assertTeamLeader(userId, role, team.getId());
         if (TEAM_SELECTED.equals(team.getStatus())) {
-            throw new SelectionBusinessException("当前团队已完成选题，不能重复提交");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前团队已完成选题，不能重复提交");
         }
         if (topicSelectionMapper.findPendingByTeamId(team.getId()) != null) {
-            throw new SelectionBusinessException("当前团队已有待审核选题申请");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前团队已有待审核选题申请");
         }
 
         TopicEntity topic = getTopicById(dto.getTopicId());
@@ -94,25 +97,25 @@ public class SelectionService {
         teamService.requireTeacherOrAdmin(role);
         TopicSelectionEntity selection = topicSelectionMapper.findById(selectionId);
         if (selection == null) {
-            throw new SelectionBusinessException(404, "选题申请不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "选题申请不存在");
         }
         if (!SELECTION_PENDING.equals(selection.getStatus())) {
-            throw new SelectionBusinessException("该选题申请已经审核");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该选题申请已经审核");
         }
         if (!Boolean.TRUE.equals(dto.getApproved()) && isBlank(dto.getOpinion())) {
-            throw new SelectionBusinessException("驳回选题时必须填写审核意见");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "驳回选题时必须填写审核意见");
         }
 
         TopicEntity topic = getTopicById(selection.getTopicId());
         if (ROLE_TEACHER.equalsIgnoreCase(role) && !userId.equals(topic.getTeacherId())) {
-            throw new SelectionBusinessException(403, "只能审核本人发布课题的选题申请");
+            throw new BusinessException(ResultCode.FORBIDDEN, "只能审核本人发布课题的选题申请");
         }
 
         TeamEntity team = teamService.getTeamById(selection.getTeamId());
         if (Boolean.TRUE.equals(dto.getApproved())) {
             validateTopicCanBeSelected(topic);
             if (TEAM_SELECTED.equals(team.getStatus())) {
-                throw new SelectionBusinessException("该团队已经完成其他课题的选题");
+                throw new BusinessException(ResultCode.BAD_REQUEST, "该团队已经完成其他课题的选题");
             }
             validateTeamSize(team.getId(), topic);
             selection.setStatus(SELECTION_APPROVED);
@@ -133,28 +136,28 @@ public class SelectionService {
     public TopicEntity getTopicById(Long topicId) {
         TopicEntity topic = topicMapper.findById(topicId);
         if (topic == null) {
-            throw new SelectionBusinessException(404, "课题不存在");
+            throw new BusinessException(ResultCode.NOT_FOUND, "课题不存在");
         }
         return topic;
     }
 
     private void validateTopicCanBeSelected(TopicEntity topic) {
         if (!TOPIC_OPEN.equals(topic.getStatus())) {
-            throw new SelectionBusinessException("该课题当前不可选择");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该课题当前不可选择");
         }
         LocalDateTime now = LocalDateTime.now();
         if (topic.getSelectionStart() != null && now.isBefore(topic.getSelectionStart())) {
-            throw new SelectionBusinessException("选题尚未开始");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "选题尚未开始");
         }
         if (topic.getSelectionEnd() != null && now.isAfter(topic.getSelectionEnd())) {
-            throw new SelectionBusinessException("选题时间已结束");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "选题时间已结束");
         }
     }
 
     private void validateTeamSize(Long teamId, TopicEntity topic) {
         int count = teamMemberMapper.countActiveByTeamId(teamId);
         if (count < topic.getMinMembers() || count > topic.getMaxMembers()) {
-            throw new SelectionBusinessException("当前团队人数为" + count + "人，不符合课题要求（" +
+            throw new BusinessException(ResultCode.BAD_REQUEST, "当前团队人数为" + count + "人，不符合课题要求（" +
                     topic.getMinMembers() + "-" + topic.getMaxMembers() + "人）");
         }
     }
