@@ -170,8 +170,8 @@ async function submit(status: number) {
       ElMessage.success(status === 0 ? '草稿已保存' : '题目已提交审核')
       router.push('/topic/my-list')
     } catch (err: any) {
-      // 全局拦截器已提示错误，此处仅避免未处理的 Promise 拒绝
-      console.error('创建题目失败', err)
+      // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
+      ElMessage.error('创建题目失败，请重试')
     } finally {
       submitting.value = false
     }

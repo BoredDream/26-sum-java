@@ -55,6 +55,11 @@ export interface TopicUpdateDTO {
   modifyReason?: string
 }
 
+/**
+ * 题目审核请求参数
+ * reviewResult 取值与后端 TopicReviewDTO 保持一致：
+ * 2 = 审核通过，3 = 退回修改，4 = 不予通过
+ */
 export interface TopicReviewDTO {
   reviewResult: number
   reviewComment: string
