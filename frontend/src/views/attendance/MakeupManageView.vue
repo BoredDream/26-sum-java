@@ -40,17 +40,16 @@
       <el-table-column prop="studentName" label="学生" width="120" />
       <el-table-column prop="studentNo" label="学号" width="140" />
       <el-table-column prop="applyReason" label="补签原因" show-overflow-tooltip />
-      <el-table-column label="证明材料" width="120">
+      <el-table-column label="证明材料" width="220" show-overflow-tooltip>
         <template #default="scope">
-          <el-button
+          <el-tooltip
             v-if="(scope.row as MakeupApplyVO).proofFilePath"
-            type="primary"
-            text
-            size="small"
-            @click="openProof((scope.row as MakeupApplyVO).proofFilePath!)"
+            effect="dark"
+            :content="(scope.row as MakeupApplyVO).proofFilePath"
+            placement="top"
           >
-            查看
-          </el-button>
+            <span class="proof-path">{{ (scope.row as MakeupApplyVO).proofFilePath }}</span>
+          </el-tooltip>
           <span v-else>-</span>
         </template>
       </el-table-column>
@@ -239,11 +238,6 @@ function resetQuery() {
   loadApplications()
 }
 
-function openProof(path: string) {
-  // 后端暂无专门下载接口，仅展示路径
-  ElMessage.info(`证明材料路径：${path}`)
-}
-
 // 审核
 const auditVisible = ref(false)
 const auditLoading = ref(false)
@@ -346,6 +340,16 @@ onMounted(() => {
     color: #606266;
     line-height: 1.6;
     white-space: pre-wrap;
+  }
+
+  .proof-path {
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #606266;
+    vertical-align: middle;
   }
 
   .detail-section {

@@ -13,17 +13,16 @@
     <el-table v-loading="loading" :data="applications" border class="data-table">
       <el-table-column prop="taskTitle" label="签到任务" show-overflow-tooltip />
       <el-table-column prop="applyReason" label="补签原因" show-overflow-tooltip />
-      <el-table-column label="证明材料" width="120">
+      <el-table-column label="证明材料" width="220" show-overflow-tooltip>
         <template #default="scope">
-          <el-button
+          <el-tooltip
             v-if="(scope.row as MakeupApplyVO).proofFilePath"
-            type="primary"
-            text
-            size="small"
-            @click="openProof((scope.row as MakeupApplyVO).proofFilePath!)"
+            effect="dark"
+            :content="(scope.row as MakeupApplyVO).proofFilePath"
+            placement="top"
           >
-            查看
-          </el-button>
+            <span class="proof-path">{{ (scope.row as MakeupApplyVO).proofFilePath }}</span>
+          </el-tooltip>
           <span v-else>-</span>
         </template>
       </el-table-column>
@@ -148,10 +147,6 @@ async function loadTaskOptions() {
   }
 }
 
-function openProof(path: string) {
-  ElMessage.info(`证明材料路径：${path}`)
-}
-
 // 申请
 const applyVisible = ref(false)
 const submitting = ref(false)
@@ -244,6 +239,16 @@ onMounted(() => {
     font-size: 12px;
     color: #909399;
     margin-top: 4px;
+  }
+
+  .proof-path {
+    display: inline-block;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #606266;
+    vertical-align: middle;
   }
 }
 </style>

@@ -60,7 +60,7 @@
         </el-statistic>
       </el-col>
       <el-col :span="4">
-        <el-statistic title="出勤率" :value="attendanceRateText" />
+        <el-statistic title="出勤率" :value="attendanceRateValue" :precision="2" suffix="%" />
       </el-col>
     </el-row>
 
@@ -93,9 +93,9 @@ const queryForm = reactive({
   className: '',
 })
 
-const attendanceRateText = computed(() => {
+const attendanceRateValue = computed(() => {
   const rate = statistics.value?.attendanceRate
-  return rate !== undefined ? `${(Number(rate) * 100).toFixed(2)}%` : '-'
+  return rate !== undefined ? Number(rate) * 100 : 0
 })
 
 const hasData = computed(() => {
