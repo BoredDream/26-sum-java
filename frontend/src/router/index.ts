@@ -179,6 +179,26 @@ const router = createRouter({
           name: 'AttendanceStatistics',
           component: () => import('@/views/attendance/AttendanceStatisticsView.vue'),
         },
+        {
+          path: '/score/stage-tasks',
+          name: 'StageTasks',
+          component: () => import('@/views/score/StageTaskView.vue'),
+        },
+        {
+          path: '/score/progress',
+          name: 'ScoreProgress',
+          component: () => import('@/views/score/ProgressView.vue'),
+        },
+        {
+          path: '/score/list',
+          name: 'ScoreList',
+          component: () => import('@/views/score/ScoreListView.vue'),
+        },
+        {
+          path: '/score/my',
+          name: 'MyScore',
+          component: () => import('@/views/score/MyScoreView.vue'),
+        },
       ],
     },
     {
