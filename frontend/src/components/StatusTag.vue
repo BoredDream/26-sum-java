@@ -19,6 +19,7 @@ type Category =
   | 'log'
   | 'logCompletion'
   | 'score'
+  | 'stageTask'
 
 const props = defineProps<{
   category: Category
@@ -91,6 +92,11 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     0: { label: '草稿', type: 'info', effect: 'plain' },
     1: { label: '已确认', type: 'success', effect: 'dark' },
     2: { label: '已锁定', type: 'danger', effect: 'dark' },
+  },
+  stageTask: {
+    0: { label: '未开始', type: 'info', effect: 'plain' },
+    1: { label: '进行中', type: 'warning', effect: 'plain' },
+    2: { label: '已结束', type: 'success', effect: 'dark' },
   },
 }
 

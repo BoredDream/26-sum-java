@@ -45,7 +45,7 @@
       </el-table-column>
       <el-table-column label="状态" width="110">
         <template #default="scope">
-          <status-tag category="attendanceTask" :value="(scope.row as StageTaskVO).status" />
+          <status-tag category="stageTask" :value="(scope.row as StageTaskVO).status" />
         </template>
       </el-table-column>
       <el-table-column prop="teacherName" label="发布人" width="120" />

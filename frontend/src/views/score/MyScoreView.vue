@@ -7,7 +7,7 @@
     <el-empty v-if="!loading && !scoreOverview && !error" description="暂无成绩信息" />
 
     <template v-if="scoreOverview">
-      <el-card class="score-overview">
+      <el-card v-loading="loading" class="score-overview">
         <template #header>
           <div class="overview-header">
             <span>成绩总览</span>

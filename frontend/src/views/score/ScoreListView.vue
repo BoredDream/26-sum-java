@@ -159,7 +159,7 @@
           <el-input-number
             v-model="form.docScore"
             :min="0"
-            :max="15"
+            :max="100"
             :precision="2"
             style="width: 200px"
           />
@@ -168,7 +168,7 @@
           <el-input-number
             v-model="form.attendanceScore"
             :min="0"
-            :max="15"
+            :max="100"
             :precision="2"
             style="width: 200px"
           />
@@ -177,7 +177,7 @@
           <el-input-number
             v-model="form.systemScore"
             :min="0"
-            :max="50"
+            :max="100"
             :precision="2"
             style="width: 200px"
           />
@@ -186,7 +186,7 @@
           <el-input-number
             v-model="form.defenseScore"
             :min="0"
-            :max="20"
+            :max="100"
             :precision="2"
             style="width: 200px"
           />
