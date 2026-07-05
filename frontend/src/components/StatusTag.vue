@@ -44,6 +44,8 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     0: { label: '未开放', type: 'info', effect: 'plain' },
     1: { label: '已开放', type: 'success', effect: 'dark' },
     2: { label: '已关闭', type: 'danger', effect: 'plain' },
+    OPEN: { label: '可选', type: 'success', effect: 'dark' },
+    SELECTED: { label: '已选', type: 'info', effect: 'plain' },
   },
   selection: {
     PENDING: { label: '待审核', type: 'warning', effect: 'plain' },
@@ -55,6 +57,9 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     0: { label: '待审核', type: 'warning', effect: 'plain' },
     1: { label: '通过', type: 'success', effect: 'dark' },
     2: { label: '驳回', type: 'danger', effect: 'dark' },
+    PENDING: { label: '待审核', type: 'warning', effect: 'plain' },
+    APPROVED: { label: '通过', type: 'success', effect: 'dark' },
+    REJECTED: { label: '驳回', type: 'danger', effect: 'dark' },
   },
   attendanceTask: {
     0: { label: '未开始', type: 'info', effect: 'plain' },
@@ -76,6 +81,9 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     0: { label: '待审核', type: 'warning', effect: 'plain' },
     1: { label: '通过', type: 'success', effect: 'dark' },
     2: { label: '需修改', type: 'danger', effect: 'plain' },
+    SUBMITTED: { label: '待反馈', type: 'warning', effect: 'plain' },
+    REVIEWED: { label: '已反馈', type: 'success', effect: 'dark' },
+    RETURNED: { label: '需修改', type: 'danger', effect: 'plain' },
   },
   log: {
     0: { label: '待审核', type: 'warning', effect: 'plain' },

@@ -79,6 +79,7 @@ export const hiddenRoutes: { title: string; path: string; roles: UserRole[] }[] 
   { title: '题目详情', path: '/topic/:topicId', roles: ['STUDENT', 'TEACHER', 'ADMIN'] },
   { title: '题目资料', path: '/topic/:topicId/files', roles: ['TEACHER', 'ADMIN'] },
   { title: '编辑题目', path: '/topic/edit/:topicId', roles: ['TEACHER', 'ADMIN'] },
+  { title: '团队详情', path: '/selection/teams/:teamId', roles: ['TEACHER', 'ADMIN'] },
 ]
 
 function pathToRegex(pattern: string): RegExp {
@@ -90,7 +91,7 @@ function pathToRegex(pattern: string): RegExp {
 export function hasRoutePermission(path: string, role?: UserRole) {
   if (!role) return false
   const allowedMenus = menusByRole[role]
-  if (allowedMenus.some((m) => path.startsWith(m.path))) return true
+  if (allowedMenus.some((m) => path === m.path)) return true
   return hiddenRoutes.some((r) => r.roles.includes(role) && pathToRegex(r.path).test(path))
 }
 

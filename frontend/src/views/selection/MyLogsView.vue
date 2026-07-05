@@ -13,7 +13,7 @@
     <el-timeline v-loading="loading">
       <el-timeline-item
         v-for="log in logs"
-        :key="log.logId"
+        :key="log.id"
         :timestamp="formatDate(log.logDate)"
         placement="top"
       >
@@ -29,9 +29,9 @@
             <strong>问题描述：</strong>{{ log.problemDescription }}
           </p>
           <p v-if="log.nextPlan"><strong>下一步计划：</strong>{{ log.nextPlan }}</p>
-          <p v-if="log.feedback"><strong>教师反馈：</strong>{{ log.feedback }}</p>
+          <p v-if="log.teacherFeedback"><strong>教师反馈：</strong>{{ log.teacherFeedback }}</p>
           <p class="log-meta">
-            提交人：{{ log.studentName }} · 提交时间：{{ formatDateTime(log.createTime) }}
+            提交人ID：{{ log.studentId }} · 提交时间：{{ formatDateTime(log.createTime) }}
           </p>
         </el-card>
       </el-timeline-item>

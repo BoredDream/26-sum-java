@@ -8,19 +8,19 @@
 
     <el-table v-loading="loading" :data="documents" border class="data-table">
       <el-table-column prop="documentName" label="文档名称" show-overflow-tooltip />
-      <el-table-column prop="teamName" label="所属团队" />
+      <el-table-column prop="teamId" label="所属团队ID" />
       <el-table-column prop="documentType" label="文档类型" />
       <el-table-column prop="projectStage" label="项目阶段" />
       <el-table-column prop="versionNo" label="版本号" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="document" :value="scope.row.auditStatus" />
+          <status-tag category="document" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column prop="feedback" label="现有反馈" show-overflow-tooltip />
-      <el-table-column prop="fileName" label="文件名" show-overflow-tooltip />
-      <el-table-column prop="createTime" label="上传时间" width="170">
-        <template #default="{ row }">{{ formatDateTime(row.createTime) }}</template>
+      <el-table-column prop="teacherFeedback" label="现有反馈" show-overflow-tooltip />
+      <el-table-column prop="originalFilename" label="文件名" show-overflow-tooltip />
+      <el-table-column prop="uploadTime" label="上传时间" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.uploadTime) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="scope">
@@ -49,7 +49,7 @@
           <el-input :model-value="currentRow?.documentName" disabled />
         </el-form-item>
         <el-form-item label="所属团队">
-          <el-input :model-value="currentRow?.teamName" disabled />
+          <el-input :model-value="currentRow?.teamId" disabled />
         </el-form-item>
         <el-form-item label="反馈意见">
           <el-input
@@ -98,8 +98,8 @@ async function loadDocuments() {
 }
 
 function handleDownload(row: ProcessDocumentVO) {
-  const url = selectionApi.getDocumentDownloadUrl(row.documentId)
-  downloadByUrl(url, {}, row.fileName)
+  const url = selectionApi.getDocumentDownloadUrl(row.id)
+  downloadByUrl(url, {}, row.originalFilename)
 }
 
 // 反馈
@@ -125,7 +125,7 @@ async function handleFeedback() {
   }
   submitting.value = true
   try {
-    await selectionApi.feedbackDocument(currentRow.value.documentId, feedbackForm.value)
+    await selectionApi.feedbackDocument(currentRow.value.id, feedbackForm.value)
     ElMessage.success('反馈已提交')
     feedbackVisible.value = false
     loadDocuments()

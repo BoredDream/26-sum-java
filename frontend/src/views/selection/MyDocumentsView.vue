@@ -17,13 +17,13 @@
       <el-table-column prop="versionNo" label="版本号" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="document" :value="scope.row.auditStatus" />
+          <status-tag category="document" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column prop="feedback" label="反馈意见" show-overflow-tooltip />
-      <el-table-column prop="fileName" label="文件名" show-overflow-tooltip />
-      <el-table-column prop="createTime" label="上传时间" width="170">
-        <template #default="{ row }">{{ formatDateTime(row.createTime) }}</template>
+      <el-table-column prop="teacherFeedback" label="反馈意见" show-overflow-tooltip />
+      <el-table-column prop="originalFilename" label="文件名" show-overflow-tooltip />
+      <el-table-column prop="uploadTime" label="上传时间" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.uploadTime) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="120" fixed="right">
         <template #default="scope">
@@ -79,6 +79,7 @@
           <el-upload
             ref="uploadRef"
             action=""
+            accept=".doc,.docx,.pdf,.xls,.xlsx,.zip,.rar"
             :auto-upload="false"
             :limit="1"
             :on-change="handleFileChange"
@@ -113,6 +114,7 @@ const documents = ref<ProcessDocumentVO[]>([])
 
 const documentTypeOptions = ['需求文档', '设计文档', '代码文档', '测试文档', '用户手册', '会议纪要']
 const projectStageOptions = ['需求分析', '概要设计', '详细设计', '编码实现', '系统测试', '项目验收']
+const allowedExtensions = ['doc', 'docx', 'pdf', 'xls', 'xlsx', 'zip', 'rar']
 
 async function loadDocuments() {
   loading.value = true
@@ -127,8 +129,8 @@ async function loadDocuments() {
 }
 
 function handleDownload(row: ProcessDocumentVO) {
-  const url = selectionApi.getDocumentDownloadUrl(row.documentId)
-  downloadByUrl(url, {}, row.fileName)
+  const url = selectionApi.getDocumentDownloadUrl(row.id)
+  downloadByUrl(url, {}, row.originalFilename)
 }
 
 // 上传
@@ -167,7 +169,15 @@ function openUpload() {
 }
 
 function handleFileChange(uploadFile: UploadFile) {
-  uploadForm.value.file = uploadFile.raw || null
+  const file = uploadFile.raw || null
+  const extension = file?.name.split('.').pop()?.toLowerCase()
+  if (!file || !extension || !allowedExtensions.includes(extension)) {
+    uploadForm.value.file = null
+    uploadRef.value?.clearFiles?.()
+    ElMessage.warning('仅支持 doc、docx、pdf、xls、xlsx、zip、rar 格式文件')
+    return
+  }
+  uploadForm.value.file = file
 }
 
 function handleFileRemove() {

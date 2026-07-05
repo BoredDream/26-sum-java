@@ -12,13 +12,13 @@
       <template #header>
         <div class="card-header">
           <span>{{ team?.teamName }}</span>
-          <el-tag v-if="team" size="small">{{ team.teamStatusName }}</el-tag>
+          <el-tag v-if="team" size="small">{{ team.status === 'SELECTED' ? '已选题' : '组建中' }}</el-tag>
         </div>
       </template>
 
       <el-descriptions v-if="team" :column="2" border>
-        <el-descriptions-item label="团队编号">{{ team.teamId }}</el-descriptions-item>
-        <el-descriptions-item label="队长">{{ team.leaderName }}</el-descriptions-item>
+        <el-descriptions-item label="团队编号">{{ team.id }}</el-descriptions-item>
+        <el-descriptions-item label="队长ID">{{ team.leaderId }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{
           formatDateTime(team.createTime)
         }}</el-descriptions-item>
@@ -29,9 +29,12 @@
 
       <h4 v-if="team" class="section-title">成员列表</h4>
       <el-table v-if="team" :data="team.members" border>
-        <el-table-column prop="studentName" label="姓名" />
-        <el-table-column prop="studentNo" label="学号" />
-        <el-table-column prop="memberRoleName" label="角色" />
+        <el-table-column prop="studentId" label="学生ID" />
+        <el-table-column label="角色">
+          <template #default="{ row }">
+            {{ row.memberRole === 'LEADER' ? '队长' : '成员' }}
+          </template>
+        </el-table-column>
         <el-table-column prop="workContent" label="分工" show-overflow-tooltip />
       </el-table>
     </el-card>

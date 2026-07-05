@@ -10,21 +10,21 @@
     />
 
     <el-table v-loading="loading" :data="applications" border class="data-table">
-      <el-table-column prop="topicName" label="课题名称" show-overflow-tooltip />
+      <el-table-column prop="topicTitle" label="课题名称" show-overflow-tooltip />
       <el-table-column prop="teamName" label="申请团队" />
       <el-table-column prop="selectionReason" label="选题说明" show-overflow-tooltip />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="selection" :value="scope.row.auditStatus" />
+          <status-tag category="selection" :value="scope.row.status" />
         </template>
       </el-table-column>
-      <el-table-column prop="createTime" label="申请时间" width="170">
-        <template #default="{ row }">{{ formatDateTime(row.createTime) }}</template>
+      <el-table-column prop="applyTime" label="申请时间" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.applyTime) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="180" fixed="right">
         <template #default="scope">
           <el-button
-            v-if="scope.row.auditStatus === 'PENDING'"
+            v-if="scope.row.status === 'PENDING'"
             type="success"
             text
             size="small"
@@ -32,7 +32,7 @@
             >通过</el-button
           >
           <el-button
-            v-if="scope.row.auditStatus === 'PENDING'"
+            v-if="scope.row.status === 'PENDING'"
             type="danger"
             text
             size="small"
@@ -48,7 +48,7 @@
     <el-dialog v-model="auditVisible" title="审核选题申请" width="500px">
       <el-form :model="auditForm" label-width="100px">
         <el-form-item label="课题名称">
-          <el-input :model-value="currentRow?.topicName" disabled />
+          <el-input :model-value="currentRow?.topicTitle" disabled />
         </el-form-item>
         <el-form-item label="申请团队">
           <el-input :model-value="currentRow?.teamName" disabled />

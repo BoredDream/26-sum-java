@@ -23,7 +23,7 @@
     <el-row v-loading="loading" :gutter="16">
       <el-col
         v-for="topic in topics"
-        :key="topic.topicId"
+        :key="topic.id"
         :xs="24"
         :sm="12"
         :md="8"
@@ -33,22 +33,22 @@
         <el-card shadow="hover" class="topic-card">
           <template #header>
             <div class="card-header">
-              <span class="title" :title="topic.topicName">{{ topic.topicName }}</span>
-              <status-tag category="topicOpen" :value="topic.openStatus" />
+              <span class="title" :title="topic.title">{{ topic.title }}</span>
+              <status-tag category="topicOpen" :value="topic.status" />
             </div>
           </template>
           <div class="topic-meta">
-            <p><strong>指导教师：</strong>{{ topic.teacherName }}</p>
-            <p><strong>题目类型：</strong>{{ topic.topicType }}</p>
+            <p><strong>指导教师ID：</strong>{{ topic.teacherId }}</p>
+            <p><strong>方向：</strong>{{ topic.direction || '-' }}</p>
             <p><strong>难度：</strong>{{ topic.difficulty }}</p>
-            <p><strong>限选人数：</strong>{{ topic.studentLimit }}</p>
+            <p><strong>人数要求：</strong>{{ topic.minMembers || '-' }} - {{ topic.maxMembers || '-' }}</p>
           </div>
           <template #footer>
             <div class="card-footer">
               <el-button type="primary" text @click="openDetail(topic)">查看详情</el-button>
               <el-button
                 type="primary"
-                :disabled="topic.openStatus !== 1"
+                :disabled="topic.status !== 'OPEN'"
                 @click="openApply(topic)"
               >
                 申请选题
@@ -64,34 +64,30 @@
       <template v-if="currentTopic">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="课题名称" :span="2">{{
-            currentTopic.topicName
+            currentTopic.title
           }}</el-descriptions-item>
           <el-descriptions-item label="指导教师">{{
-            currentTopic.teacherName
+            currentTopic.teacherId
           }}</el-descriptions-item>
-          <el-descriptions-item label="题目类型">{{ currentTopic.topicType }}</el-descriptions-item>
+          <el-descriptions-item label="方向">{{ currentTopic.direction || '-' }}</el-descriptions-item>
           <el-descriptions-item label="难度">{{ currentTopic.difficulty }}</el-descriptions-item>
           <el-descriptions-item label="限选人数">{{
-            currentTopic.studentLimit
+            currentTopic.minMembers || '-'
+          }} - {{
+            currentTopic.maxMembers || '-'
           }}</el-descriptions-item>
           <el-descriptions-item label="开放状态">
-            <status-tag category="topicOpen" :value="currentTopic.openStatus" />
+            <status-tag category="topicOpen" :value="currentTopic.status" />
           </el-descriptions-item>
           <el-descriptions-item label="选题开始">{{
-            formatDateTime(currentTopic.selectionStartTime)
+            formatDateTime(currentTopic.selectionStart)
           }}</el-descriptions-item>
           <el-descriptions-item label="选题结束">{{
-            formatDateTime(currentTopic.selectionEndTime)
+            formatDateTime(currentTopic.selectionEnd)
           }}</el-descriptions-item>
         </el-descriptions>
         <h4 class="section-title">课题内容</h4>
-        <div class="content-block">{{ currentTopic.topicContent }}</div>
-        <h4 class="section-title">技术路线</h4>
-        <div class="content-block">{{ currentTopic.technicalRoute }}</div>
-        <h4 v-if="currentTopic.developTools" class="section-title">开发工具</h4>
-        <div v-if="currentTopic.developTools" class="content-block">
-          {{ currentTopic.developTools }}
-        </div>
+        <div class="content-block">{{ currentTopic.description || '-' }}</div>
       </template>
     </el-dialog>
 
@@ -99,7 +95,7 @@
     <el-dialog v-model="applyVisible" title="提交选题申请" width="500px">
       <el-form ref="applyFormRef" :model="applyForm" :rules="applyRules" label-width="100px">
         <el-form-item label="课题名称">
-          <el-input :model-value="currentTopic?.topicName" disabled />
+          <el-input :model-value="currentTopic?.title" disabled />
         </el-form-item>
         <el-form-item label="选题说明" prop="selectionReason">
           <el-input
@@ -160,7 +156,7 @@ async function openDetail(topic: TopicVO) {
   detailLoading.value = true
   currentTopic.value = null
   try {
-    currentTopic.value = await selectionApi.getSelectableTopic(topic.topicId)
+    currentTopic.value = await selectionApi.getSelectableTopic(topic.id)
   } catch (err: any) {
     ElMessage.error(err?.message || '加载课题详情失败')
     detailVisible.value = false
@@ -184,7 +180,7 @@ const applyRules: FormRules = {
 
 function openApply(topic: TopicVO) {
   currentTopic.value = topic
-  applyForm.value = { topicId: topic.topicId, selectionReason: '' }
+  applyForm.value = { topicId: topic.id, selectionReason: '' }
   applyVisible.value = true
 }
 

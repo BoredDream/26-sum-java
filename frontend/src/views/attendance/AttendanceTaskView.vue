@@ -53,7 +53,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="teacherName" label="发布人" width="120" />
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button
             type="primary"
@@ -71,14 +71,6 @@
             @click="handleFinish(scope.row as AttendanceTaskVO)"
           >
             结束任务
-          </el-button>
-          <el-button
-            type="danger"
-            text
-            size="small"
-            @click="handleDelete(scope.row as AttendanceTaskVO)"
-          >
-            删除
           </el-button>
         </template>
       </el-table-column>
@@ -391,28 +383,6 @@ async function handleFinish(row: AttendanceTaskVO) {
     ElMessage.error(err?.message || '操作失败')
   } finally {
     finishId.value = 0
-  }
-}
-
-// 删除任务
-async function handleDelete(row: AttendanceTaskVO) {
-  try {
-    await ElMessageBox.confirm('确认删除该签到任务？删除后不可恢复。', '删除确认', {
-      type: 'warning',
-    })
-  } catch {
-    return
-  }
-  try {
-    await attendanceApi.deleteAttendanceTask(row.taskId)
-    ElMessage.success('删除成功')
-    loadTasks()
-  } catch (err: any) {
-    if (err?.response?.status === 404) {
-      ElMessage.warning('该功能暂不可用')
-    } else {
-      ElMessage.error('删除失败')
-    }
   }
 }
 

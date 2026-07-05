@@ -1,20 +1,14 @@
-import { get, post, put, del, downloadFile } from '@/utils/request'
+import { get, post, downloadFile } from '@/utils/request'
 import type { PageResult } from '@/types/api'
 import type {
   StageTaskVO,
   StageTaskCreateDTO,
-  StageTaskUpdateDTO,
   StageTaskQuery,
-  StageEvaluationVO,
   StageEvaluationSubmitDTO,
-  ContributionVO,
   ContributionUpdateDTO,
-  ContributionQuery,
   ScoreListVO,
   ScoreQuery,
-  ScoreDetailVO,
   StudentScoreVO,
-  MyScoreVO,
   ScoreSaveDTO,
   ProgressVO,
 } from '@/types/score'
@@ -22,14 +16,6 @@ import type {
 // 阶段任务
 export function createStageTask(data: StageTaskCreateDTO) {
   return post<void>('/score/stage-task', data)
-}
-
-export function updateStageTask(stageId: number, data: StageTaskUpdateDTO) {
-  return put<void>(`/score/stage-tasks/${stageId}`, data)
-}
-
-export function deleteStageTask(stageId: number) {
-  return del<void>(`/score/stage-tasks/${stageId}`)
 }
 
 export function queryStageTaskPage(query: StageTaskQuery) {
@@ -41,21 +27,9 @@ export function submitStageEvaluation(data: StageEvaluationSubmitDTO) {
   return post<void>('/score/stage-evaluation', data)
 }
 
-export function queryStageEvaluationPage(query: StageTaskQuery) {
-  return get<PageResult<StageEvaluationVO>>('/score/evaluations', { params: query })
-}
-
 // 贡献度
 export function recordContribution(data: ContributionUpdateDTO) {
   return post<void>('/score/contribution', data)
-}
-
-export function queryContributionPage(query: ContributionQuery) {
-  return get<PageResult<ContributionVO>>('/score/contributions', { params: query })
-}
-
-export function updateContribution(contributionId: number, data: ContributionUpdateDTO) {
-  return put<void>(`/score/contributions/${contributionId}`, data)
 }
 
 // 进度
@@ -72,16 +46,8 @@ export function queryScorePage(query: ScoreQuery) {
   return get<PageResult<ScoreListVO>>('/score/page', { params: query })
 }
 
-export function getScoreDetail(scoreId: number) {
-  return get<ScoreDetailVO>(`/score/${scoreId}`)
-}
-
 export function confirmScore(scoreId: number) {
   return post<void>(`/score/${scoreId}/confirm`)
-}
-
-export function lockScore(scoreId: number) {
-  return post<void>(`/score/${scoreId}/lock`)
 }
 
 export function exportScores() {
@@ -91,8 +57,4 @@ export function exportScores() {
 // 学生成绩
 export function queryStudentScore(studentId: number) {
   return get<StudentScoreVO[]>(`/score/student/${studentId}`)
-}
-
-export function getMyScore(studentId: number) {
-  return get<MyScoreVO>('/score/my', { params: { studentId } })
 }

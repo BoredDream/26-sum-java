@@ -9,7 +9,7 @@
     <el-timeline v-loading="loading">
       <el-timeline-item
         v-for="log in logs"
-        :key="log.logId"
+        :key="log.id"
         :timestamp="formatDate(log.logDate)"
         placement="top"
       >
@@ -25,15 +25,15 @@
               </div>
             </div>
           </template>
-          <p><strong>所属团队：</strong>{{ log.teamName }}</p>
-          <p><strong>提交人：</strong>{{ log.studentName }}</p>
+          <p><strong>所属团队ID：</strong>{{ log.teamId }}</p>
+          <p><strong>提交人ID：</strong>{{ log.studentId }}</p>
           <p><strong>工作内容：</strong>{{ log.workContent }}</p>
           <p v-if="log.problemDescription">
             <strong>问题描述：</strong>{{ log.problemDescription }}
           </p>
           <p v-if="log.nextPlan"><strong>下一步计划：</strong>{{ log.nextPlan }}</p>
-          <p v-if="log.feedback" class="feedback-text">
-            <strong>现有反馈：</strong>{{ log.feedback }}
+          <p v-if="log.teacherFeedback" class="feedback-text">
+            <strong>现有反馈：</strong>{{ log.teacherFeedback }}
           </p>
           <p class="log-meta">提交时间：{{ formatDateTime(log.createTime) }}</p>
         </el-card>
@@ -47,7 +47,7 @@
           <el-input :model-value="currentRow?.title" disabled />
         </el-form-item>
         <el-form-item label="所属团队">
-          <el-input :model-value="currentRow?.teamName" disabled />
+          <el-input :model-value="currentRow?.teamId" disabled />
         </el-form-item>
         <el-form-item label="反馈意见">
           <el-input
@@ -113,7 +113,7 @@ async function handleFeedback() {
   }
   submitting.value = true
   try {
-    await selectionApi.feedbackLog(currentRow.value.logId, feedbackForm.value)
+    await selectionApi.feedbackLog(currentRow.value.id, feedbackForm.value)
     ElMessage.success('反馈已提交')
     feedbackVisible.value = false
     loadLogs()

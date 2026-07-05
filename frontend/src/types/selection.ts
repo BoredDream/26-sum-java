@@ -15,59 +15,49 @@ export interface UpdateMemberWorkDTO {
 }
 
 export interface TeamMemberVO {
-  memberId: number
   studentId: number
-  studentName: string
-  studentNo: string
-  memberRole: number
-  memberRoleName: string
+  memberRole: string
   workContent?: string
-  status: number
+  joinTime?: string
 }
 
 export interface JoinRequestVO {
-  requestId: number
+  id: number
   teamId: number
   applicantId: number
-  applicantName: string
-  applicantNo: string
   applyMessage?: string
-  auditStatus: number
-  auditStatusName: string
-  createTime: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  reviewerId?: number
+  reviewOpinion?: string
+  applyTime: string
+  reviewTime?: string
 }
 
 export interface TeamVO {
-  id?: number
-  teamId?: number
+  id: number
   teamName: string
   leaderId: number
-  leaderName: string
   introduction?: string
-  teamStatus: number
-  teamStatusName: string
+  status: 'BUILDING' | 'SELECTED'
+  selectedTopicId?: number
+  maxSize: number
+  memberCount: number
   members: TeamMemberVO[]
   createTime: string
 }
 
 export interface TopicVO {
-  topicId: number
-  topicName: string
-  topicType: string
+  id: number
+  title: string
+  description?: string
+  direction?: string
   difficulty: string
-  studentLimit: number
-  teamLimit?: number
-  topicContent: string
-  developTools?: string
-  technicalRoute: string
-  selectionStartTime?: string
-  selectionEndTime?: string
   teacherId: number
-  teacherName: string
-  status: number
-  openStatus: number
-  statusName: string
-  openStatusName: string
+  minMembers?: number
+  maxMembers?: number
+  status: 'OPEN' | 'SELECTED'
+  selectionStart?: string
+  selectionEnd?: string
 }
 
 export interface SubmitSelectionDTO {
@@ -80,32 +70,30 @@ export interface SelectionVO {
   teamId: number
   teamName: string
   topicId: number
-  topicName: string
+  topicTitle: string
   selectionReason: string
-  auditStatus: string
-  auditStatusName: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  auditTeacherId?: number
   auditOpinion?: string
-  auditTeacherName?: string
+  applyTime: string
   auditTime?: string
-  createTime: string
 }
 
 export interface ProcessDocumentVO {
-  documentId: number
+  id: number
+  teamId: number
+  topicId: number
   documentName: string
   documentType: string
   projectStage: string
   versionNo?: string
-  filePath?: string
-  fileName?: string
-  auditStatus: number
-  auditStatusName: string
-  feedback?: string
-  returned: boolean
-  teamId: number
-  teamName: string
-  createTime: string
-  updateTime: string
+  originalFilename?: string
+  uploaderId?: number
+  status: 'SUBMITTED' | 'REVIEWED' | 'RETURNED'
+  teacherFeedback?: string
+  feedbackTeacherId?: number
+  uploadTime?: string
+  feedbackTime?: string
 }
 
 export interface UploadDocumentForm {
@@ -122,20 +110,19 @@ export interface DocumentFeedbackDTO {
 }
 
 export interface DevelopmentLogVO {
-  logId: number
+  id: number
+  teamId: number
+  studentId: number
   title: string
   logDate: string
   workContent: string
   completionStatus: string
-  completionStatusName: string
   problemDescription?: string
   nextPlan?: string
-  feedback?: string
-  studentId: number
-  studentName: string
-  teamId: number
-  teamName: string
+  teacherFeedback?: string
+  feedbackTeacherId?: number
   createTime: string
+  updateTime?: string
 }
 
 export interface CreateDevelopmentLogDTO {

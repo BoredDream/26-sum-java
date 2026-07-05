@@ -102,18 +102,9 @@ async function loadMyScore() {
   loading.value = true
   error.value = ''
   try {
-    const [studentScoreList, myScoreData] = await Promise.all([
-      scoreApi.queryStudentScore(studentId),
-      scoreApi.getMyScore(studentId).catch(() => null),
-    ])
+    const studentScoreList = await scoreApi.queryStudentScore(studentId)
 
     studentScores.value = studentScoreList
-
-    if (myScoreData) {
-      scoreOverview.value = myScoreData
-      stageEvaluations.value = myScoreData.stageEvaluations || []
-      return
-    }
 
     if (studentScoreList.length > 0) {
       const first = studentScoreList[0]

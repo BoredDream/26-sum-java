@@ -10,6 +10,9 @@ const request = axios.create({
 
 request.interceptors.response.use(
   (response: AxiosResponse<Result<unknown>>) => {
+    if (response.config.responseType === 'blob' || response.config.responseType === 'arraybuffer') {
+      return response
+    }
     const { data } = response
     if (data.code !== 200) {
       ElMessage.error(data.message || '请求失败')

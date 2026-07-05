@@ -36,12 +36,12 @@
         <template #header>
           <div class="card-header">
             <span>{{ team.teamName }}</span>
-            <el-tag size="small">{{ team.teamStatusName }}</el-tag>
+            <el-tag size="small">{{ team.status === 'SELECTED' ? '已选题' : '组建中' }}</el-tag>
           </div>
         </template>
 
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="队长">{{ team.leaderName }}</el-descriptions-item>
+          <el-descriptions-item label="队长ID">{{ team.leaderId }}</el-descriptions-item>
           <el-descriptions-item label="创建时间">{{
             formatDateTime(team.createTime)
           }}</el-descriptions-item>
@@ -52,9 +52,12 @@
 
         <h4 class="section-title">成员列表</h4>
         <el-table :data="team.members" border>
-          <el-table-column prop="studentName" label="姓名" />
-          <el-table-column prop="studentNo" label="学号" />
-          <el-table-column prop="memberRoleName" label="角色" />
+          <el-table-column prop="studentId" label="学生ID" />
+          <el-table-column label="角色">
+            <template #default="{ row }">
+              {{ row.memberRole === 'LEADER' ? '队长' : '成员' }}
+            </template>
+          </el-table-column>
           <el-table-column prop="workContent" label="分工" show-overflow-tooltip />
           <el-table-column v-if="isLeader" label="操作" width="120">
             <template #default="scope">
@@ -94,26 +97,29 @@
         <template #header>入队申请审核</template>
         <el-empty v-if="joinRequests.length === 0" description="暂无待审核申请" />
         <el-table v-else :data="joinRequests" border>
-          <el-table-column prop="applicantName" label="申请人" />
-          <el-table-column prop="applicantNo" label="学号" />
+          <el-table-column prop="applicantId" label="申请人ID" />
           <el-table-column prop="applyMessage" label="留言" show-overflow-tooltip />
-          <el-table-column prop="auditStatusName" label="状态" />
+          <el-table-column label="状态">
+            <template #default="{ row }">
+              <status-tag category="joinRequest" :value="row.status" />
+            </template>
+          </el-table-column>
           <el-table-column label="操作" width="180">
             <template #default="{ row }">
               <el-button
-                v-if="row.auditStatus === 0"
+                v-if="row.status === 'PENDING'"
                 type="success"
                 text
                 size="small"
-                @click="auditRequest(row.requestId, true)"
+                @click="auditRequest(row.id, true)"
                 >通过</el-button
               >
               <el-button
-                v-if="row.auditStatus === 0"
+                v-if="row.status === 'PENDING'"
                 type="danger"
                 text
                 size="small"
-                @click="auditRequest(row.requestId, false)"
+                @click="auditRequest(row.id, false)"
                 >驳回</el-button
               >
             </template>
@@ -183,7 +189,7 @@ async function loadTeam() {
   } catch (err: any) {
     const status = err?.response?.status
     const msg = err?.message || ''
-    const noTeam = status === 404 || msg.includes('暂无团队')
+    const noTeam = status === 404 || msg.includes('暂无团队') || msg.includes('请先创建或加入团队')
     if (!noTeam) {
       error.value = msg || '加载团队信息失败'
     }
@@ -240,11 +246,10 @@ const joinRequests = ref<JoinRequestVO[]>([])
 const requestsLoading = ref(false)
 
 async function loadJoinRequests() {
-  if (!team.value?.id && !team.value?.teamId) return
+  if (!team.value?.id) return
   requestsLoading.value = true
   try {
-    const teamId = team.value?.id || team.value?.teamId || 0
-    joinRequests.value = await selectionApi.listJoinRequests(teamId)
+    joinRequests.value = await selectionApi.listJoinRequests(team.value.id)
   } finally {
     requestsLoading.value = false
   }
@@ -282,8 +287,7 @@ async function handleSaveWork() {
   if (!team.value || !currentMember.value) return
   workLoading.value = true
   try {
-    const teamId = team.value.id || team.value.teamId || 0
-    await selectionApi.updateMemberWork(teamId, currentMember.value.studentId, {
+    await selectionApi.updateMemberWork(team.value.id, currentMember.value.studentId, {
       workContent: workForm.workContent,
     })
     ElMessage.success('保存成功')

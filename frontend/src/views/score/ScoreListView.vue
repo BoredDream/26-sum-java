@@ -56,7 +56,7 @@
           formatDateTime((scope.row as ScoreVO).updateTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="280" fixed="right">
+      <el-table-column label="操作" width="220" fixed="right">
         <template #default="scope">
           <el-button type="primary" text size="small" @click="openDetail(scope.row as ScoreVO)"
             >详情</el-button
@@ -73,16 +73,6 @@
             @click="handleConfirm(scope.row as ScoreVO)"
           >
             确认
-          </el-button>
-          <el-button
-            v-if="(scope.row as ScoreVO).status !== 2"
-            type="danger"
-            text
-            size="small"
-            :loading="lockingId === (scope.row as ScoreVO).scoreId"
-            @click="handleLock(scope.row as ScoreVO)"
-          >
-            锁定
           </el-button>
         </template>
       </el-table-column>
@@ -323,8 +313,8 @@ async function openDetail(row: ScoreVO) {
               scoreId: row.scoreId,
               teamId: row.teamId,
               studentId: m.studentId,
-              studentName: m.studentName,
-              studentNo: m.studentNo,
+              studentName: `学生${m.studentId}`,
+              studentNo: '-',
               contributionFactor: 1,
               personalScore: row.totalScore,
               grade: '-',
@@ -400,8 +390,8 @@ async function openEdit(row: ScoreVO) {
       const existing = existingScores[index]
       return {
         studentId: m.studentId,
-        studentName: m.studentName,
-        studentNo: m.studentNo,
+        studentName: `学生${m.studentId}`,
+        studentNo: '-',
         contributionFactor: existing?.contributionFactor ?? 1,
         teacherComment: existing?.teacherComment || '',
       }
@@ -462,27 +452,6 @@ async function handleConfirm(row: ScoreVO) {
     ElMessage.error(err?.message || '确认失败')
   } finally {
     confirmingId.value = 0
-  }
-}
-
-const lockingId = ref(0)
-async function handleLock(row: ScoreVO) {
-  try {
-    await ElMessageBox.confirm('锁定后成绩将无法再修改，是否继续？', '锁定成绩', {
-      type: 'warning',
-    })
-  } catch {
-    return
-  }
-  lockingId.value = row.scoreId
-  try {
-    await scoreApi.lockScore(row.scoreId)
-    ElMessage.success('成绩已锁定')
-    loadScores()
-  } catch (err: any) {
-    ElMessage.error(err?.message || '锁定失败')
-  } finally {
-    lockingId.value = 0
   }
 }
 

@@ -1,10 +1,9 @@
-import { get, post, put, del, uploadFile, downloadFile } from '@/utils/request'
+import { get, post, uploadFile, downloadFile } from '@/utils/request'
 import type { PageResult } from '@/types/api'
 import type {
   AttendanceTaskVO,
   AttendanceTaskDetailVO,
   AttendanceTaskCreateDTO,
-  AttendanceTaskUpdateDTO,
   AttendanceTaskQuery,
   AttendanceRecordVO,
   AttendanceSignDTO,
@@ -22,14 +21,6 @@ export function createAttendanceTask(data: AttendanceTaskCreateDTO) {
   return post<number>('/attendance/task', data)
 }
 
-export function updateAttendanceTask(taskId: number, data: AttendanceTaskUpdateDTO) {
-  return put<number>(`/attendance/task/${taskId}`, data)
-}
-
-export function deleteAttendanceTask(taskId: number) {
-  return del<void>(`/attendance/task/${taskId}`)
-}
-
 export function finishAttendanceTask(taskId: number) {
   return post<void>(`/attendance/task/${taskId}/finish`)
 }
@@ -45,13 +36,6 @@ export function queryAttendanceTaskPage(query: AttendanceTaskQuery) {
 // 考勤记录
 export function signAttendance(data: AttendanceSignDTO) {
   return post<AttendanceRecordVO>('/attendance/record/sign', data)
-}
-
-export function updateAttendanceRecordStatus(
-  recordId: number,
-  data: { signStatus: number; remark?: string }
-) {
-  return put<void>(`/attendance/record/${recordId}/status`, data)
 }
 
 export function queryAttendanceRecordPage(query: AttendanceRecordQuery) {

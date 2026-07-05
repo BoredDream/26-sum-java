@@ -49,14 +49,9 @@
         </template>
       </el-table-column>
       <el-table-column prop="teacherName" label="发布人" width="120" />
-      <el-table-column label="操作" width="220" fixed="right">
-        <template #default="scope">
-          <el-button type="primary" text size="small" @click="openEdit(scope.row as StageTaskVO)"
-            >编辑</el-button
-          >
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as StageTaskVO)"
-            >删除</el-button
-          >
+      <el-table-column label="操作" width="120" fixed="right">
+        <template #default>
+          <span class="disabled-action">仅支持新增</span>
         </template>
       </el-table-column>
     </el-table>
@@ -75,7 +70,7 @@
 
     <el-dialog
       v-model="formVisible"
-      :title="isEdit ? '编辑阶段任务' : '新增阶段任务'"
+      title="新增阶段任务"
       width="650px"
     >
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
@@ -153,9 +148,7 @@
       </el-form>
       <template #footer>
         <el-button @click="formVisible = false">取消</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">{{
-          isEdit ? '保存' : '创建'
-        }}</el-button>
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">创建</el-button>
       </template>
     </el-dialog>
   </div>
@@ -163,10 +156,10 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as scoreApi from '@/api/score'
-import type { StageTaskVO, StageTaskCreateDTO, StageTaskUpdateDTO } from '@/types/score'
+import type { StageTaskVO, StageTaskCreateDTO } from '@/types/score'
 import { formatDateTime } from '@/utils/format'
 
 const loading = ref(false)
@@ -214,8 +207,6 @@ function resetQuery() {
 
 const formVisible = ref(false)
 const submitting = ref(false)
-const isEdit = ref(false)
-const editingId = ref(0)
 const formRef = ref<FormInstance>()
 const form = reactive<StageTaskCreateDTO>({
   stageName: '',
@@ -266,23 +257,7 @@ function resetForm() {
 }
 
 function openCreate() {
-  isEdit.value = false
-  editingId.value = 0
   resetForm()
-  formVisible.value = true
-}
-
-function openEdit(row: StageTaskVO) {
-  isEdit.value = true
-  editingId.value = row.stageId
-  form.stageName = row.stageName
-  form.stageDesc = row.stageDesc
-  form.startTime = row.startTime
-  form.endTime = row.endTime
-  form.deliverables = row.deliverables
-  form.scoringCriteria = row.scoringCriteria
-  form.weight = row.weight
-  form.status = row.status
   formVisible.value = true
 }
 
@@ -292,14 +267,8 @@ async function handleSubmit() {
     if (!valid) return
     submitting.value = true
     try {
-      if (isEdit.value) {
-        const payload: StageTaskUpdateDTO = { ...form }
-        await scoreApi.updateStageTask(editingId.value, payload)
-        ElMessage.success('保存成功')
-      } else {
-        await scoreApi.createStageTask({ ...form })
-        ElMessage.success('创建成功')
-      }
+      await scoreApi.createStageTask({ ...form })
+      ElMessage.success('创建成功')
       formVisible.value = false
       loadTasks()
     } catch (err: any) {
@@ -308,23 +277,6 @@ async function handleSubmit() {
       submitting.value = false
     }
   })
-}
-
-async function handleDelete(row: StageTaskVO) {
-  try {
-    await ElMessageBox.confirm('确认删除该阶段任务？删除后不可恢复。', '删除确认', {
-      type: 'warning',
-    })
-  } catch {
-    return
-  }
-  try {
-    await scoreApi.deleteStageTask(row.stageId)
-    ElMessage.success('删除成功')
-    loadTasks()
-  } catch (err: any) {
-    ElMessage.error(err?.message || '删除失败')
-  }
 }
 
 onMounted(loadTasks)
@@ -353,6 +305,11 @@ onMounted(loadTasks)
   .form-tip {
     margin-left: 8px;
     color: #909399;
+  }
+
+  .disabled-action {
+    color: #909399;
+    font-size: 13px;
   }
 }
 </style>

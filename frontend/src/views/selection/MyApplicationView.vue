@@ -7,21 +7,21 @@
     <el-empty v-if="!loading && applications.length === 0 && !error" description="暂无选题申请" />
 
     <el-table v-loading="loading" :data="applications" border class="data-table">
-      <el-table-column prop="topicName" label="课题名称" show-overflow-tooltip />
+      <el-table-column prop="topicTitle" label="课题名称" show-overflow-tooltip />
       <el-table-column prop="teamName" label="申请团队" />
       <el-table-column prop="selectionReason" label="选题说明" show-overflow-tooltip />
       <el-table-column label="审核状态" width="120">
         <template #default="{ row }">
-          <status-tag category="selection" :value="row.auditStatus" />
+          <status-tag category="selection" :value="row.status" />
         </template>
       </el-table-column>
-      <el-table-column prop="auditTeacherName" label="审核教师" />
+      <el-table-column prop="auditTeacherId" label="审核教师ID" />
       <el-table-column prop="auditOpinion" label="审核意见" show-overflow-tooltip />
       <el-table-column prop="auditTime" label="审核时间" width="170">
         <template #default="{ row }">{{ formatDateTime(row.auditTime) }}</template>
       </el-table-column>
-      <el-table-column prop="createTime" label="申请时间" width="170">
-        <template #default="{ row }">{{ formatDateTime(row.createTime) }}</template>
+      <el-table-column prop="applyTime" label="申请时间" width="170">
+        <template #default="{ row }">{{ formatDateTime(row.applyTime) }}</template>
       </el-table-column>
     </el-table>
   </div>
