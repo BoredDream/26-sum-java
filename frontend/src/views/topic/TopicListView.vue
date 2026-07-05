@@ -121,6 +121,8 @@ async function handleSubmit(row: TopicVO) {
     await topicApi.submitForReview(row.topicId)
     ElMessage.success('已提交审核')
     loadTopics()
+  } catch {
+    // 全局请求拦截器已显示错误提示，这里只需阻止未处理的 Promise 拒绝
   } finally {
     submittingId.value = 0
   }

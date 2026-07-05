@@ -170,7 +170,7 @@ async function handleOpen(row: TopicVO) {
     ElMessage.success('题目已开放')
     loadTopics()
   } catch (err: any) {
-    console.error('开放题目失败', err)
+    ElMessage.error(err?.message || '开放题目失败')
   } finally {
     actionId.value = 0
   }
@@ -188,7 +188,7 @@ async function handleClose(row: TopicVO) {
     ElMessage.success('题目已关闭')
     loadTopics()
   } catch (err: any) {
-    console.error('关闭题目失败', err)
+    ElMessage.error(err?.message || '关闭题目失败')
   } finally {
     actionId.value = 0
   }

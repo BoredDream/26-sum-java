@@ -112,7 +112,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
@@ -121,6 +121,7 @@ import { formatDateTime } from '@/utils/format'
 import { downloadByUrl } from '@/utils/download'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 
 const loading = ref(false)
@@ -133,7 +134,8 @@ const actionLoading = ref(false)
 async function loadData() {
   const topicId = Number(route.params.topicId)
   if (!topicId) {
-    error.value = '题目 ID 无效'
+    ElMessage.error('题目 ID 无效')
+    router.push('/topic/browse')
     return
   }
   loading.value = true
@@ -173,7 +175,7 @@ async function handleOpen(topicId: number) {
     ElMessage.success('题目已开放')
     loadData()
   } catch (err: any) {
-    console.error('开放题目失败', err)
+    ElMessage.error(err?.message || '开放题目失败')
   } finally {
     actionLoading.value = false
   }
@@ -193,7 +195,7 @@ async function handleClose(topicId: number) {
     ElMessage.success('题目已关闭')
     loadData()
   } catch (err: any) {
-    console.error('关闭题目失败', err)
+    ElMessage.error(err?.message || '关闭题目失败')
   } finally {
     actionLoading.value = false
   }
