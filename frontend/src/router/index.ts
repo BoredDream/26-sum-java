@@ -212,18 +212,18 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const auth = useAuthStore()
 
-  if (!auth.isLoggedIn) {
-    await auth.fetchMe()
-  }
-
   // 已登录访问登录页，跳转到对应角色首页
   if (to.path === '/login' && auth.isLoggedIn) {
     return next(auth.getHomePath(auth.role))
   }
 
-  // 公开路由直接放行
+  // 公开路由不主动探测 /api/auth/me，避免未登录 401 触发登录页重载循环。
   if (to.meta.public) {
     return next()
+  }
+
+  if (!auth.isLoggedIn) {
+    await auth.fetchMe()
   }
 
   // 未登录跳登录

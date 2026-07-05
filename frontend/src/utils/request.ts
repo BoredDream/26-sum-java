@@ -8,6 +8,12 @@ const request = axios.create({
   withCredentials: true,
 })
 
+function redirectToLogin() {
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
+  }
+}
+
 request.interceptors.response.use(
   (response: AxiosResponse<Result<unknown>>) => {
     if (response.config.responseType === 'blob' || response.config.responseType === 'arraybuffer') {
@@ -17,7 +23,7 @@ request.interceptors.response.use(
     if (data.code !== 200) {
       ElMessage.error(data.message || '请求失败')
       if (data.code === 401) {
-        window.location.href = '/login'
+        redirectToLogin()
       }
       return Promise.reject(new Error(data.message || '请求失败'))
     }
@@ -27,7 +33,7 @@ request.interceptors.response.use(
     const status = error.response?.status
     const data = error.response?.data
     if (status === 401) {
-      window.location.href = '/login'
+      redirectToLogin()
     }
     const msg = data?.message || error.message || '网络错误'
     ElMessage.error(msg)
