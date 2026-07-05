@@ -62,7 +62,7 @@ public class TeamService {
         leader.setStudentId(userId);
         leader.setMemberRole("LEADER");
         leader.setWorkContent("团队负责人：统筹项目进度与任务分工");
-        leader.setActive(true);
+        leader.setEnabled(true);
         teamMemberMapper.insert(leader);
         return getTeamDetail(team.getId());
     }
@@ -142,7 +142,7 @@ public class TeamService {
             member.setStudentId(request.getApplicantId());
             member.setMemberRole("MEMBER");
             member.setWorkContent("待团队负责人分配");
-            member.setActive(true);
+            member.setEnabled(true);
             teamMemberMapper.insert(member);
             request.setStatus(JOIN_APPROVED);
         } else {
@@ -158,7 +158,7 @@ public class TeamService {
     public void updateMemberWork(Long userId, String role, Long teamId, Long studentId, UpdateMemberWorkDTO dto) {
         assertTeamLeader(userId, role, teamId);
         TeamMemberEntity member = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
-        if (member == null || !Boolean.TRUE.equals(member.getActive())) {
+        if (member == null || !Boolean.TRUE.equals(member.getEnabled())) {
             throw new BusinessException(ResultCode.NOT_FOUND, "团队成员不存在或已退出");
         }
         teamMemberMapper.updateWorkContent(teamId, studentId, dto.getWorkContent().trim());
@@ -182,7 +182,7 @@ public class TeamService {
 
     public boolean isTeamMember(Long teamId, Long studentId) {
         TeamMemberEntity member = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
-        return member != null && Boolean.TRUE.equals(member.getActive());
+        return member != null && Boolean.TRUE.equals(member.getEnabled());
     }
 
     public void assertTeamLeader(Long userId, String role, Long teamId) {

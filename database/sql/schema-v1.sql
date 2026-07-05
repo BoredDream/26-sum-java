@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS attendance_task;
 DROP TABLE IF EXISTS development_log;
 DROP TABLE IF EXISTS process_document;
 DROP TABLE IF EXISTS topic_selection;
+DROP TABLE IF EXISTS team_join_request;
 DROP TABLE IF EXISTS team_member;
 DROP TABLE IF EXISTS team_info;
 DROP TABLE IF EXISTS topic_review;
@@ -157,6 +158,23 @@ CREATE TABLE team_member (
   INDEX idx_team_member_student (student_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='团队成员表';
 
+CREATE TABLE team_join_request (
+  request_id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '入队申请编号',
+  team_id BIGINT NOT NULL COMMENT '申请加入的团队编号',
+  applicant_id BIGINT NOT NULL COMMENT '申请学生编号',
+  apply_message VARCHAR(500) NULL COMMENT '申请说明',
+  audit_status TINYINT NOT NULL DEFAULT 0 COMMENT '审核状态：0-待审核，1-通过，2-驳回',
+  reviewer_id BIGINT NULL COMMENT '审核人学生编号（团队负责人）',
+  review_opinion VARCHAR(500) NULL COMMENT '审核意见',
+  apply_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+  review_time DATETIME NULL COMMENT '审核时间',
+  CONSTRAINT fk_join_request_team FOREIGN KEY (team_id) REFERENCES team_info(team_id),
+  CONSTRAINT fk_join_request_applicant FOREIGN KEY (applicant_id) REFERENCES student(student_id),
+  CONSTRAINT fk_join_request_reviewer FOREIGN KEY (reviewer_id) REFERENCES student(student_id),
+  INDEX idx_join_request_team_status (team_id, audit_status),
+  INDEX idx_join_request_applicant (applicant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='团队入队申请表';
+
 CREATE TABLE topic_selection (
   selection_id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '选题申请编号',
   team_id BIGINT NOT NULL COMMENT '申请团队编号',
@@ -210,11 +228,13 @@ CREATE TABLE development_log (
   problem_description TEXT NULL COMMENT '遇到的问题',
   next_plan TEXT NULL COMMENT '下一步计划',
   teacher_feedback TEXT NULL COMMENT '教师反馈',
+  feedback_teacher_id BIGINT NULL COMMENT '反馈教师编号',
   is_deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否逻辑删除：0-否，1-是',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   update_time DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   CONSTRAINT fk_log_team FOREIGN KEY (team_id) REFERENCES team_info(team_id),
   CONSTRAINT fk_log_student FOREIGN KEY (student_id) REFERENCES student(student_id),
+  CONSTRAINT fk_log_feedback_teacher FOREIGN KEY (feedback_teacher_id) REFERENCES teacher(teacher_id),
   INDEX idx_log_team_date (team_id, log_date, is_deleted)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='开发日志表';
 

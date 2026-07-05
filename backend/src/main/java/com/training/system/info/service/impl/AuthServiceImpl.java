@@ -51,11 +51,14 @@ public class AuthServiceImpl implements AuthService {
         }
 
         session.setAttribute("userId", account.getUserId());
+        session.setAttribute("username", account.getUsername());
         session.setAttribute("role", account.getRole());
+        session.setAttribute("relatedId", account.getRelatedId());
         session.setAttribute("name", name);
 
         LoginVO vo = new LoginVO();
         vo.setUserId(account.getUserId());
+        vo.setRelatedId(account.getRelatedId());
         vo.setUsername(account.getUsername());
         vo.setRole(account.getRole());
         vo.setName(name);

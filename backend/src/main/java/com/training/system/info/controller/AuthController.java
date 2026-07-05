@@ -36,6 +36,7 @@ public class AuthController {
         }
         LoginVO vo = new LoginVO();
         vo.setUserId(userId);
+        vo.setRelatedId((Long) session.getAttribute("relatedId"));
         vo.setUsername((String) session.getAttribute("username"));
         vo.setRole((String) session.getAttribute("role"));
         vo.setName((String) session.getAttribute("name"));

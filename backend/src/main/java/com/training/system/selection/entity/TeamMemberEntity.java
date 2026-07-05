@@ -8,7 +8,7 @@ public class TeamMemberEntity {
     private Long studentId;
     private String memberRole;
     private String workContent;
-    private Boolean active;
+    private Boolean enabled;
     private LocalDateTime joinTime;
 
     public Long getId() { return id; }
@@ -21,8 +21,8 @@ public class TeamMemberEntity {
     public void setMemberRole(String memberRole) { this.memberRole = memberRole; }
     public String getWorkContent() { return workContent; }
     public void setWorkContent(String workContent) { this.workContent = workContent; }
-    public Boolean getActive() { return active; }
-    public void setActive(Boolean active) { this.active = active; }
+    public Boolean getEnabled() { return enabled; }
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
     public LocalDateTime getJoinTime() { return joinTime; }
     public void setJoinTime(LocalDateTime joinTime) { this.joinTime = joinTime; }
 }

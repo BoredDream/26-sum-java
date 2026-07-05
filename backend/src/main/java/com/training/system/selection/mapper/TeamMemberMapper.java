@@ -7,29 +7,35 @@ import java.util.List;
 
 @Mapper
 public interface TeamMemberMapper {
-    @Select("SELECT COUNT(1) FROM team_member WHERE team_id = #{teamId}")
+    @Select("SELECT COUNT(1) FROM team_member WHERE team_id = #{teamId} AND status = 1")
     int countTeamById(@Param("teamId") Long teamId);
 
-    @Select("SELECT student_id FROM team_member WHERE team_id = #{teamId} AND active = 1")
+    @Select("SELECT student_id FROM team_member WHERE team_id = #{teamId} AND status = 1")
     List<Long> selectStudentIdsByTeamId(@Param("teamId") Long teamId);
 
-    @Select("SELECT * FROM team_member WHERE student_id = #{studentId} AND active = 1 LIMIT 1")
+    @Select("SELECT member_id AS id, team_id, student_id, CASE WHEN member_role = 1 THEN 'LEADER' ELSE 'MEMBER' END AS member_role, " +
+            "work_content, CASE WHEN status = 1 THEN TRUE ELSE FALSE END AS enabled, join_time " +
+            "FROM team_member WHERE student_id = #{studentId} AND status = 1 LIMIT 1")
     TeamMemberEntity findActiveByStudentId(@Param("studentId") Long studentId);
 
-    @Select("SELECT * FROM team_member WHERE team_id = #{teamId} AND active = 1 ORDER BY join_time ASC")
+    @Select("SELECT member_id AS id, team_id, student_id, CASE WHEN member_role = 1 THEN 'LEADER' ELSE 'MEMBER' END AS member_role, " +
+            "work_content, CASE WHEN status = 1 THEN TRUE ELSE FALSE END AS enabled, join_time " +
+            "FROM team_member WHERE team_id = #{teamId} AND status = 1 ORDER BY join_time ASC")
     List<TeamMemberEntity> findActiveByTeamId(@Param("teamId") Long teamId);
 
-    @Select("SELECT COUNT(1) FROM team_member WHERE team_id = #{teamId} AND active = 1")
+    @Select("SELECT COUNT(1) FROM team_member WHERE team_id = #{teamId} AND status = 1")
     int countActiveByTeamId(@Param("teamId") Long teamId);
 
-    @Select("SELECT * FROM team_member WHERE team_id = #{teamId} AND student_id = #{studentId} LIMIT 1")
+    @Select("SELECT member_id AS id, team_id, student_id, CASE WHEN member_role = 1 THEN 'LEADER' ELSE 'MEMBER' END AS member_role, " +
+            "work_content, CASE WHEN status = 1 THEN TRUE ELSE FALSE END AS enabled, join_time " +
+            "FROM team_member WHERE team_id = #{teamId} AND student_id = #{studentId} LIMIT 1")
     TeamMemberEntity findByTeamIdAndStudentId(@Param("teamId") Long teamId, @Param("studentId") Long studentId);
 
-    @Insert("INSERT INTO team_member(team_id, student_id, member_role, work_content, active, join_time) " +
-            "VALUES(#{teamId}, #{studentId}, #{memberRole}, #{workContent}, #{active}, NOW())")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Insert("INSERT INTO team_member(team_id, student_id, member_role, work_content, status, join_time) " +
+            "VALUES(#{teamId}, #{studentId}, CASE WHEN #{memberRole} = 'LEADER' THEN 1 ELSE 0 END, #{workContent}, CASE WHEN #{enabled} THEN 1 ELSE 0 END, NOW())")
+    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "member_id")
     int insert(TeamMemberEntity member);
 
-    @Update("UPDATE team_member SET work_content = #{workContent} WHERE team_id = #{teamId} AND student_id = #{studentId} AND active = 1")
+    @Update("UPDATE team_member SET work_content = #{workContent} WHERE team_id = #{teamId} AND student_id = #{studentId} AND status = 1")
     int updateWorkContent(@Param("teamId") Long teamId, @Param("studentId") Long studentId, @Param("workContent") String workContent);
 }

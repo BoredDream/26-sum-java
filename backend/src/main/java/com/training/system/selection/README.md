@@ -35,7 +35,7 @@ backend/src/main/java/com/training/system/selection
 4. 确认后端已有以下依赖：Spring Web、Validation、MyBatis、MySQL 驱动。独立示例所需依赖已在 `backend/pom.xml` 中写好。
 5. 修改 `backend/src/main/resources/application.yml` 里的 MySQL 地址、数据库账号和密码。
 
-> 本模块用 `X-User-Id`、`X-Role` 两个请求头临时模拟登录用户，便于单独联调。接入你们的登录模块后，把各 Controller 中的这两个 `@RequestHeader` 参数换成项目已有的登录用户上下文即可。
+> 本模块使用项目统一的 Session 登录态，从 `HttpSession` 读取 `role` 和 `relatedId` 作为当前角色与学生/教师业务编号。
 
 角色取值：`STUDENT`、`TEACHER`、`ADMIN`。
 
@@ -69,8 +69,7 @@ backend/src/main/java/com/training/system/selection
 请求头：
 
 ```text
-X-User-Id: 1001
-X-Role: STUDENT
+Cookie: JSESSIONID=...
 Content-Type: application/json
 ```
 
@@ -89,8 +88,7 @@ Content-Type: application/json
 请求头：
 
 ```text
-X-User-Id: 1001
-X-Role: STUDENT
+Cookie: JSESSIONID=...
 Content-Type: application/json
 ```
 
@@ -108,8 +106,7 @@ Content-Type: application/json
 请求头：
 
 ```text
-X-User-Id: 2001
-X-Role: TEACHER
+Cookie: JSESSIONID=...
 Content-Type: application/json
 ```
 

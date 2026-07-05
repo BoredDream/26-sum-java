@@ -21,7 +21,7 @@
 |---|---|
 | 公共账号与基础信息 | `user_account`、`student`、`teacher` |
 | 出题管理模块 | `project_topic`、`topic_file`、`topic_review` |
-| 选题管理模块 | `team_info`、`team_member`、`topic_selection`、`process_document`、`development_log` |
+| 选题管理模块 | `team_info`、`team_member`、`team_join_request`、`topic_selection`、`process_document`、`development_log` |
 | 学生考勤管理模块 | `attendance_task`、`attendance_record`、`makeup_sign_apply` |
 | 信息管理模块 | `notice`、`data_backup`、`operate_log` |
 | 成绩评估与过程分析模块 | `stage_task`、`stage_evaluation`、`contribution`、`score`、`student_score`、`score_detail`、`ai_report` |
@@ -82,7 +82,15 @@
 | 2 | 驳回 |
 | 3 | 已撤回 |
 
-### 4.6 签到状态 `attendance_record.sign_status`
+### 4.6 入队申请状态 `team_join_request.audit_status`
+
+| 值 | 说明 |
+|---|---|
+| 0 | 待审核 |
+| 1 | 通过 |
+| 2 | 驳回 |
+
+### 4.7 签到状态 `attendance_record.sign_status`
 
 | 值 | 说明 |
 |---|---|
@@ -91,7 +99,7 @@
 | 2 | 迟到 |
 | 3 | 补签 |
 
-### 4.7 补签审核状态 `makeup_sign_apply.audit_status`
+### 4.8 补签审核状态 `makeup_sign_apply.audit_status`
 
 | 值 | 说明 |
 |---|---|
@@ -99,7 +107,7 @@
 | 1 | 通过 |
 | 2 | 驳回 |
 
-### 4.8 成绩状态 `score.status`
+### 4.9 成绩状态 `score.status`
 
 | 值 | 说明 |
 |---|---|
@@ -115,6 +123,7 @@
 | `topic_file` | `topic_id` | `project_topic.topic_id` |
 | `team_info` | `leader_id` | `student.student_id` |
 | `team_member` | `team_id`、`student_id` | `team_info`、`student` |
+| `team_join_request` | `team_id`、`applicant_id`、`reviewer_id` | `team_info`、`student` |
 | `topic_selection` | `team_id`、`topic_id` | `team_info`、`project_topic` |
 | `process_document` | `team_id`、`topic_id`、`uploader_id` | `team_info`、`project_topic`、`student` |
 | `attendance_record` | `task_id`、`student_id` | `attendance_task`、`student` |

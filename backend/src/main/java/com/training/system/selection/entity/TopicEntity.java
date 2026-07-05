@@ -12,6 +12,7 @@ public class TopicEntity {
     private Long teacherId;
     private Integer minMembers;
     private Integer maxMembers;
+    private Integer teamLimit;
     private String status;
     private LocalDateTime selectionStart;
     private LocalDateTime selectionEnd;
@@ -33,6 +34,8 @@ public class TopicEntity {
     public void setMinMembers(Integer minMembers) { this.minMembers = minMembers; }
     public Integer getMaxMembers() { return maxMembers; }
     public void setMaxMembers(Integer maxMembers) { this.maxMembers = maxMembers; }
+    public Integer getTeamLimit() { return teamLimit; }
+    public void setTeamLimit(Integer teamLimit) { this.teamLimit = teamLimit; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public LocalDateTime getSelectionStart() { return selectionStart; }

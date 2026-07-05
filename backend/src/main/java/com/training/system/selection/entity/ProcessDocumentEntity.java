@@ -12,6 +12,7 @@ public class ProcessDocumentEntity {
     private String versionNo;
     private String originalFilename;
     private String storedPath;
+    private Long fileSize;
     private Long uploaderId;
     private String status;
     private String teacherFeedback;
@@ -37,6 +38,8 @@ public class ProcessDocumentEntity {
     public void setOriginalFilename(String originalFilename) { this.originalFilename = originalFilename; }
     public String getStoredPath() { return storedPath; }
     public void setStoredPath(String storedPath) { this.storedPath = storedPath; }
+    public Long getFileSize() { return fileSize; }
+    public void setFileSize(Long fileSize) { this.fileSize = fileSize; }
     public Long getUploaderId() { return uploaderId; }
     public void setUploaderId(Long uploaderId) { this.uploaderId = uploaderId; }
     public String getStatus() { return status; }

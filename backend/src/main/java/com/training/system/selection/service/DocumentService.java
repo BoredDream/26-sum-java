@@ -95,6 +95,7 @@ public class DocumentService {
         document.setVersionNo("V" + version + ".0");
         document.setOriginalFilename(originalFilename);
         document.setStoredPath(storedFilename);
+        document.setFileSize(file.getSize());
         document.setUploaderId(userId);
         document.setStatus(DOCUMENT_SUBMITTED);
         document.setUploadTime(LocalDateTime.now());

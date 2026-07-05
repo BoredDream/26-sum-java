@@ -4,8 +4,11 @@ import com.training.system.selection.dto.AuditSelectionDTO;
 import com.training.system.selection.dto.SubmitSelectionDTO;
 import com.training.system.selection.service.SelectionService;
 import com.training.system.common.Result;
+import com.training.system.selection.util.SelectionSessionUtil;
+import com.training.system.selection.util.SelectionSessionUtil.CurrentUser;
 import com.training.system.selection.vo.SelectionVO;
 import com.training.system.selection.vo.TopicVO;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,29 +34,29 @@ public class TopicSelectionController {
     }
 
     @PostMapping("/applications")
-    public Result<SelectionVO> submitSelection(@RequestHeader("X-User-Id") Long userId,
-                                                     @RequestHeader("X-Role") String role,
-                                                     @RequestBody @Valid SubmitSelectionDTO dto) {
-        return Result.success(selectionService.submitSelection(userId, role, dto));
+    public Result<SelectionVO> submitSelection(HttpSession session,
+                                               @RequestBody @Valid SubmitSelectionDTO dto) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(selectionService.submitSelection(user.relatedId(), user.role(), dto));
     }
 
     @GetMapping("/applications/my")
-    public Result<List<SelectionVO>> getMySelections(@RequestHeader("X-User-Id") Long userId,
-                                                           @RequestHeader("X-Role") String role) {
-        return Result.success(selectionService.getMySelections(userId, role));
+    public Result<List<SelectionVO>> getMySelections(HttpSession session) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(selectionService.getMySelections(user.relatedId(), user.role()));
     }
 
     @GetMapping("/applications/pending")
-    public Result<List<SelectionVO>> getPendingSelections(@RequestHeader("X-User-Id") Long userId,
-                                                                @RequestHeader("X-Role") String role) {
-        return Result.success(selectionService.getPendingSelections(userId, role));
+    public Result<List<SelectionVO>> getPendingSelections(HttpSession session) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(selectionService.getPendingSelections(user.relatedId(), user.role()));
     }
 
     @PatchMapping("/applications/{selectionId}/audit")
-    public Result<SelectionVO> auditSelection(@RequestHeader("X-User-Id") Long userId,
-                                                    @RequestHeader("X-Role") String role,
-                                                    @PathVariable Long selectionId,
-                                                    @RequestBody @Valid AuditSelectionDTO dto) {
-        return Result.success(selectionService.auditSelection(userId, role, selectionId, dto));
+    public Result<SelectionVO> auditSelection(HttpSession session,
+                                              @PathVariable Long selectionId,
+                                              @RequestBody @Valid AuditSelectionDTO dto) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(selectionService.auditSelection(user.relatedId(), user.role(), selectionId, dto));
     }
 }

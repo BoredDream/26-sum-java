@@ -122,7 +122,6 @@ public class SelectionService {
             team.setStatus(TEAM_SELECTED);
             team.setSelectedTopicId(topic.getId());
             teamMapper.updateSelectionStatus(team);
-            topicMapper.updateStatus(topic.getId(), TOPIC_SELECTED);
         } else {
             selection.setStatus(SELECTION_REJECTED);
         }

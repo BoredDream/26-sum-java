@@ -3,7 +3,10 @@ package com.training.system.selection.controller;
 import com.training.system.selection.dto.DocumentFeedbackDTO;
 import com.training.system.selection.service.DocumentService;
 import com.training.system.common.Result;
+import com.training.system.selection.util.SelectionSessionUtil;
+import com.training.system.selection.util.SelectionSessionUtil.CurrentUser;
 import com.training.system.selection.vo.ProcessDocumentVO;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -26,34 +29,34 @@ public class DocumentController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Result<ProcessDocumentVO> upload(@RequestHeader("X-User-Id") Long userId,
-                                                 @RequestHeader("X-Role") String role,
-                                                 @RequestParam String documentName,
-                                                 @RequestParam String documentType,
-                                                 @RequestParam String projectStage,
-                                                 @RequestPart MultipartFile file) {
-        return Result.success(                documentService.upload(userId, role, documentName, documentType, projectStage, file));
+    public Result<ProcessDocumentVO> upload(HttpSession session,
+                                            @RequestParam String documentName,
+                                            @RequestParam String documentType,
+                                            @RequestParam String projectStage,
+                                            @RequestPart MultipartFile file) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(documentService.upload(user.relatedId(), user.role(), documentName, documentType, projectStage, file));
     }
 
     @GetMapping
-    public Result<List<ProcessDocumentVO>> listMyScope(@RequestHeader("X-User-Id") Long userId,
-                                                            @RequestHeader("X-Role") String role) {
-        return Result.success(documentService.listMyScope(userId, role));
+    public Result<List<ProcessDocumentVO>> listMyScope(HttpSession session) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(documentService.listMyScope(user.relatedId(), user.role()));
     }
 
     @PatchMapping("/{documentId}/feedback")
-    public Result<ProcessDocumentVO> feedback(@RequestHeader("X-User-Id") Long userId,
-                                                    @RequestHeader("X-Role") String role,
-                                                    @PathVariable Long documentId,
-                                                    @RequestBody @Valid DocumentFeedbackDTO dto) {
-        return Result.success(documentService.feedback(userId, role, documentId, dto));
+    public Result<ProcessDocumentVO> feedback(HttpSession session,
+                                              @PathVariable Long documentId,
+                                              @RequestBody @Valid DocumentFeedbackDTO dto) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(documentService.feedback(user.relatedId(), user.role(), documentId, dto));
     }
 
     @GetMapping("/{documentId}/download")
-    public ResponseEntity<Resource> download(@RequestHeader("X-User-Id") Long userId,
-                                             @RequestHeader("X-Role") String role,
+    public ResponseEntity<Resource> download(HttpSession session,
                                              @PathVariable Long documentId) {
-        Resource resource = documentService.download(userId, role, documentId);
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        Resource resource = documentService.download(user.relatedId(), user.role(), documentId);
         String filename = resource.getFilename() == null ? "download" : resource.getFilename();
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
