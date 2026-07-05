@@ -243,8 +243,8 @@ async function handleSubmit() {
     submitting.value = true
     try {
       if (isEdit.value) {
-        const dto: TeacherUpdateDTO = { ...form.value }
-        await infoApi.updateTeacher(currentId.value, dto)
+        const { password, ...dto } = form.value
+        await infoApi.updateTeacher(currentId.value, dto as TeacherUpdateDTO)
       } else {
         const dto: TeacherCreateDTO = { ...form.value }
         if (dto.password === '') {

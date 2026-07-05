@@ -277,8 +277,8 @@ async function handleSubmit() {
     submitting.value = true
     try {
       if (isEdit.value) {
-        const dto: StudentUpdateDTO = { ...form.value }
-        await infoApi.updateStudent(currentId.value, dto)
+        const { password, ...dto } = form.value
+        await infoApi.updateStudent(currentId.value, dto as StudentUpdateDTO)
       } else {
         const dto: StudentCreateDTO = { ...form.value }
         if (dto.password === '') {
