@@ -17,6 +17,7 @@ type Category =
   | 'makeup'
   | 'document'
   | 'log'
+  | 'logCompletion'
   | 'score'
 
 const props = defineProps<{
@@ -79,6 +80,12 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     0: { label: '待审核', type: 'warning', effect: 'plain' },
     1: { label: '通过', type: 'success', effect: 'dark' },
     2: { label: '需修改', type: 'danger', effect: 'plain' },
+  },
+  logCompletion: {
+    未开始: { label: '未开始', type: 'info', effect: 'plain' },
+    进行中: { label: '进行中', type: 'warning', effect: 'plain' },
+    已完成: { label: '已完成', type: 'success', effect: 'dark' },
+    已阻塞: { label: '已阻塞', type: 'danger', effect: 'plain' },
   },
   score: {
     0: { label: '草稿', type: 'info', effect: 'plain' },

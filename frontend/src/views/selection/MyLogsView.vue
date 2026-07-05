@@ -21,7 +21,7 @@
           <template #header>
             <div class="log-header">
               <span class="title">{{ log.title }}</span>
-              <status-tag category="log" :value="log.completionStatus" />
+              <status-tag category="logCompletion" :value="log.completionStatus" />
             </div>
           </template>
           <p><strong>工作内容：</strong>{{ log.workContent }}</p>

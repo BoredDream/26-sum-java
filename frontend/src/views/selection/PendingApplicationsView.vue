@@ -79,7 +79,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import * as selectionApi from '@/api/selection'
 import type { SelectionVO } from '@/types/selection'
 import { formatDateTime } from '@/utils/format'
@@ -117,6 +117,15 @@ function openAudit(row: SelectionVO, approved: boolean) {
 
 async function handleAudit() {
   if (!currentRow.value) return
+  try {
+    await ElMessageBox.confirm(
+      `确认${auditForm.value.approved ? '通过' : '驳回'}该选题申请？`,
+      '审核确认',
+      { type: 'warning' }
+    )
+  } catch {
+    return
+  }
   submitting.value = true
   try {
     await selectionApi.auditSelection(currentRow.value.selectionId, auditForm.value)

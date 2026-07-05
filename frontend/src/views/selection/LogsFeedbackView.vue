@@ -18,7 +18,7 @@
             <div class="log-header">
               <span class="title">{{ log.title }}</span>
               <div class="header-actions">
-                <status-tag category="log" :value="log.completionStatus" />
+                <status-tag category="logCompletion" :value="log.completionStatus" />
                 <el-button type="warning" text size="small" @click="openFeedback(log)"
                   >反馈</el-button
                 >

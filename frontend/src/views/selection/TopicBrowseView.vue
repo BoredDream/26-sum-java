@@ -60,7 +60,7 @@
     </el-row>
 
     <!-- 课题详情弹窗 -->
-    <el-dialog v-model="detailVisible" title="课题详情" width="700px">
+    <el-dialog v-model="detailVisible" v-loading="detailLoading" title="课题详情" width="700px">
       <template v-if="currentTopic">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="课题名称" :span="2">{{
@@ -152,11 +152,21 @@ function handleSearch() {
 
 // 详情
 const detailVisible = ref(false)
+const detailLoading = ref(false)
 const currentTopic = ref<TopicVO | null>(null)
 
-function openDetail(topic: TopicVO) {
-  currentTopic.value = topic
+async function openDetail(topic: TopicVO) {
   detailVisible.value = true
+  detailLoading.value = true
+  currentTopic.value = null
+  try {
+    currentTopic.value = await selectionApi.getSelectableTopic(topic.topicId)
+  } catch (err: any) {
+    ElMessage.error(err?.message || '加载课题详情失败')
+    detailVisible.value = false
+  } finally {
+    detailLoading.value = false
+  }
 }
 
 // 申请

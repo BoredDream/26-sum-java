@@ -2,6 +2,8 @@
   <div class="my-team-page">
     <page-header title="我的团队" />
 
+    <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon class="mb-4" />
+
     <!-- 无团队：创建表单 -->
     <el-card v-if="!team" v-loading="loading">
       <template #header>
@@ -152,6 +154,7 @@ import { formatDateTime } from '@/utils/format'
 const auth = useAuthStore()
 const loading = ref(false)
 const submitting = ref(false)
+const error = ref('')
 const team = ref<TeamVO | null>(null)
 
 const isLeader = computed(() => {
@@ -171,14 +174,18 @@ const createRules: FormRules = {
 
 async function loadTeam() {
   loading.value = true
+  error.value = ''
   try {
     team.value = await selectionApi.getMyTeam()
     if (isLeader.value) {
       loadJoinRequests()
     }
   } catch (err: any) {
-    if (err?.response?.status !== 404 && err?.message !== '暂无团队') {
-      // 无团队时不提示错误
+    const status = err?.response?.status
+    const msg = err?.message || ''
+    const noTeam = status === 404 || msg.includes('暂无团队')
+    if (!noTeam) {
+      error.value = msg || '加载团队信息失败'
     }
     team.value = null
   } finally {
@@ -292,6 +299,10 @@ onMounted(loadTeam)
 
 <style scoped lang="scss">
 .my-team-page {
+  .mb-4 {
+    margin-bottom: 16px;
+  }
+
   .card-header {
     display: flex;
     align-items: center;
