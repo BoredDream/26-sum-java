@@ -243,6 +243,7 @@ async function handleSubmit() {
     submitting.value = true
     try {
       if (isEdit.value) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...dto } = form.value
         await infoApi.updateTeacher(currentId.value, dto as TeacherUpdateDTO)
       } else {
