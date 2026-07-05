@@ -19,10 +19,21 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+# 通用文件上传目录
+file:
+  upload:
+    dir: ./uploads
+
 # 出题管理模块-文件上传目录
 topic:
   file:
     upload-dir: ./uploads/topic
+
+# 数据备份配置
+backup:
+  cron: "0 0 2 * * ?"
+  dir: ./backup
+  retention-days: 30
 
 logging:
   level:
