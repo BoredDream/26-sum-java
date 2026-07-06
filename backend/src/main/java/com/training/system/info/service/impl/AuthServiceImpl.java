@@ -40,6 +40,9 @@ public class AuthServiceImpl implements AuthService {
         if (!encoder.matches(dto.getPassword(), account.getPassword())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
         }
+        if (!account.getRole().equals(dto.getRole())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
+        }
 
         String name = "";
         if ("STUDENT".equals(account.getRole())) {
