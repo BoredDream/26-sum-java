@@ -43,6 +43,7 @@ backend/src/main/java/com/training/system/selection
 
 | 功能 | 方法 | 地址 |
 |---|---|---|
+| 查询可加入团队 | GET | `/api/selection/teams` |
 | 创建团队 | POST | `/api/selection/teams` |
 | 查看我的团队 | GET | `/api/selection/teams/my` |
 | 申请加入团队 | POST | `/api/selection/teams/{teamId}/join-requests` |

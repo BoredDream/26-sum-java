@@ -10,6 +10,7 @@ public class TeamEntity {
     private String status;
     private Long selectedTopicId;
     private Integer maxSize;
+    private Integer memberCount;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -27,6 +28,8 @@ public class TeamEntity {
     public void setSelectedTopicId(Long selectedTopicId) { this.selectedTopicId = selectedTopicId; }
     public Integer getMaxSize() { return maxSize; }
     public void setMaxSize(Integer maxSize) { this.maxSize = maxSize; }
+    public Integer getMemberCount() { return memberCount; }
+    public void setMemberCount(Integer memberCount) { this.memberCount = memberCount; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }

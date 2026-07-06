@@ -35,6 +35,11 @@ public class TeamController {
         return Result.success(teamService.getMyTeam(user.relatedId(), user.role()));
     }
 
+    @GetMapping
+    public Result<List<TeamVO>> listJoinableTeams() {
+        return Result.success(teamService.listJoinableTeams());
+    }
+
     @GetMapping("/{teamId}")
     public Result<TeamVO> getTeamDetail(@PathVariable Long teamId) {
         return Result.success(teamService.getTeamDetail(teamId));

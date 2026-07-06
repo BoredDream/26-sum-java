@@ -81,6 +81,17 @@ public class TeamService {
         return vo;
     }
 
+    public List<TeamVO> listJoinableTeams() {
+        return teamMapper.findJoinableTeams().stream().map(team -> {
+            TeamVO vo = toTeamVO(team);
+            vo.setMembers(List.of());
+            if (team.getMemberCount() != null) {
+                vo.setMemberCount(team.getMemberCount());
+            }
+            return vo;
+        }).toList();
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public JoinRequestVO applyJoin(Long userId, String role, Long teamId, JoinTeamDTO dto) {
         requireStudent(role);
@@ -217,6 +228,7 @@ public class TeamService {
         vo.setStatus(entity.getStatus());
         vo.setSelectedTopicId(entity.getSelectedTopicId());
         vo.setMaxSize(entity.getMaxSize());
+        vo.setMemberCount(entity.getMemberCount());
         vo.setCreateTime(entity.getCreateTime());
         return vo;
     }
