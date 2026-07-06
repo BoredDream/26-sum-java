@@ -300,6 +300,7 @@ CREATE TABLE notice (
   top_flag TINYINT NOT NULL DEFAULT 0 COMMENT '0-普通，1-置顶',
   publisher_id BIGINT NOT NULL COMMENT '发布人账号编号',
   is_deleted TINYINT NOT NULL DEFAULT 0 COMMENT '是否逻辑删除：0-否，1-是',
+  delete_time DATETIME NULL DEFAULT NULL COMMENT '删除时间',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发布时间',
   update_time DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   CONSTRAINT fk_notice_publisher FOREIGN KEY (publisher_id) REFERENCES user_account(user_id),
