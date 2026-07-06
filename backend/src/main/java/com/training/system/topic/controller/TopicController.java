@@ -4,6 +4,7 @@ import com.training.system.common.PageResult;
 import com.training.system.common.Result;
 import com.training.system.common.ResultCode;
 import com.training.system.exception.BusinessException;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.topic.dto.TopicCreateDTO;
 import com.training.system.topic.dto.TopicQueryDTO;
 import com.training.system.topic.dto.TopicReviewDTO;
@@ -45,6 +46,7 @@ public class TopicController {
     /**
      * 新增题目（保存草稿或提交审核）
      */
+    @OperationLog(type = "CREATE", description = "新增题目")
     @PostMapping
     public Result<Void> createTopic(@Valid @RequestBody TopicCreateDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -55,6 +57,7 @@ public class TopicController {
     /**
      * 修改题目
      */
+    @OperationLog(type = "UPDATE", description = "修改题目")
     @PutMapping("/{topicId}")
     public Result<Void> updateTopic(@PathVariable Long topicId,
                                      @Valid @RequestBody TopicUpdateDTO dto,
@@ -67,6 +70,7 @@ public class TopicController {
     /**
      * 删除题目（逻辑删除，仅管理员）
      */
+    @OperationLog(type = "DELETE", description = "删除题目")
     @DeleteMapping("/{topicId}")
     public Result<Void> deleteTopic(@PathVariable Long topicId, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -99,6 +103,7 @@ public class TopicController {
     /**
      * 提交题目审核
      */
+    @OperationLog(type = "UPDATE", description = "提交题目审核")
     @PostMapping("/{topicId}/submit")
     public Result<Void> submitForReview(@PathVariable Long topicId, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -109,6 +114,7 @@ public class TopicController {
     /**
      * 审核题目（仅管理员）
      */
+    @OperationLog(type = "UPDATE", description = "审核题目")
     @PostMapping("/{topicId}/review")
     public Result<Void> reviewTopic(@PathVariable Long topicId,
                                      @Valid @RequestBody TopicReviewDTO dto,
@@ -124,6 +130,7 @@ public class TopicController {
     /**
      * 开放题目（仅管理员）
      */
+    @OperationLog(type = "UPDATE", description = "开放题目")
     @PostMapping("/{topicId}/open")
     public Result<Void> openTopic(@PathVariable Long topicId, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -134,6 +141,7 @@ public class TopicController {
     /**
      * 关闭题目（仅管理员）
      */
+    @OperationLog(type = "UPDATE", description = "关闭题目")
     @PostMapping("/{topicId}/close")
     public Result<Void> closeTopic(@PathVariable Long topicId, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -146,6 +154,7 @@ public class TopicController {
     /**
      * 上传题目资料
      */
+    @OperationLog(type = "CREATE", description = "上传题目资料")
     @PostMapping("/{topicId}/file")
     public Result<Void> uploadFile(@PathVariable Long topicId,
                                     @RequestParam("file") MultipartFile file,
@@ -159,6 +168,7 @@ public class TopicController {
     /**
      * 删除资料
      */
+    @OperationLog(type = "DELETE", description = "删除题目资料")
     @DeleteMapping("/file/{fileId}")
     public Result<Void> deleteFile(@PathVariable Long fileId, HttpSession session) {
         UserSession user = getUserSession(session);

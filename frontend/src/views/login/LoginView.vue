@@ -73,8 +73,8 @@ async function handleLogin() {
       await auth.login(form)
       ElMessage.success('登录成功')
       router.push(auth.getHomePath(auth.role))
-    } catch {
-      // 错误已由 request 拦截器提示
+    } catch (err: any) {
+      ElMessage.error(err?.message || '登录失败，请检查账号密码')
     }
   })
 }

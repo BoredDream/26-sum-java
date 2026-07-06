@@ -1,5 +1,6 @@
 package com.training.system.selection.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.selection.dto.CreateDevelopmentLogDTO;
 import com.training.system.selection.dto.LogFeedbackDTO;
 import com.training.system.selection.service.DevelopmentLogService;
@@ -22,6 +23,7 @@ public class DevelopmentLogController {
         this.developmentLogService = developmentLogService;
     }
 
+    @OperationLog(type = "CREATE", description = "提交开发日志")
     @PostMapping
     public Result<DevelopmentLogVO> create(HttpSession session,
                                            @RequestBody @Valid CreateDevelopmentLogDTO dto) {
@@ -35,6 +37,7 @@ public class DevelopmentLogController {
         return Result.success(developmentLogService.listMyScope(user.relatedId(), user.role()));
     }
 
+    @OperationLog(type = "UPDATE", description = "反馈开发日志")
     @PatchMapping("/{logId}/feedback")
     public Result<DevelopmentLogVO> feedback(HttpSession session,
                                              @PathVariable Long logId,

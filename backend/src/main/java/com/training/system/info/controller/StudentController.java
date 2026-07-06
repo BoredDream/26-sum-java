@@ -2,6 +2,7 @@ package com.training.system.info.controller;
 
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.info.dto.StudentCreateDTO;
 import com.training.system.info.dto.StudentUpdateDTO;
 import com.training.system.info.entity.Student;
@@ -25,11 +26,13 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
+    @OperationLog(type = "CREATE", description = "新增学生")
     @PostMapping
     public Result<StudentVO> create(@Valid @RequestBody StudentCreateDTO dto) {
         return Result.success(studentService.createStudent(dto));
     }
 
+    @OperationLog(type = "UPDATE", description = "修改学生信息")
     @PutMapping("/{studentId}")
     public Result<StudentVO> update(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateDTO dto) {
         return Result.success(studentService.updateStudent(studentId, dto));
@@ -60,12 +63,14 @@ public class StudentController {
         return Result.success();
     }
 
+    @OperationLog(type = "DELETE", description = "删除学生")
     @DeleteMapping("/{studentId}")
     public Result<Void> delete(@PathVariable Long studentId) {
         studentService.deleteStudent(studentId);
         return Result.success();
     }
 
+    @OperationLog(type = "EXPORT", description = "导出学生信息")
     @GetMapping("/export")
     public void export(HttpServletResponse response) {
         try {
@@ -79,6 +84,7 @@ public class StudentController {
         }
     }
 
+    @OperationLog(type = "IMPORT", description = "导入学生信息")
     @PostMapping("/import")
     public Result<String> importStudents(@RequestParam("file") MultipartFile file) {
         try {

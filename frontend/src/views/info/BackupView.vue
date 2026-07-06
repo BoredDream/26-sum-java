@@ -2,10 +2,10 @@
   <div class="backup-page">
     <page-header title="数据备份">
       <template #extra>
-        <el-button type="danger" :icon="Delete" @click="handleCleanup">清理旧备份</el-button>
-        <el-button type="primary" :icon="Plus" :loading="creating" @click="handleCreate"
-          >创建备份</el-button
-        >
+        <div class="toolbar-group">
+          <el-button type="primary" :icon="Plus" :loading="creating" @click="handleCreate">创建备份</el-button>
+          <el-button type="danger" :icon="Delete" @click="handleCleanup">清理旧备份</el-button>
+        </div>
       </template>
     </page-header>
 
@@ -180,6 +180,12 @@ onMounted(loadBackups)
 .backup-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .data-table {

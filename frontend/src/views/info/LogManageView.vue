@@ -2,33 +2,37 @@
   <div class="log-manage-page">
     <page-header title="操作日志">
       <template #extra>
-        <el-input
-          v-model="keyword"
-          placeholder="搜索操作人/内容"
-          clearable
-          style="width: 220px"
-          @clear="handleSearch"
-          @keyup.enter="handleSearch"
-        />
-        <el-select
-          v-model="filterType"
-          placeholder="操作类型"
-          clearable
-          style="width: 160px"
-          @change="handleSearch"
-        >
-          <el-option label="登录" value="LOGIN" />
-          <el-option label="登出" value="LOGOUT" />
-          <el-option label="新增" value="CREATE" />
-          <el-option label="修改" value="UPDATE" />
-          <el-option label="删除" value="DELETE" />
-          <el-option label="导出" value="EXPORT" />
-          <el-option label="导入" value="IMPORT" />
-          <el-option label="备份" value="BACKUP" />
-          <el-option label="恢复" value="RESTORE" />
-        </el-select>
-        <el-button :icon="Search" @click="handleSearch" />
-        <el-button type="danger" :icon="Delete" @click="handleClear">清理日志</el-button>
+        <div class="toolbar-group">
+          <el-input
+            v-model="keyword"
+            placeholder="搜索操作人/内容"
+            clearable
+            style="width: 200px"
+            @clear="handleSearch"
+            @keyup.enter="handleSearch"
+          />
+          <el-select
+            v-model="filterType"
+            placeholder="操作类型"
+            clearable
+            style="width: 120px"
+            @change="handleSearch"
+          >
+            <el-option label="登录" value="LOGIN" />
+            <el-option label="登出" value="LOGOUT" />
+            <el-option label="新增" value="CREATE" />
+            <el-option label="修改" value="UPDATE" />
+            <el-option label="删除" value="DELETE" />
+            <el-option label="导出" value="EXPORT" />
+            <el-option label="导入" value="IMPORT" />
+            <el-option label="备份" value="BACKUP" />
+            <el-option label="恢复" value="RESTORE" />
+          </el-select>
+          <el-button :icon="Search" @click="handleSearch">搜索</el-button>
+        </div>
+        <div class="toolbar-group">
+          <el-button type="danger" :icon="Delete" @click="handleClear">清理日志</el-button>
+        </div>
       </template>
     </page-header>
 
@@ -127,6 +131,12 @@ onMounted(loadLogs)
 .log-manage-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .data-table {

@@ -1,6 +1,7 @@
 package com.training.system.info.controller;
 
 import com.training.system.common.Result;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.info.dto.LoginDTO;
 import com.training.system.info.service.AuthService;
 import com.training.system.info.vo.LoginVO;
@@ -16,12 +17,14 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @OperationLog(type = "LOGIN", description = "用户登录")
     @PostMapping("/login")
     public Result<LoginVO> login(@Valid @RequestBody LoginDTO dto, HttpSession session) {
         LoginVO vo = authService.login(dto, session);
         return Result.success(vo);
     }
 
+    @OperationLog(type = "LOGOUT", description = "用户登出")
     @PostMapping("/logout")
     public Result<Void> logout(HttpSession session) {
         authService.logout(session);

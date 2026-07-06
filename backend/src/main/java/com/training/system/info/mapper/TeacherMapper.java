@@ -20,10 +20,10 @@ public interface TeacherMapper {
 
     Teacher selectByTeacherNo(@Param("teacherNo") String teacherNo);
 
-    List<TeacherVO> selectPage(@Param("keyword") String keyword,
+    List<TeacherVO> selectPage(@Param("keyword") String keyword, @Param("status") Integer status,
                                @Param("offset") int offset, @Param("size") int size);
 
-    long countPage(@Param("keyword") String keyword);
+    long countPage(@Param("keyword") String keyword, @Param("status") Integer status);
 
     @Select("<script>SELECT teacher_id, teacher_name FROM teacher WHERE teacher_id IN " +
             "<foreach item='id' collection='ids' open='(' separator=',' close=')'>#{id}</foreach>" +

@@ -1,10 +1,10 @@
 <template>
   <div class="notice-page">
-    <page-header title="公告管理">
-      <template v-if="isAdminOrTeacher" #extra>
-        <el-button type="primary" :icon="Plus" @click="openCreate">新增公告</el-button>
-      </template>
-    </page-header>
+    <page-header title="公告管理" />
+
+    <div v-if="isAdminOrTeacher" class="toolbar-row">
+      <el-button type="primary" :icon="Plus" @click="openCreate">新增公告</el-button>
+    </div>
 
     <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon class="mb-4" />
 
@@ -27,28 +27,16 @@
           formatDateTime((scope.row as NoticeVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="240" fixed="right">
+      <el-table-column label="操作" width="260" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="openDetail(scope.row as NoticeVO)"
-            >查看</el-button
-          >
-          <template v-if="isAdminOrTeacher">
-            <el-button type="primary" text size="small" @click="openEdit(scope.row as NoticeVO)"
-              >编辑</el-button
-            >
-            <el-button
-              type="warning"
-              text
-              size="small"
-              :loading="topId === (scope.row as NoticeVO).noticeId"
-              @click="handleToggleTop(scope.row as NoticeVO)"
-            >
-              {{ (scope.row as NoticeVO).topFlag === 1 ? '取消置顶' : '置顶' }}
-            </el-button>
-            <el-button type="danger" text size="small" @click="handleDelete(scope.row as NoticeVO)"
-              >删除</el-button
-            >
-          </template>
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="openDetail(scope.row as NoticeVO)">查看</el-button>
+            <template v-if="isAdminOrTeacher">
+              <el-button type="primary" link size="small" @click="openEdit(scope.row as NoticeVO)">编辑</el-button>
+              <el-button type="danger" link size="small" @click="handleDelete(scope.row as NoticeVO)">删除</el-button>
+              <el-button type="warning" link size="small" :loading="topId === (scope.row as NoticeVO).noticeId" @click="handleToggleTop(scope.row as NoticeVO)">{{ (scope.row as NoticeVO).topFlag === 1 ? '取消置顶' : '置顶' }}</el-button>
+            </template>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -307,6 +295,18 @@ onMounted(loadNotices)
 .notice-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .toolbar-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

@@ -1,5 +1,6 @@
 package com.training.system.selection.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.selection.dto.*;
 import com.training.system.selection.service.TeamService;
 import com.training.system.common.Result;
@@ -22,6 +23,7 @@ public class TeamController {
         this.teamService = teamService;
     }
 
+    @OperationLog(type = "CREATE", description = "创建团队")
     @PostMapping
     public Result<TeamVO> createTeam(HttpSession session,
                                      @RequestBody @Valid CreateTeamDTO dto) {
@@ -45,6 +47,7 @@ public class TeamController {
         return Result.success(teamService.getTeamDetail(teamId));
     }
 
+    @OperationLog(type = "CREATE", description = "申请加入团队")
     @PostMapping("/{teamId}/join-requests")
     public Result<JoinRequestVO> applyJoin(HttpSession session,
                                            @PathVariable Long teamId,
@@ -60,6 +63,7 @@ public class TeamController {
         return Result.success(teamService.listPendingJoinRequests(user.relatedId(), user.role(), teamId));
     }
 
+    @OperationLog(type = "UPDATE", description = "审核入队申请")
     @PatchMapping("/join-requests/{requestId}/audit")
     public Result<JoinRequestVO> auditJoinRequest(HttpSession session,
                                                   @PathVariable Long requestId,
@@ -68,6 +72,7 @@ public class TeamController {
         return Result.success(teamService.auditJoinRequest(user.relatedId(), user.role(), requestId, dto));
     }
 
+    @OperationLog(type = "UPDATE", description = "修改成员工作内容")
     @PutMapping("/{teamId}/members/{studentId}/work-content")
     public Result<Void> updateMemberWork(HttpSession session,
                                          @PathVariable Long teamId,

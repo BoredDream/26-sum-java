@@ -71,10 +71,10 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
-    public PageResult<TeacherVO> pageTeachers(String keyword, int pageNum, int pageSize) {
+    public PageResult<TeacherVO> pageTeachers(String keyword, Integer status, int pageNum, int pageSize) {
         int offset = (pageNum - 1) * pageSize;
-        List<TeacherVO> records = teacherMapper.selectPage(keyword, offset, pageSize);
-        long total = teacherMapper.countPage(keyword);
+        List<TeacherVO> records = teacherMapper.selectPage(keyword, status, offset, pageSize);
+        long total = teacherMapper.countPage(keyword, status);
         return new PageResult<>(records, total, pageNum, pageSize);
     }
 
@@ -139,7 +139,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public List<Teacher> getAllTeachers() {
-        return teacherMapper.selectPage(null, 0, Integer.MAX_VALUE)
+        return teacherMapper.selectPage(null, null, 0, Integer.MAX_VALUE)
                 .stream().map(vo -> teacherMapper.selectById(vo.getTeacherId())).toList();
     }
 
@@ -155,7 +155,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public long count() {
-        return teacherMapper.countPage(null);
+        return teacherMapper.countPage(null, null);
     }
 
     private TeacherVO toVO(Teacher teacher, UserAccount account) {

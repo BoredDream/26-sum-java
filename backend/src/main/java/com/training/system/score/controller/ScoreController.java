@@ -4,6 +4,7 @@ import com.training.system.common.PageResult;
 import com.training.system.common.Result;
 import com.training.system.common.ResultCode;
 import com.training.system.exception.BusinessException;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.score.dto.*;
 import com.training.system.score.service.ScoreService;
 import com.training.system.score.vo.ProgressVO;
@@ -30,6 +31,7 @@ public class ScoreController {
         this.scoreService = scoreService;
     }
 
+    @OperationLog(type = "CREATE", description = "创建阶段任务")
     @PostMapping("/stage-task")
     public Result<Void> createStageTask(@Valid @RequestBody StageTaskCreateDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -43,6 +45,7 @@ public class ScoreController {
         return Result.success(scoreService.queryStageTaskPage(dto, user.role, user.relatedId));
     }
 
+    @OperationLog(type = "CREATE", description = "阶段评分")
     @PostMapping("/stage-evaluation")
     public Result<Void> evaluateStage(@Valid @RequestBody StageEvaluationDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -57,6 +60,7 @@ public class ScoreController {
         return Result.success(scoreService.queryProgress(teamId, user.role, user.relatedId));
     }
 
+    @OperationLog(type = "CREATE", description = "记录贡献度")
     @PostMapping("/contribution")
     public Result<Void> recordContribution(@Valid @RequestBody ContributionDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -64,6 +68,7 @@ public class ScoreController {
         return Result.success();
     }
 
+    @OperationLog(type = "CREATE", description = "保存团队成绩")
     @PostMapping
     public Result<Void> saveTeamScore(@Valid @RequestBody ScoreSaveDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -83,6 +88,7 @@ public class ScoreController {
         return Result.success(scoreService.queryStudentScore(studentId, user.role, user.relatedId));
     }
 
+    @OperationLog(type = "UPDATE", description = "确认成绩")
     @PostMapping("/{scoreId}/confirm")
     public Result<Void> confirmScore(@PathVariable Long scoreId, HttpSession session) {
         UserSession user = getUserSession(session);
@@ -90,6 +96,7 @@ public class ScoreController {
         return Result.success();
     }
 
+    @OperationLog(type = "EXPORT", description = "导出成绩")
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportScores(HttpSession session) {
         UserSession user = getUserSession(session);

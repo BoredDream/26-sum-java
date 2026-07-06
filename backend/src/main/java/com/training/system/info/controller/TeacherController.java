@@ -2,6 +2,7 @@ package com.training.system.info.controller;
 
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.info.dto.TeacherCreateDTO;
 import com.training.system.info.dto.TeacherUpdateDTO;
 import com.training.system.info.entity.Teacher;
@@ -24,11 +25,13 @@ public class TeacherController {
     @Autowired
     private TeacherService teacherService;
 
+    @OperationLog(type = "CREATE", description = "新增教师")
     @PostMapping
     public Result<TeacherVO> create(@Valid @RequestBody TeacherCreateDTO dto) {
         return Result.success(teacherService.createTeacher(dto));
     }
 
+    @OperationLog(type = "UPDATE", description = "修改教师信息")
     @PutMapping("/{teacherId}")
     public Result<TeacherVO> update(@PathVariable Long teacherId, @Valid @RequestBody TeacherUpdateDTO dto) {
         return Result.success(teacherService.updateTeacher(teacherId, dto));
@@ -41,9 +44,10 @@ public class TeacherController {
 
     @GetMapping("/page")
     public Result<PageResult<TeacherVO>> page(@RequestParam(defaultValue = "") String keyword,
+                                               @RequestParam(required = false) Integer status,
                                                @RequestParam(defaultValue = "1") int pageNum,
                                                @RequestParam(defaultValue = "15") int pageSize) {
-        return Result.success(teacherService.pageTeachers(keyword, pageNum, pageSize));
+        return Result.success(teacherService.pageTeachers(keyword, status, pageNum, pageSize));
     }
 
     @PostMapping("/{teacherId}/reset-password")
@@ -58,12 +62,14 @@ public class TeacherController {
         return Result.success();
     }
 
+    @OperationLog(type = "DELETE", description = "删除教师")
     @DeleteMapping("/{teacherId}")
     public Result<Void> delete(@PathVariable Long teacherId) {
         teacherService.deleteTeacher(teacherId);
         return Result.success();
     }
 
+    @OperationLog(type = "EXPORT", description = "导出教师信息")
     @GetMapping("/export")
     public void export(HttpServletResponse response) {
         try {

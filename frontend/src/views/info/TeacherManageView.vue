@@ -2,22 +2,21 @@
   <div class="teacher-manage-page">
     <page-header title="教师管理">
       <template #extra>
-        <el-input
-          v-model="keyword"
-          placeholder="搜索工号/姓名"
-          clearable
-          style="width: 220px"
-          @clear="handleSearch"
-          @keyup.enter="handleSearch"
-        />
-        <el-button :icon="Search" @click="handleSearch" />
-        <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
-        <el-tooltip content="教师批量导入暂不支持" placement="top">
-          <span style="display: inline-block; margin: 0 12px">
-            <el-button type="warning" :icon="Upload" disabled>导入</el-button>
-          </span>
-        </el-tooltip>
-        <el-button type="primary" :icon="Plus" @click="openCreate">新增教师</el-button>
+        <div class="toolbar-group">
+          <el-input
+            v-model="keyword"
+            placeholder="搜索工号/姓名"
+            clearable
+            style="width: 200px"
+            @clear="handleSearch"
+            @keyup.enter="handleSearch"
+          />
+          <el-button :icon="Search" @click="handleSearch">搜索</el-button>
+        </div>
+        <div class="toolbar-group">
+          <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
+          <el-button type="primary" :icon="Plus" @click="openCreate">新增教师</el-button>
+        </div>
       </template>
     </page-header>
 
@@ -49,24 +48,12 @@
       </el-table-column>
       <el-table-column label="操作" width="260" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="openEdit(scope.row as TeacherVO)"
-            >编辑</el-button
-          >
-          <el-button
-            type="warning"
-            text
-            size="small"
-            :loading="actionId === (scope.row as TeacherVO).teacherId"
-            @click="handleToggleRole(scope.row as TeacherVO)"
-          >
-            切换角色
-          </el-button>
-          <el-button type="info" text size="small" @click="openPassword(scope.row as TeacherVO)"
-            >重置密码</el-button
-          >
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TeacherVO)"
-            >删除</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="openEdit(scope.row as TeacherVO)">编辑</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(scope.row as TeacherVO)">删除</el-button>
+            <el-button type="warning" link size="small" :loading="actionId === (scope.row as TeacherVO).teacherId" @click="handleToggleRole(scope.row as TeacherVO)">切换角色</el-button>
+            <el-button type="info" link size="small" @click="openPassword(scope.row as TeacherVO)">重置密码</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -139,7 +126,7 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { Plus, Search, Download, Upload } from '@element-plus/icons-vue'
+import { Plus, Search, Download } from '@element-plus/icons-vue'
 import * as infoApi from '@/api/info'
 import type { TeacherVO, TeacherCreateDTO, TeacherUpdateDTO } from '@/types/info'
 import { formatDateTime } from '@/utils/format'
@@ -332,6 +319,12 @@ onMounted(loadTeachers)
     margin-bottom: 16px;
   }
 
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .data-table {
     margin-top: 8px;
   }
@@ -340,6 +333,12 @@ onMounted(loadTeachers)
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .tip-text {

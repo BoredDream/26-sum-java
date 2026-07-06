@@ -17,7 +17,7 @@ public interface TeacherService {
 
     TeacherVO updateTeacher(Long teacherId, TeacherUpdateDTO dto);
 
-    PageResult<TeacherVO> pageTeachers(String keyword, int pageNum, int pageSize);
+    PageResult<TeacherVO> pageTeachers(String keyword, Integer status, int pageNum, int pageSize);
 
     TeacherVO getTeacherDetail(Long teacherId);
 

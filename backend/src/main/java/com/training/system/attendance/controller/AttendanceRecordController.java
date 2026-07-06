@@ -1,5 +1,6 @@
 package com.training.system.attendance.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.attendance.dto.AttendanceRecordQueryDTO;
 import com.training.system.attendance.dto.AttendanceSignDTO;
 import com.training.system.attendance.dto.CurrentUserDTO;
@@ -50,6 +51,7 @@ public class AttendanceRecordController {
         return Result.success(pageResult);
     }
 
+    @OperationLog(type = "EXPORT", description = "导出考勤记录")
     @GetMapping({"/export", "/record/export"})
     public void export(AttendanceRecordQueryDTO dto, HttpSession session, HttpServletResponse response) throws IOException {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);

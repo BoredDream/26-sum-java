@@ -11,6 +11,7 @@
         <result property="phone" column="phone"/>
         <result property="email" column="email"/>
         <result property="role" column="role"/>
+        <result property="status" column="status"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
 
@@ -33,21 +34,27 @@
     </select>
 
     <select id="selectPage" resultMap="TeacherVOMap">
-        SELECT t.*, ua.role FROM teacher t
+        SELECT t.*, ua.role, ua.status FROM teacher t
         LEFT JOIN user_account ua ON t.teacher_id = ua.related_id AND (ua.role='TEACHER' OR ua.role='ADMIN')
         WHERE 1=1
         <if test="keyword != null and keyword != ''">
             AND (t.teacher_no LIKE CONCAT('%',#{keyword},'%') OR t.teacher_name LIKE CONCAT('%',#{keyword},'%')
             OR t.office LIKE CONCAT('%',#{keyword},'%') OR t.title LIKE CONCAT('%',#{keyword},'%'))
         </if>
+        <if test="status != null">AND ua.status=#{status}</if>
+        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
         ORDER BY t.create_time DESC LIMIT #{offset},#{size}
     </select>
 
     <select id="countPage" resultType="long">
-        SELECT COUNT(*) FROM teacher WHERE 1=1
+        SELECT COUNT(*) FROM teacher t
+        LEFT JOIN user_account ua ON t.teacher_id = ua.related_id AND (ua.role='TEACHER' OR ua.role='ADMIN')
+        WHERE 1=1
         <if test="keyword != null and keyword != ''">
-            AND (teacher_no LIKE CONCAT('%',#{keyword},'%') OR teacher_name LIKE CONCAT('%',#{keyword},'%')
-            OR office LIKE CONCAT('%',#{keyword},'%') OR title LIKE CONCAT('%',#{keyword},'%'))
+            AND (t.teacher_no LIKE CONCAT('%',#{keyword},'%') OR t.teacher_name LIKE CONCAT('%',#{keyword},'%')
+            OR t.office LIKE CONCAT('%',#{keyword},'%') OR t.title LIKE CONCAT('%',#{keyword},'%'))
         </if>
+        <if test="status != null">AND ua.status=#{status}</if>
+        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
     </select>
 </mapper>

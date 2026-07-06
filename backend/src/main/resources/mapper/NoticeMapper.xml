@@ -35,14 +35,16 @@
     </select>
 
     <select id="selectVOById" resultMap="NoticeVOMap">
-        SELECT n.*, t.teacher_name AS publisher_name FROM notice n
-        LEFT JOIN teacher t ON n.publisher_id = t.teacher_id
+        SELECT n.*, COALESCE(t.teacher_name, ua.username) AS publisher_name FROM notice n
+        LEFT JOIN user_account ua ON n.publisher_id = ua.user_id
+        LEFT JOIN teacher t ON ua.related_id = t.teacher_id AND ua.role IN ('TEACHER', 'ADMIN')
         WHERE n.notice_id=#{noticeId} AND n.is_deleted=0
     </select>
 
     <select id="selectPage" resultMap="NoticeVOMap">
-        SELECT n.*, t.teacher_name AS publisher_name FROM notice n
-        LEFT JOIN teacher t ON n.publisher_id = t.teacher_id
+        SELECT n.*, COALESCE(t.teacher_name, ua.username) AS publisher_name FROM notice n
+        LEFT JOIN user_account ua ON n.publisher_id = ua.user_id
+        LEFT JOIN teacher t ON ua.related_id = t.teacher_id AND ua.role IN ('TEACHER', 'ADMIN')
         WHERE n.is_deleted=0
         <if test="keyword != null and keyword != ''">
             AND (n.title LIKE CONCAT('%',#{keyword},'%') OR n.content LIKE CONCAT('%',#{keyword},'%'))

@@ -41,6 +41,7 @@
             OR s.major LIKE CONCAT('%',#{keyword},'%') OR s.class_name LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="status != null">AND ua.status=#{status}</if>
+        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
         ORDER BY s.create_time DESC LIMIT #{offset},#{size}
     </select>
 
@@ -53,5 +54,6 @@
             OR s.major LIKE CONCAT('%',#{keyword},'%') OR s.class_name LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="status != null">AND ua.status=#{status}</if>
+        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
     </select>
 </mapper>

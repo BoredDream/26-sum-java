@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
         }
         if (!account.getRole().equals(dto.getRole())) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "用户名或密码错误");
+            throw new BusinessException(ResultCode.BAD_REQUEST, "角色选择错误，该账号不是" + roleName(dto.getRole()));
         }
 
         String name = "";
@@ -71,5 +71,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(HttpSession session) {
         session.invalidate();
+    }
+
+    private String roleName(String role) {
+        return switch (role) {
+            case "STUDENT" -> "学生";
+            case "TEACHER" -> "教师";
+            case "ADMIN" -> "管理员";
+            default -> role;
+        };
     }
 }

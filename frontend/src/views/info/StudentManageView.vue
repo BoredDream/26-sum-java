@@ -2,37 +2,41 @@
   <div class="student-manage-page">
     <page-header title="学生管理">
       <template #extra>
-        <el-input
-          v-model="keyword"
-          placeholder="搜索学号/姓名"
-          clearable
-          style="width: 220px"
-          @clear="handleSearch"
-          @keyup.enter="handleSearch"
-        />
-        <el-select
-          v-model="filterStatus"
-          placeholder="账号状态"
-          clearable
-          style="width: 140px"
-          @change="handleSearch"
-        >
-          <el-option label="正常" :value="1" />
-          <el-option label="禁用" :value="0" />
-        </el-select>
-        <el-button :icon="Search" @click="handleSearch" />
-        <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
-        <el-upload
-          ref="uploadRef"
-          action="#"
-          :auto-upload="false"
-          :show-file-list="false"
-          :on-change="handleImport"
-          style="display: inline-block; margin: 0 12px"
-        >
-          <el-button type="warning" :icon="Upload" :loading="importing">导入</el-button>
-        </el-upload>
-        <el-button type="primary" :icon="Plus" @click="openCreate">新增学生</el-button>
+        <div class="toolbar-group">
+          <el-input
+            v-model="keyword"
+            placeholder="搜索学号/姓名"
+            clearable
+            style="width: 200px"
+            @clear="handleSearch"
+            @keyup.enter="handleSearch"
+          />
+          <el-select
+            v-model="filterStatus"
+            placeholder="状态"
+            clearable
+            style="width: 100px"
+            @change="handleSearch"
+          >
+            <el-option label="正常" :value="1" />
+            <el-option label="禁用" :value="0" />
+          </el-select>
+          <el-button :icon="Search" @click="handleSearch">搜索</el-button>
+        </div>
+        <div class="toolbar-group">
+          <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
+          <el-upload
+            ref="uploadRef"
+            action="#"
+            :auto-upload="false"
+            :show-file-list="false"
+            :on-change="handleImport"
+            class="inline-upload"
+          >
+            <el-button type="warning" :icon="Upload" :loading="importing">导入</el-button>
+          </el-upload>
+          <el-button type="primary" :icon="Plus" @click="openCreate">新增学生</el-button>
+        </div>
       </template>
     </page-header>
 
@@ -60,26 +64,14 @@
           formatDateTime((scope.row as StudentVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="260" fixed="right">
+      <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="openEdit(scope.row as StudentVO)"
-            >编辑</el-button
-          >
-          <el-button
-            type="warning"
-            text
-            size="small"
-            :loading="actionId === (scope.row as StudentVO).studentId"
-            @click="handleToggleStatus(scope.row as StudentVO)"
-          >
-            {{ (scope.row as StudentVO).status === 1 ? '禁用' : '启用' }}
-          </el-button>
-          <el-button type="info" text size="small" @click="openPassword(scope.row as StudentVO)"
-            >重置密码</el-button
-          >
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as StudentVO)"
-            >删除</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="openEdit(scope.row as StudentVO)">编辑</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(scope.row as StudentVO)">删除</el-button>
+            <el-button type="warning" link size="small" :loading="actionId === (scope.row as StudentVO).studentId" @click="handleToggleStatus(scope.row as StudentVO)">{{ (scope.row as StudentVO).status === 1 ? '禁用' : '启用' }}</el-button>
+            <el-button type="info" link size="small" @click="openPassword(scope.row as StudentVO)">重置密码</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -367,6 +359,16 @@ onMounted(loadStudents)
     margin-bottom: 16px;
   }
 
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .inline-upload {
+    display: inline-block;
+  }
+
   .data-table {
     margin-top: 8px;
   }
@@ -375,6 +377,12 @@ onMounted(loadStudents)
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .tip-text {

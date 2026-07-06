@@ -1,5 +1,6 @@
 package com.training.system.selection.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.selection.dto.AuditSelectionDTO;
 import com.training.system.selection.dto.SubmitSelectionDTO;
 import com.training.system.selection.service.SelectionService;
@@ -33,6 +34,7 @@ public class TopicSelectionController {
         return Result.success(selectionService.getTopicDetail(topicId));
     }
 
+    @OperationLog(type = "CREATE", description = "提交选题申请")
     @PostMapping("/applications")
     public Result<SelectionVO> submitSelection(HttpSession session,
                                                @RequestBody @Valid SubmitSelectionDTO dto) {
@@ -52,6 +54,7 @@ public class TopicSelectionController {
         return Result.success(selectionService.getPendingSelections(user.relatedId(), user.role()));
     }
 
+    @OperationLog(type = "UPDATE", description = "审核选题申请")
     @PatchMapping("/applications/{selectionId}/audit")
     public Result<SelectionVO> auditSelection(HttpSession session,
                                               @PathVariable Long selectionId,

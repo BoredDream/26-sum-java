@@ -2,6 +2,7 @@ package com.training.system.info.controller;
 
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.info.service.BackupService;
 import com.training.system.info.vo.BackupVO;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,6 +22,7 @@ public class BackupController {
     @Autowired
     private BackupService backupService;
 
+    @OperationLog(type = "BACKUP", description = "手动备份数据")
     @PostMapping
     public Result<BackupVO> manualBackup(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -48,12 +50,14 @@ public class BackupController {
         }
     }
 
+    @OperationLog(type = "RESTORE", description = "恢复备份数据")
     @PostMapping("/{backupId}/restore")
     public Result<Void> restore(@PathVariable Long backupId) {
         backupService.restoreBackup(backupId);
         return Result.success();
     }
 
+    @OperationLog(type = "DELETE", description = "删除备份文件")
     @DeleteMapping("/{backupId}")
     public Result<Void> delete(@PathVariable Long backupId) {
         backupService.deleteBackup(backupId);

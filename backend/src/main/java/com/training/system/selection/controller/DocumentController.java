@@ -1,5 +1,6 @@
 package com.training.system.selection.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.selection.dto.DocumentFeedbackDTO;
 import com.training.system.selection.service.DocumentService;
 import com.training.system.common.Result;
@@ -28,6 +29,7 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
+    @OperationLog(type = "CREATE", description = "上传过程文档")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<ProcessDocumentVO> upload(HttpSession session,
                                             @RequestParam String documentName,
@@ -44,6 +46,7 @@ public class DocumentController {
         return Result.success(documentService.listMyScope(user.relatedId(), user.role()));
     }
 
+    @OperationLog(type = "UPDATE", description = "反馈过程文档")
     @PatchMapping("/{documentId}/feedback")
     public Result<ProcessDocumentVO> feedback(HttpSession session,
                                               @PathVariable Long documentId,

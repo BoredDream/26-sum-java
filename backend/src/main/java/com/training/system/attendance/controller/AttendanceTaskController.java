@@ -1,5 +1,6 @@
 package com.training.system.attendance.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.attendance.dto.AttendanceTaskCreateDTO;
 import com.training.system.attendance.dto.AttendanceTaskQueryDTO;
 import com.training.system.attendance.dto.CurrentUserDTO;
@@ -26,6 +27,7 @@ public class AttendanceTaskController {
         this.attendanceTaskService = attendanceTaskService;
     }
 
+    @OperationLog(type = "CREATE", description = "创建签到任务")
     @PostMapping
     public Result<Long> create(@Valid @RequestBody AttendanceTaskCreateDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);
@@ -33,6 +35,7 @@ public class AttendanceTaskController {
         return Result.success(taskId);
     }
 
+    @OperationLog(type = "UPDATE", description = "结束签到任务")
     @PostMapping("/{taskId}/finish")
     public Result<Void> finish(@PathVariable Long taskId, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);

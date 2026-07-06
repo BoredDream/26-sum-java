@@ -1,5 +1,6 @@
 package com.training.system.attendance.controller;
 
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.attendance.dto.CurrentUserDTO;
 import com.training.system.attendance.dto.MakeupApplyDTO;
 import com.training.system.attendance.dto.MakeupApplyQueryDTO;
@@ -43,6 +44,7 @@ public class MakeupSignApplyController {
         this.uploadPath = uploadPath;
     }
 
+    @OperationLog(type = "CREATE", description = "提交补签申请")
     @PostMapping
     public Result<Long> apply(@Valid @RequestBody MakeupApplyDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);
@@ -50,6 +52,7 @@ public class MakeupSignApplyController {
         return Result.success(applyId);
     }
 
+    @OperationLog(type = "UPDATE", description = "审核补签申请")
     @PostMapping("/{applyId}/review")
     public Result<Void> review(@PathVariable Long applyId,
                                @Valid @RequestBody MakeupReviewDTO dto,

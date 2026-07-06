@@ -16,6 +16,7 @@ public class TeacherVO {
     private String email;
     private String role;
     private String roleText;
+    private Integer status;
     private LocalDateTime createTime;
 
     public Long getTeacherId() { return teacherId; }
@@ -36,6 +37,8 @@ public class TeacherVO {
     public void setRole(String role) { this.role = role; }
     public String getRoleText() { return roleText; }
     public void setRoleText(String roleText) { this.roleText = roleText; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

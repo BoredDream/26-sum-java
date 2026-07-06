@@ -2,6 +2,7 @@ package com.training.system.info.controller;
 
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
+import com.training.system.info.annotation.OperationLog;
 import com.training.system.info.dto.NoticeCreateDTO;
 import com.training.system.info.dto.NoticeQueryDTO;
 import com.training.system.info.dto.NoticeUpdateDTO;
@@ -26,6 +27,7 @@ public class NoticeController {
     @Autowired
     private NoticeService noticeService;
 
+    @OperationLog(type = "CREATE", description = "发布通知")
     @PostMapping
     public Result<NoticeVO> create(@Valid @ModelAttribute NoticeCreateDTO dto,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
@@ -34,6 +36,7 @@ public class NoticeController {
         return Result.success(noticeService.createNotice(dto, publisherId, file));
     }
 
+    @OperationLog(type = "UPDATE", description = "修改通知")
     @PutMapping("/{noticeId}")
     public Result<NoticeVO> update(@PathVariable Long noticeId,
                                    @Valid @ModelAttribute NoticeUpdateDTO dto,
@@ -41,6 +44,7 @@ public class NoticeController {
         return Result.success(noticeService.updateNotice(noticeId, dto, file));
     }
 
+    @OperationLog(type = "DELETE", description = "删除通知")
     @DeleteMapping("/{noticeId}")
     public Result<Void> delete(@PathVariable Long noticeId, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
