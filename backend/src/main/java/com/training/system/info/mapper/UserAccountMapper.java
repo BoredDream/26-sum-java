@@ -18,4 +18,6 @@ public interface UserAccountMapper {
     int updateStatus(@Param("userId") Long userId, @Param("status") Integer status);
 
     int updateRole(@Param("userId") Long userId, @Param("role") String role);
+
+    int deleteByUserId(@Param("userId") Long userId);
 }

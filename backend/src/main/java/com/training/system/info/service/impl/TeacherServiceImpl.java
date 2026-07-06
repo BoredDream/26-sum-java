@@ -133,7 +133,7 @@ public class TeacherServiceImpl implements TeacherService {
             throw new BusinessException(ResultCode.FORBIDDEN, "不允许删除管理员账号");
         }
         if (account != null) {
-            userAccountMapper.updateStatus(account.getUserId(), 0);
+            userAccountMapper.deleteByUserId(account.getUserId());
         }
     }
 

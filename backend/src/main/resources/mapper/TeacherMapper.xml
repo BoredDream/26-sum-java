@@ -42,7 +42,6 @@
             OR t.office LIKE CONCAT('%',#{keyword},'%') OR t.title LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="status != null">AND ua.status=#{status}</if>
-        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
         ORDER BY t.create_time DESC LIMIT #{offset},#{size}
     </select>
 
@@ -55,6 +54,5 @@
             OR t.office LIKE CONCAT('%',#{keyword},'%') OR t.title LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="status != null">AND ua.status=#{status}</if>
-        <if test="status == null">AND (ua.status IS NULL OR ua.status = 1)</if>
     </select>
 </mapper>

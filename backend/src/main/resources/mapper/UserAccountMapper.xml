@@ -26,4 +26,8 @@
     <update id="updateRole">
         UPDATE user_account SET role=#{role} WHERE user_id=#{userId}
     </update>
+
+    <delete id="deleteByUserId">
+        DELETE FROM user_account WHERE user_id=#{userId}
+    </delete>
 </mapper>
