@@ -3,6 +3,7 @@ package com.training.system.info.service.impl;
 import com.training.system.common.PageResult;
 import com.training.system.common.ResultCode;
 import com.training.system.info.dto.TeacherCreateDTO;
+import com.training.system.info.dto.TeacherUpdateDTO;
 import com.training.system.info.entity.Teacher;
 import com.training.system.info.entity.UserAccount;
 import com.training.system.exception.BusinessException;
@@ -55,7 +56,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     @Transactional
-    public TeacherVO updateTeacher(Long teacherId, TeacherCreateDTO dto) {
+    public TeacherVO updateTeacher(Long teacherId, TeacherUpdateDTO dto) {
         Teacher teacher = teacherMapper.selectById(teacherId);
         if (teacher == null) {
             throw new BusinessException(ResultCode.NOT_FOUND, "教师不存在");

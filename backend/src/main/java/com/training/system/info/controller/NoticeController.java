@@ -27,33 +27,17 @@ public class NoticeController {
     private NoticeService noticeService;
 
     @PostMapping
-    public Result<NoticeVO> create(@Valid @RequestParam("title") String title,
-                                   @Valid @RequestParam("content") String content,
-                                   @RequestParam("type") String type,
-                                   @RequestParam(value = "topFlag", defaultValue = "0") Integer topFlag,
+    public Result<NoticeVO> create(@Valid @ModelAttribute NoticeCreateDTO dto,
                                    @RequestParam(value = "file", required = false) MultipartFile file,
                                    HttpSession session) {
-        NoticeCreateDTO dto = new NoticeCreateDTO();
-        dto.setTitle(title);
-        dto.setContent(content);
-        dto.setType(type);
-        dto.setTopFlag(topFlag);
         Long publisherId = (Long) session.getAttribute("userId");
         return Result.success(noticeService.createNotice(dto, publisherId, file));
     }
 
     @PutMapping("/{noticeId}")
     public Result<NoticeVO> update(@PathVariable Long noticeId,
-                                   @RequestParam(required = false) String title,
-                                   @RequestParam(required = false) String content,
-                                   @RequestParam(required = false) String type,
-                                   @RequestParam(required = false) Integer topFlag,
+                                   @Valid @ModelAttribute NoticeUpdateDTO dto,
                                    @RequestParam(value = "file", required = false) MultipartFile file) {
-        NoticeUpdateDTO dto = new NoticeUpdateDTO();
-        dto.setTitle(title);
-        dto.setContent(content);
-        dto.setType(type);
-        dto.setTopFlag(topFlag);
         return Result.success(noticeService.updateNotice(noticeId, dto, file));
     }
 

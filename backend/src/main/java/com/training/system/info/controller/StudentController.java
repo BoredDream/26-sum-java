@@ -3,6 +3,7 @@ package com.training.system.info.controller;
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
 import com.training.system.info.dto.StudentCreateDTO;
+import com.training.system.info.dto.StudentUpdateDTO;
 import com.training.system.info.entity.Student;
 import com.training.system.info.service.StudentService;
 import com.training.system.info.util.ExcelUtil;
@@ -30,7 +31,7 @@ public class StudentController {
     }
 
     @PutMapping("/{studentId}")
-    public Result<StudentVO> update(@PathVariable Long studentId, @RequestBody StudentCreateDTO dto) {
+    public Result<StudentVO> update(@PathVariable Long studentId, @Valid @RequestBody StudentUpdateDTO dto) {
         return Result.success(studentService.updateStudent(studentId, dto));
     }
 

@@ -2,6 +2,7 @@ package com.training.system.info.service;
 
 import com.training.system.common.PageResult;
 import com.training.system.info.dto.TeacherCreateDTO;
+import com.training.system.info.dto.TeacherUpdateDTO;
 import com.training.system.info.entity.Teacher;
 import com.training.system.info.vo.TeacherVO;
 
@@ -14,7 +15,7 @@ public interface TeacherService {
 
     TeacherVO createTeacher(TeacherCreateDTO dto);
 
-    TeacherVO updateTeacher(Long teacherId, TeacherCreateDTO dto);
+    TeacherVO updateTeacher(Long teacherId, TeacherUpdateDTO dto);
 
     PageResult<TeacherVO> pageTeachers(String keyword, int pageNum, int pageSize);
 

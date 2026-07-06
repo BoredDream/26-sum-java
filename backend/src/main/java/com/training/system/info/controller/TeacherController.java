@@ -3,11 +3,13 @@ package com.training.system.info.controller;
 import com.training.system.common.PageResult;
 import com.training.system.common.Result;
 import com.training.system.info.dto.TeacherCreateDTO;
+import com.training.system.info.dto.TeacherUpdateDTO;
 import com.training.system.info.entity.Teacher;
 import com.training.system.info.service.TeacherService;
 import com.training.system.info.util.ExcelUtil;
 import com.training.system.info.vo.TeacherVO;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +25,12 @@ public class TeacherController {
     private TeacherService teacherService;
 
     @PostMapping
-    public Result<TeacherVO> create(@RequestBody TeacherCreateDTO dto) {
+    public Result<TeacherVO> create(@Valid @RequestBody TeacherCreateDTO dto) {
         return Result.success(teacherService.createTeacher(dto));
     }
 
     @PutMapping("/{teacherId}")
-    public Result<TeacherVO> update(@PathVariable Long teacherId, @RequestBody TeacherCreateDTO dto) {
+    public Result<TeacherVO> update(@PathVariable Long teacherId, @Valid @RequestBody TeacherUpdateDTO dto) {
         return Result.success(teacherService.updateTeacher(teacherId, dto));
     }
 
