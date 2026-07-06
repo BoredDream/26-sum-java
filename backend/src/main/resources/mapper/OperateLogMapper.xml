@@ -17,14 +17,15 @@
     </insert>
 
     <select id="selectPage" resultMap="OperateLogVOMap">
-        SELECT ol.*, COALESCE(t.teacher_name, s.student_name) AS operate_user_name
+        SELECT ol.*, COALESCE(t.teacher_name, s.student_name, ua.username) AS operate_user_name
         FROM operate_log ol
-        LEFT JOIN teacher t ON ol.operate_user_id = t.teacher_id
-        LEFT JOIN student s ON ol.operate_user_id = s.student_id
+        LEFT JOIN user_account ua ON ol.operate_user_id = ua.user_id
+        LEFT JOIN teacher t ON ua.related_id = t.teacher_id AND ua.role IN ('TEACHER','ADMIN')
+        LEFT JOIN student s ON ua.related_id = s.student_id AND ua.role = 'STUDENT'
         WHERE 1=1
         <if test="keyword != null and keyword != ''">
             AND (ol.operate_content LIKE CONCAT('%',#{keyword},'%')
-            OR COALESCE(t.teacher_name, s.student_name) LIKE CONCAT('%',#{keyword},'%'))
+            OR COALESCE(t.teacher_name, s.student_name, ua.username) LIKE CONCAT('%',#{keyword},'%'))
         </if>
         <if test="operateType != null and operateType != ''">
             AND ol.operate_type=#{operateType}
