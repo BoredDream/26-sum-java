@@ -123,7 +123,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as topicApi from '@/api/topic'
-import type { TopicVO, TopicUpdateDTO } from '@/types/topic'
+import type { TopicDetailVO, TopicUpdateDTO } from '@/types/topic'
 
 const route = useRoute()
 const router = useRouter()
@@ -173,7 +173,7 @@ const rules: FormRules = {
   ],
 }
 
-function fillForm(detail: TopicVO) {
+function fillForm(detail: TopicDetailVO) {
   form.topicName = detail.topicName
   form.topicType = detail.topicType
   form.difficulty = detail.difficulty

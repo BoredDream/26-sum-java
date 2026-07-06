@@ -303,8 +303,9 @@ async function openDetail(row: ScoreVO) {
   currentScore.value = { ...row, studentScores: [] }
   try {
     const team = await selectionApi.getTeam(row.teamId)
+    const members = team.members ?? []
     const studentScores = await Promise.all(
-      team.members.map((m: TeamMemberVO) =>
+      members.map((m: TeamMemberVO) =>
         scoreApi.queryStudentScore(m.studentId).then((list) => {
           const matched = list.find((item) => item.scoreId === row.scoreId)
           return (
@@ -379,14 +380,15 @@ async function openEdit(row: ScoreVO) {
 
   try {
     const team: TeamVO = await selectionApi.getTeam(row.teamId)
+    const members = team.members ?? []
     const existingScores = await Promise.all(
-      team.members.map((m: TeamMemberVO) =>
+      members.map((m: TeamMemberVO) =>
         scoreApi
           .queryStudentScore(m.studentId)
           .then((list) => list.find((item) => item.scoreId === row.scoreId))
       )
     )
-    form.studentScores = team.members.map((m: TeamMemberVO, index: number) => {
+    form.studentScores = members.map((m: TeamMemberVO, index: number) => {
       const existing = existingScores[index]
       return {
         studentId: m.studentId,

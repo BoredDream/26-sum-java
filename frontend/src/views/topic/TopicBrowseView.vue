@@ -104,7 +104,7 @@
     <el-dialog v-model="applyVisible" title="提交选题申请" width="500px">
       <el-form ref="applyFormRef" :model="applyForm" :rules="applyRules" label-width="100px">
         <el-form-item label="题目名称">
-          <el-input :model-value="currentTopic?.topicName" disabled />
+          <el-input :model-value="applyTopic?.topicName" disabled />
         </el-form-item>
         <el-form-item label="选题说明" prop="selectionReason">
           <el-input
@@ -133,14 +133,14 @@ import { Search } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
 import * as selectionApi from '@/api/selection'
-import type { TopicVO } from '@/types/topic'
+import type { TopicListVO, TopicDetailVO } from '@/types/topic'
 import { formatDateTime } from '@/utils/format'
 
 const auth = useAuthStore()
 const loading = ref(false)
 const error = ref('')
 const keyword = ref('')
-const topics = ref<TopicVO[]>([])
+const topics = ref<TopicListVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(9)
@@ -172,9 +172,23 @@ function handleSearch() {
 // 详情
 const detailVisible = ref(false)
 const detailLoading = ref(false)
-const currentTopic = ref<TopicVO | null>(null)
+const currentTopic = ref<TopicDetailVO | null>(null)
 
-async function openDetail(topic: TopicVO) {
+// 申请
+const applyVisible = ref(false)
+const submitting = ref(false)
+const applyFormRef = ref<FormInstance>()
+const applyTopic = ref<TopicListVO | null>(null)
+const applyForm = ref({
+  topicId: 0,
+  selectionReason: '',
+})
+
+const applyRules: FormRules = {
+  selectionReason: [{ required: true, message: '请输入选题说明', trigger: 'blur' }],
+}
+
+async function openDetail(topic: TopicListVO) {
   detailVisible.value = true
   detailLoading.value = true
   currentTopic.value = null
@@ -188,21 +202,8 @@ async function openDetail(topic: TopicVO) {
   }
 }
 
-// 申请
-const applyVisible = ref(false)
-const submitting = ref(false)
-const applyFormRef = ref<FormInstance>()
-const applyForm = ref({
-  topicId: 0,
-  selectionReason: '',
-})
-
-const applyRules: FormRules = {
-  selectionReason: [{ required: true, message: '请输入选题说明', trigger: 'blur' }],
-}
-
-function openApply(topic: TopicVO) {
-  currentTopic.value = topic
+function openApply(topic: TopicListVO) {
+  applyTopic.value = topic
   applyForm.value = { topicId: topic.topicId, selectionReason: '' }
   applyVisible.value = true
 }

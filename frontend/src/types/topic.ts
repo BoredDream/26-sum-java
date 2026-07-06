@@ -1,28 +1,29 @@
 import type { PageQuery } from './api'
 
-export interface TopicVO {
+export interface TopicListVO {
   topicId: number
   topicName: string
   topicType: string
   difficulty: string
+  teacherId: number
+  teacherName?: string
   studentLimit: number
   teamLimit?: number
+  status: number
+  statusText?: string
+  openStatus: number
+  openStatusText?: string
+  createTime?: string
+  updateTime?: string
+}
+
+export interface TopicDetailVO extends TopicListVO {
+  teacherNo?: string
   topicContent: string
   developTools?: string
   technicalRoute: string
   selectionStartTime?: string
   selectionEndTime?: string
-  teacherId: number
-  teacherName?: string
-  teacherNo?: string
-  status: number
-  statusName?: string
-  statusText?: string
-  openStatus: number
-  openStatusName?: string
-  openStatusText?: string
-  createTime?: string
-  updateTime?: string
   files?: TopicFileVO[]
   reviews?: TopicReviewVO[]
 }
@@ -58,7 +59,7 @@ export interface TopicUpdateDTO {
 /**
  * 题目审核请求参数
  * reviewResult 取值与后端 TopicReviewDTO 保持一致：
- * 2 = 审核通过，3 = 退回修改，4 = 不予通过
+ * 1 = 通过，2 = 退回修改，3 = 不予通过
  */
 export interface TopicReviewDTO {
   reviewResult: number

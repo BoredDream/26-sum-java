@@ -16,38 +16,40 @@
       <el-table-column prop="difficulty" label="难度" width="100" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="topic" :value="(scope.row as TopicVO).status" />
+          <status-tag category="topic" :value="(scope.row as TopicListVO).status" />
         </template>
       </el-table-column>
       <el-table-column label="开放状态" width="120">
         <template #default="scope">
-          <status-tag category="topicOpen" :value="(scope.row as TopicVO).openStatus" />
+          <status-tag category="topicOpen" :value="(scope.row as TopicListVO).openStatus" />
         </template>
       </el-table-column>
       <el-table-column prop="updateTime" label="更新时间" width="170">
         <template #default="scope">{{
-          formatDateTime((scope.row as TopicVO).updateTime)
+          formatDateTime((scope.row as TopicListVO).updateTime)
         }}</template>
       </el-table-column>
       <el-table-column label="操作" width="260" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="handleEdit(scope.row as TopicVO)"
+          <el-button type="primary" text size="small" @click="handleEdit(scope.row as TopicListVO)"
             >编辑</el-button
           >
-          <el-button type="primary" text size="small" @click="handleFiles(scope.row as TopicVO)"
+          <el-button type="primary" text size="small" @click="handleFiles(scope.row as TopicListVO)"
             >资料</el-button
           >
           <el-button
-            v-if="(scope.row as TopicVO).status === 0 || (scope.row as TopicVO).status === 3"
+            v-if="
+              (scope.row as TopicListVO).status === 0 || (scope.row as TopicListVO).status === 3
+            "
             type="success"
             text
             size="small"
-            :loading="submittingId === (scope.row as TopicVO).topicId"
-            @click="handleSubmit(scope.row as TopicVO)"
+            :loading="submittingId === (scope.row as TopicListVO).topicId"
+            @click="handleSubmit(scope.row as TopicListVO)"
           >
             提交审核
           </el-button>
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicVO)"
+          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicListVO)"
             >删除</el-button
           >
         </template>
@@ -73,13 +75,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as topicApi from '@/api/topic'
-import type { TopicVO } from '@/types/topic'
+import type { TopicListVO } from '@/types/topic'
 import { formatDateTime } from '@/utils/format'
 
 const router = useRouter()
 const loading = ref(false)
 const error = ref('')
-const topics = ref<TopicVO[]>([])
+const topics = ref<TopicListVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
@@ -102,15 +104,15 @@ async function loadTopics() {
   }
 }
 
-function handleEdit(row: TopicVO) {
+function handleEdit(row: TopicListVO) {
   router.push(`/topic/edit/${row.topicId}`)
 }
 
-function handleFiles(row: TopicVO) {
+function handleFiles(row: TopicListVO) {
   router.push(`/topic/${row.topicId}/files`)
 }
 
-async function handleSubmit(row: TopicVO) {
+async function handleSubmit(row: TopicListVO) {
   try {
     await ElMessageBox.confirm('确认提交该题目进行审核？', '提交确认', { type: 'warning' })
   } catch {
@@ -128,7 +130,7 @@ async function handleSubmit(row: TopicVO) {
   }
 }
 
-async function handleDelete(row: TopicVO) {
+async function handleDelete(row: TopicListVO) {
   try {
     await ElMessageBox.confirm('确认删除该题目？删除后不可恢复。', '删除确认', { type: 'warning' })
   } catch {

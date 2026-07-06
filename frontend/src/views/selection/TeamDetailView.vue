@@ -12,7 +12,9 @@
       <template #header>
         <div class="card-header">
           <span>{{ team?.teamName }}</span>
-          <el-tag v-if="team" size="small">{{ team.status === 'SELECTED' ? '已选题' : '组建中' }}</el-tag>
+          <el-tag v-if="team" size="small">{{
+            team.status === 'SELECTED' ? '已选题' : '组建中'
+          }}</el-tag>
         </div>
       </template>
 

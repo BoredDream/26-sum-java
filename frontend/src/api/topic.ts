@@ -1,6 +1,7 @@
 import { get, post, put, del, uploadFile } from '@/utils/request'
 import type {
-  TopicVO,
+  TopicListVO,
+  TopicDetailVO,
   TopicCreateDTO,
   TopicUpdateDTO,
   TopicReviewDTO,
@@ -24,11 +25,11 @@ export function deleteTopic(topicId: number) {
 }
 
 export function getTopicDetail(topicId: number) {
-  return get<TopicVO>(`/topic/${topicId}`)
+  return get<TopicDetailVO>(`/topic/${topicId}`)
 }
 
 export function queryTopicPage(query: TopicQuery) {
-  return get<PageResult<TopicVO>>('/topic/page', { params: query })
+  return get<PageResult<TopicListVO>>('/topic/page', { params: query })
 }
 
 // 流程操作

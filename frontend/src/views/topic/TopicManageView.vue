@@ -49,45 +49,45 @@
       <el-table-column prop="difficulty" label="难度" width="100" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="topic" :value="(scope.row as TopicVO).status" />
+          <status-tag category="topic" :value="(scope.row as TopicListVO).status" />
         </template>
       </el-table-column>
       <el-table-column label="开放状态" width="120">
         <template #default="scope">
-          <status-tag category="topicOpen" :value="(scope.row as TopicVO).openStatus" />
+          <status-tag category="topicOpen" :value="(scope.row as TopicListVO).openStatus" />
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" width="170">
         <template #default="scope">{{
-          formatDateTime((scope.row as TopicVO).createTime)
+          formatDateTime((scope.row as TopicListVO).createTime)
         }}</template>
       </el-table-column>
       <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicVO)"
+          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicListVO)"
             >查看详情</el-button
           >
           <el-button
-            v-if="(scope.row as TopicVO).openStatus !== 1"
+            v-if="(scope.row as TopicListVO).openStatus !== 1"
             type="success"
             text
             size="small"
-            :loading="actionId === (scope.row as TopicVO).topicId"
-            @click="handleOpen(scope.row as TopicVO)"
+            :loading="actionId === (scope.row as TopicListVO).topicId"
+            @click="handleOpen(scope.row as TopicListVO)"
           >
             开放
           </el-button>
           <el-button
-            v-if="(scope.row as TopicVO).openStatus === 1"
+            v-if="(scope.row as TopicListVO).openStatus === 1"
             type="danger"
             text
             size="small"
-            :loading="actionId === (scope.row as TopicVO).topicId"
-            @click="handleClose(scope.row as TopicVO)"
+            :loading="actionId === (scope.row as TopicListVO).topicId"
+            @click="handleClose(scope.row as TopicListVO)"
           >
             关闭
           </el-button>
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicVO)"
+          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicListVO)"
             >删除</el-button
           >
         </template>
@@ -114,13 +114,13 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import * as topicApi from '@/api/topic'
-import type { TopicVO } from '@/types/topic'
+import type { TopicListVO } from '@/types/topic'
 import { formatDateTime } from '@/utils/format'
 
 const router = useRouter()
 const loading = ref(false)
 const error = ref('')
-const topics = ref<TopicVO[]>([])
+const topics = ref<TopicListVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
@@ -154,11 +154,11 @@ function handleSearch() {
   loadTopics()
 }
 
-function viewDetail(row: TopicVO) {
+function viewDetail(row: TopicListVO) {
   router.push(`/topic/${row.topicId}`)
 }
 
-async function handleOpen(row: TopicVO) {
+async function handleOpen(row: TopicListVO) {
   try {
     await ElMessageBox.confirm('确认开放该题目？', '操作确认', { type: 'warning' })
   } catch {
@@ -176,7 +176,7 @@ async function handleOpen(row: TopicVO) {
   }
 }
 
-async function handleClose(row: TopicVO) {
+async function handleClose(row: TopicListVO) {
   try {
     await ElMessageBox.confirm('确认关闭该题目？', '操作确认', { type: 'warning' })
   } catch {
@@ -194,7 +194,7 @@ async function handleClose(row: TopicVO) {
   }
 }
 
-async function handleDelete(row: TopicVO) {
+async function handleDelete(row: TopicListVO) {
   try {
     await ElMessageBox.confirm('确认删除该题目？删除后不可恢复。', '删除确认', { type: 'warning' })
   } catch {

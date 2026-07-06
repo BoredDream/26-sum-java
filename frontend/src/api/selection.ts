@@ -5,7 +5,7 @@ import type {
   JoinTeamDTO,
   JoinRequestVO,
   UpdateMemberWorkDTO,
-  TopicVO,
+  SelectableTopicVO,
   SubmitSelectionDTO,
   SelectionVO,
   ProcessDocumentVO,
@@ -19,6 +19,10 @@ import type { AuditDTO } from '@/types/api'
 // 团队管理
 export function createTeam(data: CreateTeamDTO) {
   return post<TeamVO>('/selection/teams', data)
+}
+
+export function listJoinableTeams() {
+  return get<TeamVO[]>('/selection/teams')
 }
 
 export function getMyTeam() {
@@ -47,11 +51,11 @@ export function updateMemberWork(teamId: number, studentId: number, data: Update
 
 // 选题申请
 export function listSelectableTopics(keyword?: string) {
-  return get<TopicVO[]>('/selection/topics', { params: { keyword } })
+  return get<SelectableTopicVO[]>('/selection/topics', { params: { keyword } })
 }
 
 export function getSelectableTopic(topicId: number) {
-  return get<TopicVO>(`/selection/topics/${topicId}`)
+  return get<SelectableTopicVO>(`/selection/topics/${topicId}`)
 }
 
 export function submitSelection(data: SubmitSelectionDTO) {

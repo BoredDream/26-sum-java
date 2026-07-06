@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { User, UserFilled, Document, CopyDocument, Tickets, Bell } from '@element-plus/icons-vue'
+import { User, UserFilled, CopyDocument, Tickets, Bell } from '@element-plus/icons-vue'
 import * as infoApi from '@/api/info'
 import type { DashboardStatisticsVO } from '@/types/info'
 
@@ -55,7 +55,6 @@ const statItems = [
   { key: 'noticeCount', label: '公告数量', icon: Bell, color: '#e6a23c' },
   { key: 'backupCount', label: '备份数量', icon: CopyDocument, color: '#909399' },
   { key: 'logCount', label: '日志数量', icon: Tickets, color: '#f56c6c' },
-  { key: 'topicCount', label: '题目数量', icon: Document, color: '#9254de' },
 ]
 
 const hasData = computed(() => {

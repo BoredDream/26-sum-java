@@ -129,8 +129,6 @@ export interface DashboardStatisticsVO {
   noticeCount?: number
   backupCount?: number
   logCount?: number
-  topicCount?: number
-  teamCount?: number
 }
 
 export interface ChangePasswordDTO {

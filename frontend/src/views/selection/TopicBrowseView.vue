@@ -41,7 +41,10 @@
             <p><strong>指导教师ID：</strong>{{ topic.teacherId }}</p>
             <p><strong>方向：</strong>{{ topic.direction || '-' }}</p>
             <p><strong>难度：</strong>{{ topic.difficulty }}</p>
-            <p><strong>人数要求：</strong>{{ topic.minMembers || '-' }} - {{ topic.maxMembers || '-' }}</p>
+            <p>
+              <strong>人数要求：</strong>{{ topic.minMembers || '-' }} -
+              {{ topic.maxMembers || '-' }}
+            </p>
           </div>
           <template #footer>
             <div class="card-footer">
@@ -66,16 +69,15 @@
           <el-descriptions-item label="课题名称" :span="2">{{
             currentTopic.title
           }}</el-descriptions-item>
-          <el-descriptions-item label="指导教师">{{
-            currentTopic.teacherId
+          <el-descriptions-item label="指导教师">{{ currentTopic.teacherId }}</el-descriptions-item>
+          <el-descriptions-item label="方向">{{
+            currentTopic.direction || '-'
           }}</el-descriptions-item>
-          <el-descriptions-item label="方向">{{ currentTopic.direction || '-' }}</el-descriptions-item>
           <el-descriptions-item label="难度">{{ currentTopic.difficulty }}</el-descriptions-item>
-          <el-descriptions-item label="限选人数">{{
-            currentTopic.minMembers || '-'
-          }} - {{
-            currentTopic.maxMembers || '-'
-          }}</el-descriptions-item>
+          <el-descriptions-item label="限选人数"
+            >{{ currentTopic.minMembers || '-' }} -
+            {{ currentTopic.maxMembers || '-' }}</el-descriptions-item
+          >
           <el-descriptions-item label="开放状态">
             <status-tag category="topicOpen" :value="currentTopic.status" />
           </el-descriptions-item>
@@ -122,13 +124,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import * as selectionApi from '@/api/selection'
-import type { TopicVO } from '@/types/selection'
+import type { SelectableTopicVO } from '@/types/selection'
 import { formatDateTime } from '@/utils/format'
 
 const loading = ref(false)
 const error = ref('')
 const keyword = ref('')
-const topics = ref<TopicVO[]>([])
+const topics = ref<SelectableTopicVO[]>([])
 
 async function loadTopics() {
   loading.value = true
@@ -149,9 +151,9 @@ function handleSearch() {
 // 详情
 const detailVisible = ref(false)
 const detailLoading = ref(false)
-const currentTopic = ref<TopicVO | null>(null)
+const currentTopic = ref<SelectableTopicVO | null>(null)
 
-async function openDetail(topic: TopicVO) {
+async function openDetail(topic: SelectableTopicVO) {
   detailVisible.value = true
   detailLoading.value = true
   currentTopic.value = null
@@ -178,7 +180,7 @@ const applyRules: FormRules = {
   selectionReason: [{ required: true, message: '请输入选题说明', trigger: 'blur' }],
 }
 
-function openApply(topic: TopicVO) {
+function openApply(topic: SelectableTopicVO) {
   currentTopic.value = topic
   applyForm.value = { topicId: topic.id, selectionReason: '' }
   applyVisible.value = true

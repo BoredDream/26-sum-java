@@ -84,15 +84,18 @@ export const hiddenRoutes: { title: string; path: string; roles: UserRole[] }[] 
 
 function pathToRegex(pattern: string): RegExp {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
-  const withParam = escaped.replace(/:\\w+/g, '[^/]+')
+  const withParam = escaped.replace(new RegExp(':\\w+', 'g'), '[^/]+')
   return new RegExp(`^${withParam}$`)
 }
 
 export function hasRoutePermission(path: string, role?: UserRole) {
   if (!role) return false
+  const normalizedPath = path.length > 1 ? path.replace(/\/+$/, '') : path
   const allowedMenus = menusByRole[role]
-  if (allowedMenus.some((m) => path === m.path)) return true
-  return hiddenRoutes.some((r) => r.roles.includes(role) && pathToRegex(r.path).test(path))
+  if (allowedMenus.some((m) => normalizedPath === m.path)) return true
+  return hiddenRoutes.some(
+    (r) => r.roles.includes(role) && pathToRegex(r.path).test(normalizedPath)
+  )
 }
 
 export function getMenuByPath(path: string) {

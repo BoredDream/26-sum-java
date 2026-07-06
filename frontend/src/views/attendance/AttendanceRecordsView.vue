@@ -99,7 +99,6 @@
         @current-change="loadRecords"
       />
     </div>
-
   </div>
 </template>
 

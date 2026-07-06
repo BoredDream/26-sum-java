@@ -40,6 +40,8 @@ export interface StageTaskUpdateDTO {
 }
 
 export interface StageTaskQuery extends PageQuery {
+  teamId?: number
+  teacherId?: number
   status?: number
   keyword?: string
 }

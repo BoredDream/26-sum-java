@@ -42,11 +42,11 @@ export interface TeamVO {
   selectedTopicId?: number
   maxSize: number
   memberCount: number
-  members: TeamMemberVO[]
+  members?: TeamMemberVO[]
   createTime: string
 }
 
-export interface TopicVO {
+export interface SelectableTopicVO {
   id: number
   title: string
   description?: string

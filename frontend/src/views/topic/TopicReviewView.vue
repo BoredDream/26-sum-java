@@ -13,26 +13,34 @@
       <el-table-column prop="difficulty" label="难度" width="100" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
-          <status-tag category="topic" :value="(scope.row as TopicVO).status" />
+          <status-tag category="topic" :value="(scope.row as TopicListVO).status" />
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="提交时间" width="170">
         <template #default="scope">{{
-          formatDateTime((scope.row as TopicVO).createTime)
+          formatDateTime((scope.row as TopicListVO).createTime)
         }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicVO)"
+          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicListVO)"
             >查看详情</el-button
           >
-          <el-button type="success" text size="small" @click="openAudit(scope.row as TopicVO, 2)"
+          <el-button
+            type="success"
+            text
+            size="small"
+            @click="openAudit(scope.row as TopicListVO, 1)"
             >通过</el-button
           >
-          <el-button type="warning" text size="small" @click="openAudit(scope.row as TopicVO, 3)"
+          <el-button
+            type="warning"
+            text
+            size="small"
+            @click="openAudit(scope.row as TopicListVO, 2)"
             >退回</el-button
           >
-          <el-button type="danger" text size="small" @click="openAudit(scope.row as TopicVO, 4)"
+          <el-button type="danger" text size="small" @click="openAudit(scope.row as TopicListVO, 3)"
             >不通过</el-button
           >
         </template>
@@ -87,20 +95,20 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as topicApi from '@/api/topic'
-import type { TopicVO } from '@/types/topic'
+import type { TopicListVO } from '@/types/topic'
 import { formatDateTime } from '@/utils/format'
 
 const router = useRouter()
 const loading = ref(false)
 const error = ref('')
-const topics = ref<TopicVO[]>([])
+const topics = ref<TopicListVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
 
 const auditVisible = ref(false)
 const submitting = ref(false)
-const currentRow = ref<TopicVO | null>(null)
+const currentRow = ref<TopicListVO | null>(null)
 const auditForm = ref({
   reviewResult: 2,
   reviewComment: '',
@@ -108,18 +116,18 @@ const auditForm = ref({
 
 const auditResultLabel = computed(() => {
   const map: Record<number, string> = {
-    2: '审核通过',
-    3: '退回修改',
-    4: '不予通过',
+    1: '审核通过',
+    2: '退回修改',
+    3: '不予通过',
   }
   return map[auditForm.value.reviewResult] || '审核'
 })
 
 const auditResultType = computed(() => {
   const map: Record<number, 'success' | 'warning' | 'danger'> = {
-    2: 'success',
-    3: 'warning',
-    4: 'danger',
+    1: 'success',
+    2: 'warning',
+    3: 'danger',
   }
   return map[auditForm.value.reviewResult] || 'info'
 })
@@ -142,11 +150,11 @@ async function loadTopics() {
   }
 }
 
-function viewDetail(row: TopicVO) {
+function viewDetail(row: TopicListVO) {
   router.push(`/topic/${row.topicId}`)
 }
 
-function openAudit(row: TopicVO, result: number) {
+function openAudit(row: TopicListVO, result: number) {
   currentRow.value = row
   auditForm.value = { reviewResult: result, reviewComment: '' }
   auditVisible.value = true

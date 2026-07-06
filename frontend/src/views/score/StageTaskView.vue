@@ -68,11 +68,7 @@
       />
     </div>
 
-    <el-dialog
-      v-model="formVisible"
-      title="新增阶段任务"
-      width="650px"
-    >
+    <el-dialog v-model="formVisible" title="新增阶段任务" width="650px">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="阶段名称" prop="stageName">
           <el-input v-model="form.stageName" maxlength="100" show-word-limit />

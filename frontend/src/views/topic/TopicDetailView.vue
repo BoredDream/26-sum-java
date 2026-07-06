@@ -116,7 +116,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
-import type { TopicVO, TopicFileVO, TopicReviewVO } from '@/types/topic'
+import type { TopicDetailVO, TopicFileVO, TopicReviewVO } from '@/types/topic'
 import { formatDateTime } from '@/utils/format'
 import { downloadByUrl } from '@/utils/download'
 
@@ -126,7 +126,7 @@ const auth = useAuthStore()
 
 const loading = ref(false)
 const error = ref('')
-const topic = ref<TopicVO | null>(null)
+const topic = ref<TopicDetailVO | null>(null)
 const files = ref<TopicFileVO[]>([])
 const reviews = ref<TopicReviewVO[]>([])
 const actionLoading = ref(false)
