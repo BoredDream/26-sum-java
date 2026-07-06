@@ -271,6 +271,20 @@ class TopicServiceImplTest {
             assertEquals(1, detail.getReviews().size());
             assertEquals("2.0 KB", detail.getFiles().get(0).getFileSizeText());
         }
+
+        @Test
+        @DisplayName("管理员查看教师题目详情不受教师归属限制")
+        void getTopicDetail_asAdmin_canViewTeacherTopic() {
+            when(topicMapper.selectById(1L)).thenReturn(createPendingTopic(1L, TEACHER_RELATED_ID));
+            when(fileMapper.selectByTopicId(1L)).thenReturn(List.of());
+            when(reviewMapper.selectByTopicId(1L)).thenReturn(List.of());
+
+            TopicDetailVO detail = service.getTopicDetail(1L, ADMIN_USER_ID, "ADMIN", ADMIN_USER_ID);
+
+            assertEquals("在线商城系统", detail.getTopicName());
+            assertEquals(TEACHER_RELATED_ID, detail.getTeacherId());
+            assertEquals(1, detail.getStatus());
+        }
     }
 
     // ========================================================================
@@ -711,6 +725,91 @@ class TopicServiceImplTest {
             assertEquals("题目信息不存在", ex.getMessage());
         }
     }
+
+        @Test
+        @DisplayName("删除题目 - 管理员删除无学生选择的题目")
+        void deleteTopic_success() {
+            when(topicMapper.selectById(1L)).thenReturn(createDraftTopic(1L, TEACHER_RELATED_ID));
+            when(topicMapper.countActiveSelections(1L)).thenReturn(0);
+
+            service.deleteTopic(1L, ADMIN_USER_ID, "ADMIN");
+
+            verify(topicMapper).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("修改题目 - 教师成功修改自己的草稿题目")
+        void updateTopic_teacherOwnDraftSuccess() {
+            when(topicMapper.selectById(1L)).thenReturn(createDraftTopic(1L, TEACHER_RELATED_ID));
+
+            TopicUpdateDTO dto = buildUpdateDto();
+            service.updateTopic(1L, dto, TEACHER_USER_ID, "TEACHER", TEACHER_RELATED_ID);
+
+            verify(topicMapper).update(topicCaptor.capture());
+            ProjectTopic updated = topicCaptor.getValue();
+            assertEquals("更新后的题目名称", updated.getTopicName());
+            assertEquals(0, updated.getStatus().intValue());
+        }
+
+        @Test
+        @DisplayName("审核题目 - 管理员审核结果为不予通过")
+        void reviewTopic_rejectResult3() {
+            when(topicMapper.selectById(1L)).thenReturn(createPendingTopic(1L, TEACHER_RELATED_ID));
+
+            TopicReviewDTO dto = new TopicReviewDTO();
+            dto.setReviewResult(3);
+            dto.setReviewComment("课题方向与本次实训不符");
+
+            service.reviewTopic(1L, dto, ADMIN_USER_ID);
+
+            verify(reviewMapper).insert(reviewCaptor.capture());
+            assertEquals(3, reviewCaptor.getValue().getReviewResult());
+            verify(topicMapper).updateStatus(1L, 4);
+        }
+
+        @Test
+        @DisplayName("开放题目 - 已开放题目重复开放抛异常")
+        void openTopic_alreadyOpenThrows() {
+            ProjectTopic openTopic = createApprovedTopic(1L, TEACHER_RELATED_ID);
+            openTopic.setOpenStatus(1);
+            when(topicMapper.selectById(1L)).thenReturn(openTopic);
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.openTopic(1L, ADMIN_USER_ID, "ADMIN"));
+
+            assertEquals("该题目已开放", ex.getMessage());
+        }
+
+        @Test
+        @DisplayName("上传资料 - 大写扩展名允许上传")
+        void uploadFile_allowedExtensionCaseInsensitive() throws Exception {
+            when(topicMapper.selectById(1L)).thenReturn(createDraftTopic(1L, TEACHER_RELATED_ID));
+
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "REPORT.PDF", "application/pdf",
+                    new byte[1024]
+            );
+            service.uploadFile(1L, file, null, TEACHER_USER_ID, "TEACHER", TEACHER_RELATED_ID);
+
+            verify(fileMapper).insert(fileCaptor.capture());
+            assertEquals("REPORT.PDF", fileCaptor.getValue().getFileName());
+        }
+
+        @Test
+        @DisplayName("上传资料 - 无扩展名文件拒绝上传")
+        void uploadFile_noExtensionThrows() {
+            when(topicMapper.selectById(1L)).thenReturn(createDraftTopic(1L, TEACHER_RELATED_ID));
+
+            MockMultipartFile file = new MockMultipartFile(
+                    "file", "README", "text/plain",
+                    new byte[100]
+            );
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.uploadFile(1L, file, null, TEACHER_USER_ID, "TEACHER", TEACHER_RELATED_ID));
+
+            assertEquals("文件格式不符合要求", ex.getMessage());
+        }
 
     // ========================================================================
     // 辅助方法
