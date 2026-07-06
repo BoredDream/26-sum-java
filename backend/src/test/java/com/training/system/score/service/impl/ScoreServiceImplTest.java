@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -238,7 +239,7 @@ class ScoreServiceImplTest {
         score.setStatus(1);
         when(scoreMapper.selectScoreExport(TEACHER_ID)).thenReturn(List.of(score));
 
-        String csv = new String(service.exportScores("TEACHER", TEACHER_ID));
+        String csv = new String(service.exportScores("TEACHER", TEACHER_ID), StandardCharsets.UTF_8);
 
         assertTrue(csv.contains("scoreId,teamName"));
         assertTrue(csv.contains("第一小组"));

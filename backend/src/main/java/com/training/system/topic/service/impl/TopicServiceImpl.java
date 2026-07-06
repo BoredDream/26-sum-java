@@ -129,8 +129,8 @@ public class TopicServiceImpl implements TopicService {
             if (!topic.getTeacherId().equals(relatedId)) {
                 throw new BusinessException(ResultCode.FORBIDDEN, "无权限修改该题目");
             }
-            // 教师只能在草稿或退回修改状态下修改
-            if (topic.getStatus() != 0 && topic.getStatus() != 3) {
+            // 教师只能在草稿、待审核或退回修改状态下修改
+            if (topic.getStatus() != 0 && topic.getStatus() != 1 && topic.getStatus() != 3) {
                 throw new BusinessException(ResultCode.CONFLICT, "当前题目状态不允许修改");
             }
         } else if (!"ADMIN".equals(role)) {
