@@ -54,7 +54,7 @@ public class SelectionService {
     @Transactional(rollbackFor = Exception.class)
     public SelectionVO submitSelection(Long userId, String role, SubmitSelectionDTO dto) {
         teamService.requireStudent(role);
-        TeamEntity team = teamService.getCurrentTeamByStudent(userId);
+        TeamEntity team = teamService.getTeamForStudent(userId, dto.getTeamId());
         teamService.assertTeamLeader(userId, role, team.getId());
         if (TEAM_SELECTED.equals(team.getStatus())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "当前团队已完成选题，不能重复提交");
@@ -78,10 +78,17 @@ public class SelectionService {
         return selectionView(selection, team, topic);
     }
 
-    public List<SelectionVO> getMySelections(Long userId, String role) {
+    public List<SelectionVO> getMySelections(Long userId, String role, Long teamId) {
         teamService.requireStudent(role);
-        TeamEntity team = teamService.getCurrentTeamByStudent(userId);
-        return topicSelectionMapper.findViewByTeamId(team.getId());
+        if (teamId != null) {
+            TeamEntity team = teamService.getTeamForStudent(userId, teamId);
+            return topicSelectionMapper.findViewByTeamId(team.getId());
+        }
+        // 列出学生所有团队的选题申请
+        List<TeamEntity> teams = teamService.getTeamsForStudent(userId);
+        return teams.stream()
+                .flatMap(t -> topicSelectionMapper.findViewByTeamId(t.getId()).stream())
+                .toList();
     }
 
     public List<SelectionVO> getPendingSelections(Long userId, String role) {

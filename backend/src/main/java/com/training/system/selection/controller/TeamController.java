@@ -7,6 +7,7 @@ import com.training.system.common.Result;
 import com.training.system.selection.util.SelectionSessionUtil;
 import com.training.system.selection.util.SelectionSessionUtil.CurrentUser;
 import com.training.system.selection.vo.JoinRequestVO;
+import com.training.system.selection.vo.LeaveRequestVO;
 import com.training.system.selection.vo.TeamVO;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -32,9 +33,9 @@ public class TeamController {
     }
 
     @GetMapping("/my")
-    public Result<TeamVO> getMyTeam(HttpSession session) {
+    public Result<List<TeamVO>> getMyTeams(HttpSession session) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(teamService.getMyTeam(user.relatedId(), user.role()));
+        return Result.success(teamService.getMyTeams(user.relatedId(), user.role()));
     }
 
     @GetMapping
@@ -70,6 +71,31 @@ public class TeamController {
                                                   @RequestBody @Valid AuditJoinRequestDTO dto) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
         return Result.success(teamService.auditJoinRequest(user.relatedId(), user.role(), requestId, dto));
+    }
+
+    @OperationLog(type = "CREATE", description = "申请离开团队")
+    @PostMapping("/{teamId}/leave-requests")
+    public Result<LeaveRequestVO> requestLeave(HttpSession session,
+                                               @PathVariable Long teamId,
+                                               @RequestBody @Valid RequestLeaveTeamDTO dto) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(teamService.requestLeave(user.relatedId(), user.role(), teamId, dto));
+    }
+
+    @GetMapping("/{teamId}/leave-requests")
+    public Result<List<LeaveRequestVO>> getPendingLeaveRequests(HttpSession session,
+                                                                 @PathVariable Long teamId) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(teamService.listPendingLeaveRequests(user.relatedId(), user.role(), teamId));
+    }
+
+    @OperationLog(type = "UPDATE", description = "审核离队申请")
+    @PatchMapping("/leave-requests/{requestId}/audit")
+    public Result<LeaveRequestVO> auditLeaveRequest(HttpSession session,
+                                                     @PathVariable Long requestId,
+                                                     @RequestBody @Valid AuditLeaveRequestDTO dto) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        return Result.success(teamService.auditLeaveRequest(user.relatedId(), user.role(), requestId, dto));
     }
 
     @OperationLog(type = "UPDATE", description = "修改成员工作内容")

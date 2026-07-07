@@ -25,15 +25,11 @@
       <el-table-column prop="uploadTime" label="上传时间" width="170">
         <template #default="{ row }">{{ formatDateTime(row.uploadTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="120" fixed="right">
+      <el-table-column label="操作" width="100" fixed="right">
         <template #default="scope">
-          <el-button
-            type="primary"
-            text
-            size="small"
-            @click="handleDownload(scope.row as ProcessDocumentVO)"
-            >下载</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="handleDownload(scope.row as ProcessDocumentVO)">下载</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -41,6 +37,21 @@
     <!-- 上传文档弹窗 -->
     <el-dialog v-model="uploadVisible" title="上传过程文档" width="520px">
       <el-form ref="uploadFormRef" :model="uploadForm" :rules="uploadRules" label-width="100px">
+        <el-form-item label="所属团队" prop="teamId">
+          <el-select
+            v-model="uploadForm.teamId"
+            placeholder="请选择团队"
+            style="width: 100%"
+            :loading="myTeamsLoading"
+          >
+            <el-option
+              v-for="team in myTeams"
+              :key="team.id"
+              :label="team.teamName"
+              :value="team.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="文档名称" prop="documentName">
           <el-input v-model="uploadForm.documentName" placeholder="请输入文档名称" />
         </el-form-item>
@@ -104,13 +115,17 @@ import { ref, onMounted, nextTick } from 'vue'
 import { ElMessage, type UploadFile } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as selectionApi from '@/api/selection'
-import type { ProcessDocumentVO } from '@/types/selection'
+import type { ProcessDocumentVO, TeamVO } from '@/types/selection'
 import { formatDateTime } from '@/utils/format'
 import { downloadByUrl } from '@/utils/download'
 
 const loading = ref(false)
 const error = ref('')
 const documents = ref<ProcessDocumentVO[]>([])
+
+// 我的团队（用于上传时选择）
+const myTeams = ref<TeamVO[]>([])
+const myTeamsLoading = ref(false)
 
 const documentTypeOptions = ['需求文档', '设计文档', '代码文档', '测试文档', '用户手册', '会议纪要']
 const projectStageOptions = ['需求分析', '概要设计', '详细设计', '编码实现', '系统测试', '项目验收']
@@ -139,6 +154,7 @@ const submitting = ref(false)
 const uploadFormRef = ref<FormInstance>()
 const uploadRef = ref()
 const uploadForm = ref({
+  teamId: 0,
   documentName: '',
   documentType: '',
   projectStage: '',
@@ -147,14 +163,16 @@ const uploadForm = ref({
 })
 
 const uploadRules: FormRules = {
+  teamId: [{ required: true, message: '请选择所属团队', trigger: 'change' }],
   documentName: [{ required: true, message: '请输入文档名称', trigger: 'blur' }],
   documentType: [{ required: true, message: '请选择文档类型', trigger: 'change' }],
   projectStage: [{ required: true, message: '请选择项目阶段', trigger: 'change' }],
   file: [{ required: true, message: '请选择文件', trigger: 'change' }],
 }
 
-function openUpload() {
+async function openUpload() {
   uploadForm.value = {
+    teamId: 0,
     documentName: '',
     documentType: '',
     projectStage: '',
@@ -162,6 +180,15 @@ function openUpload() {
     file: null,
   }
   uploadVisible.value = true
+  // 加载团队列表
+  myTeamsLoading.value = true
+  try {
+    myTeams.value = await selectionApi.getMyTeams()
+  } catch {
+    myTeams.value = []
+  } finally {
+    myTeamsLoading.value = false
+  }
   nextTick(() => {
     uploadRef.value?.clearFiles?.()
     uploadFormRef.value?.clearValidate()
@@ -186,27 +213,30 @@ function handleFileRemove() {
 
 async function handleUpload() {
   if (!uploadFormRef.value) return
-  await uploadFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    if (!uploadForm.value.file) {
-      ElMessage.warning('请选择文件')
-      return
-    }
-    submitting.value = true
-    try {
-      const formData = new FormData()
-      formData.append('documentName', uploadForm.value.documentName)
-      formData.append('documentType', uploadForm.value.documentType)
-      formData.append('projectStage', uploadForm.value.projectStage)
-      formData.append('file', uploadForm.value.file)
-      await selectionApi.uploadDocument(formData)
-      ElMessage.success('上传成功')
-      uploadVisible.value = false
-      loadDocuments()
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await uploadFormRef.value.validate()
+  } catch {
+    return
+  }
+  if (!uploadForm.value.file) {
+    ElMessage.warning('请选择文件')
+    return
+  }
+  submitting.value = true
+  try {
+    const formData = new FormData()
+    formData.append('teamId', String(uploadForm.value.teamId))
+    formData.append('documentName', uploadForm.value.documentName)
+    formData.append('documentType', uploadForm.value.documentType)
+    formData.append('projectStage', uploadForm.value.projectStage)
+    formData.append('file', uploadForm.value.file)
+    await selectionApi.uploadDocument(formData)
+    ElMessage.success('上传成功')
+    uploadVisible.value = false
+    loadDocuments()
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(loadDocuments)
@@ -216,6 +246,12 @@ onMounted(loadDocuments)
 .my-documents-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

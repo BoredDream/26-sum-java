@@ -161,21 +161,23 @@ const rules: FormRules = {
 
 async function submit(status: number) {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      const payload: TopicCreateDTO = { ...form, status }
-      await topicApi.createTopic(payload)
-      ElMessage.success(status === 0 ? '草稿已保存' : '题目已提交审核')
-      router.push('/topic/my-list')
-    } catch (err: any) {
-      // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
-      ElMessage.error('创建题目失败，请重试')
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    const payload: TopicCreateDTO = { ...form, status }
+    await topicApi.createTopic(payload)
+    ElMessage.success(status === 0 ? '草稿已保存' : '题目已提交审核')
+    router.push('/topic/my-list')
+  } catch (err: any) {
+    // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
+    ElMessage.error('创建题目失败，请重试')
+  } finally {
+    submitting.value = false
+  }
 }
 
 function handleSaveDraft() {

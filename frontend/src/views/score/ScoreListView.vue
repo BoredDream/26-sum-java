@@ -407,33 +407,35 @@ async function openEdit(row: ScoreVO) {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      const payload: ScoreSaveDTO = {
-        teamId: form.teamId,
-        docScore: form.docScore,
-        attendanceScore: form.attendanceScore,
-        systemScore: form.systemScore,
-        defenseScore: form.defenseScore,
-        teacherComment: form.teacherComment,
-        studentScores: form.studentScores.map((item): StudentScoreSaveDTO => ({
-          studentId: item.studentId,
-          contributionFactor: item.contributionFactor,
-          teacherComment: item.teacherComment,
-        })),
-      }
-      await scoreApi.saveTeamScore(payload)
-      ElMessage.success('保存成功')
-      formVisible.value = false
-      loadScores()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '保存失败')
-    } finally {
-      submitting.value = false
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    const payload: ScoreSaveDTO = {
+      teamId: form.teamId,
+      docScore: form.docScore,
+      attendanceScore: form.attendanceScore,
+      systemScore: form.systemScore,
+      defenseScore: form.defenseScore,
+      teacherComment: form.teacherComment,
+      studentScores: form.studentScores.map((item): StudentScoreSaveDTO => ({
+        studentId: item.studentId,
+        contributionFactor: item.contributionFactor,
+        teacherComment: item.teacherComment,
+      })),
     }
-  })
+    await scoreApi.saveTeamScore(payload)
+    ElMessage.success('保存成功')
+    formVisible.value = false
+    loadScores()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '保存失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 const confirmingId = ref(0)

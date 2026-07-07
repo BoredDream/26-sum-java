@@ -344,24 +344,26 @@ function openCreate() {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      const payload: AttendanceTaskCreateDTO = {
-        ...form,
-        scopeValue: form.scopeType === 3 ? undefined : String(form.scopeValue),
-      }
-      await attendanceApi.createAttendanceTask(payload)
-      ElMessage.success('任务发布成功')
-      formVisible.value = false
-      loadTasks()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '发布失败')
-    } finally {
-      submitting.value = false
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    const payload: AttendanceTaskCreateDTO = {
+      ...form,
+      scopeValue: form.scopeType === 3 ? undefined : String(form.scopeValue),
     }
-  })
+    await attendanceApi.createAttendanceTask(payload)
+    ElMessage.success('任务发布成功')
+    formVisible.value = false
+    loadTasks()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '发布失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 // 结束任务

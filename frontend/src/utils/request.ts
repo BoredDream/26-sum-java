@@ -24,7 +24,9 @@ request.interceptors.response.use(
       if (data.code === 401) {
         ElMessage.error(data.message || '登录已过期，请重新登录')
         redirectToLogin()
+        return Promise.reject(new Error(data.message || '请求失败'))
       }
+      ElMessage.error(data.message || '请求失败')
       return Promise.reject(new Error(data.message || '请求失败'))
     }
     return response

@@ -31,27 +31,12 @@
       </el-table-column>
       <el-table-column label="操作" width="260" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="handleEdit(scope.row as TopicListVO)"
-            >编辑</el-button
-          >
-          <el-button type="primary" text size="small" @click="handleFiles(scope.row as TopicListVO)"
-            >资料</el-button
-          >
-          <el-button
-            v-if="
-              (scope.row as TopicListVO).status === 0 || (scope.row as TopicListVO).status === 3
-            "
-            type="success"
-            text
-            size="small"
-            :loading="submittingId === (scope.row as TopicListVO).topicId"
-            @click="handleSubmit(scope.row as TopicListVO)"
-          >
-            提交审核
-          </el-button>
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicListVO)"
-            >删除</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="handleEdit(scope.row as TopicListVO)">编辑</el-button>
+            <el-button type="primary" link size="small" @click="handleFiles(scope.row as TopicListVO)">资料</el-button>
+            <el-button v-if="(scope.row as TopicListVO).status === 0 || (scope.row as TopicListVO).status === 3" type="success" link size="small" :loading="submittingId === (scope.row as TopicListVO).topicId" @click="handleSubmit(scope.row as TopicListVO)">提交审核</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(scope.row as TopicListVO)">删除</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -152,6 +137,12 @@ onMounted(loadTopics)
 .topic-list-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

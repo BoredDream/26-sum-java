@@ -227,25 +227,27 @@ function handleFileRemove() {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      if (isEdit.value) {
-        const dto: NoticeUpdateDTO = { ...form.value }
-        await infoApi.updateNotice(currentId.value, dto, selectedFile.value)
-      } else {
-        await infoApi.createNotice(form.value, selectedFile.value)
-      }
-      ElMessage.success('保存成功')
-      formVisible.value = false
-      loadNotices()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '保存失败')
-    } finally {
-      submitting.value = false
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    if (isEdit.value) {
+      const dto: NoticeUpdateDTO = { ...form.value }
+      await infoApi.updateNotice(currentId.value, dto, selectedFile.value)
+    } else {
+      await infoApi.createNotice(form.value, selectedFile.value)
     }
-  })
+    ElMessage.success('保存成功')
+    formVisible.value = false
+    loadNotices()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '保存失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 // 删除

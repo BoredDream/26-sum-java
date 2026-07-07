@@ -4,15 +4,9 @@ import com.training.system.exception.BusinessException;
 import com.training.system.common.ResultCode;
 
 import com.training.system.selection.dto.*;
-import com.training.system.selection.entity.TeamEntity;
-import com.training.system.selection.entity.TeamJoinRequestEntity;
-import com.training.system.selection.entity.TeamMemberEntity;
-import com.training.system.selection.mapper.TeamJoinRequestMapper;
-import com.training.system.selection.mapper.TeamMapper;
-import com.training.system.selection.mapper.TeamMemberMapper;
-import com.training.system.selection.vo.JoinRequestVO;
-import com.training.system.selection.vo.TeamMemberVO;
-import com.training.system.selection.vo.TeamVO;
+import com.training.system.selection.entity.*;
+import com.training.system.selection.mapper.*;
+import com.training.system.selection.vo.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,21 +20,21 @@ public class TeamService {
     private final TeamMapper teamMapper;
     private final TeamMemberMapper teamMemberMapper;
     private final TeamJoinRequestMapper joinRequestMapper;
+    private final TeamLeaveRequestMapper leaveRequestMapper;
 
     public TeamService(TeamMapper teamMapper,
                        TeamMemberMapper teamMemberMapper,
-                       TeamJoinRequestMapper joinRequestMapper) {
+                       TeamJoinRequestMapper joinRequestMapper,
+                       TeamLeaveRequestMapper leaveRequestMapper) {
         this.teamMapper = teamMapper;
         this.teamMemberMapper = teamMemberMapper;
         this.joinRequestMapper = joinRequestMapper;
+        this.leaveRequestMapper = leaveRequestMapper;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public TeamVO createTeam(Long userId, String role, CreateTeamDTO dto) {
         requireStudent(role);
-        if (teamMemberMapper.findActiveByStudentId(userId) != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "当前学生已加入团队，不能重复创建团队");
-        }
         String teamName = dto.getTeamName().trim();
         if (teamMapper.findByName(teamName) != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "团队名称已存在");
@@ -67,10 +61,20 @@ public class TeamService {
         return getTeamDetail(team.getId());
     }
 
-    public TeamVO getMyTeam(Long userId, String role) {
+    // ── 我的团队（多团队） ──
+
+    public List<TeamVO> getMyTeams(Long userId, String role) {
         requireStudent(role);
-        return getTeamDetail(getCurrentTeamByStudent(userId).getId());
+        List<TeamMemberEntity> memberships = teamMemberMapper.findActiveByStudentId(userId);
+        if (memberships.isEmpty()) {
+            return List.of();
+        }
+        return memberships.stream()
+                .map(m -> getTeamDetail(m.getTeamId()))
+                .toList();
     }
+
+    // ── 团队详情 ──
 
     public TeamVO getTeamDetail(Long teamId) {
         TeamEntity team = getTeamById(teamId);
@@ -92,11 +96,15 @@ public class TeamService {
         }).toList();
     }
 
+    // ── 加入团队申请 ──
+
     @Transactional(rollbackFor = Exception.class)
     public JoinRequestVO applyJoin(Long userId, String role, Long teamId, JoinTeamDTO dto) {
         requireStudent(role);
-        if (teamMemberMapper.findActiveByStudentId(userId) != null) {
-            throw new BusinessException(ResultCode.BAD_REQUEST, "当前学生已加入团队，不能重复申请加入");
+        // 检查是否已是该团队成员
+        TeamMemberEntity existingMembership = teamMemberMapper.findByTeamIdAndStudentId(teamId, userId);
+        if (existingMembership != null && Boolean.TRUE.equals(existingMembership.getEnabled())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "您已经是该团队的成员");
         }
         TeamEntity team = getTeamById(teamId);
         if (TEAM_SELECTED.equals(team.getStatus())) {
@@ -145,16 +153,19 @@ public class TeamService {
             if (teamMemberMapper.countActiveByTeamId(team.getId()) >= team.getMaxSize()) {
                 throw new BusinessException(ResultCode.BAD_REQUEST, "团队人数已达到上限");
             }
-            if (teamMemberMapper.findActiveByStudentId(request.getApplicantId()) != null) {
-                throw new BusinessException(ResultCode.BAD_REQUEST, "该学生已加入其他团队");
+            // 如果该学生之前退出了该团队，reactivate 而非 insert（避免 uk_team_student 冲突）
+            TeamMemberEntity existing = teamMemberMapper.findByTeamIdAndStudentId(request.getTeamId(), request.getApplicantId());
+            if (existing != null) {
+                teamMemberMapper.reactivateMember(request.getTeamId(), request.getApplicantId());
+            } else {
+                TeamMemberEntity member = new TeamMemberEntity();
+                member.setTeamId(team.getId());
+                member.setStudentId(request.getApplicantId());
+                member.setMemberRole("MEMBER");
+                member.setWorkContent("待团队负责人分配");
+                member.setEnabled(true);
+                teamMemberMapper.insert(member);
             }
-            TeamMemberEntity member = new TeamMemberEntity();
-            member.setTeamId(team.getId());
-            member.setStudentId(request.getApplicantId());
-            member.setMemberRole("MEMBER");
-            member.setWorkContent("待团队负责人分配");
-            member.setEnabled(true);
-            teamMemberMapper.insert(member);
             request.setStatus(JOIN_APPROVED);
         } else {
             request.setStatus(JOIN_REJECTED);
@@ -166,6 +177,66 @@ public class TeamService {
         return toJoinRequestVO(request);
     }
 
+    // ── 离队申请 ──
+
+    @Transactional(rollbackFor = Exception.class)
+    public LeaveRequestVO requestLeave(Long userId, String role, Long teamId, RequestLeaveTeamDTO dto) {
+        requireStudent(role);
+        TeamEntity team = getTeamById(teamId);
+        if (team.getLeaderId().equals(userId)) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "团队负责人不能申请离队。如需离队，请先转让负责人或将团队解散");
+        }
+        TeamMemberEntity membership = teamMemberMapper.findByTeamIdAndStudentId(teamId, userId);
+        if (membership == null || !Boolean.TRUE.equals(membership.getEnabled())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "您不是该团队的成员");
+        }
+        if (leaveRequestMapper.findPending(teamId, userId) != null) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "已有待审核的离队申请，请等待负责人审核");
+        }
+        TeamLeaveRequestEntity request = new TeamLeaveRequestEntity();
+        request.setTeamId(teamId);
+        request.setApplicantId(userId);
+        request.setLeaveMessage(dto.getLeaveMessage());
+        request.setStatus(LEAVE_PENDING);
+        request.setApplyTime(LocalDateTime.now());
+        leaveRequestMapper.insert(request);
+        return toLeaveRequestVO(request);
+    }
+
+    public List<LeaveRequestVO> listPendingLeaveRequests(Long userId, String role, Long teamId) {
+        assertTeamLeader(userId, role, teamId);
+        return leaveRequestMapper.findPendingByTeamId(teamId).stream().map(this::toLeaveRequestVO).toList();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public LeaveRequestVO auditLeaveRequest(Long userId, String role, Long requestId, AuditLeaveRequestDTO dto) {
+        TeamLeaveRequestEntity request = leaveRequestMapper.findById(requestId);
+        if (request == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "离队申请不存在");
+        }
+        assertTeamLeader(userId, role, request.getTeamId());
+        if (!LEAVE_PENDING.equals(request.getStatus())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "该离队申请已经处理");
+        }
+        if (!Boolean.TRUE.equals(dto.getApproved()) && isBlank(dto.getOpinion())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "驳回申请时必须填写审核意见");
+        }
+
+        if (Boolean.TRUE.equals(dto.getApproved())) {
+            teamMemberMapper.deactivateMember(request.getTeamId(), request.getApplicantId());
+            request.setStatus(LEAVE_APPROVED);
+        } else {
+            request.setStatus(LEAVE_REJECTED);
+        }
+        request.setReviewerId(userId);
+        request.setReviewOpinion(dto.getOpinion());
+        request.setReviewTime(LocalDateTime.now());
+        leaveRequestMapper.audit(request);
+        return toLeaveRequestVO(request);
+    }
+
+    // ── 成员分工编辑 ──
+
     public void updateMemberWork(Long userId, String role, Long teamId, Long studentId, UpdateMemberWorkDTO dto) {
         assertTeamLeader(userId, role, teamId);
         TeamMemberEntity member = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
@@ -175,12 +246,33 @@ public class TeamService {
         teamMemberMapper.updateWorkContent(teamId, studentId, dto.getWorkContent().trim());
     }
 
+    // ── 团队查询辅助方法 ──
+
+    @Deprecated
     public TeamEntity getCurrentTeamByStudent(Long studentId) {
-        TeamMemberEntity membership = teamMemberMapper.findActiveByStudentId(studentId);
-        if (membership == null) {
+        List<TeamMemberEntity> memberships = teamMemberMapper.findActiveByStudentId(studentId);
+        if (memberships.isEmpty()) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请先创建或加入团队");
         }
-        return getTeamById(membership.getTeamId());
+        return getTeamById(memberships.get(0).getTeamId());
+    }
+
+    public TeamEntity getTeamForStudent(Long studentId, Long teamId) {
+        TeamMemberEntity membership = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
+        if (membership == null || !Boolean.TRUE.equals(membership.getEnabled())) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "您不是该团队的成员");
+        }
+        return getTeamById(teamId);
+    }
+
+    public List<TeamEntity> getTeamsForStudent(Long studentId) {
+        List<TeamMemberEntity> memberships = teamMemberMapper.findActiveByStudentId(studentId);
+        if (memberships.isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "请先创建或加入团队");
+        }
+        return memberships.stream()
+                .map(m -> getTeamById(m.getTeamId()))
+                .toList();
     }
 
     public TeamEntity getTeamById(Long teamId) {
@@ -195,6 +287,8 @@ public class TeamService {
         TeamMemberEntity member = teamMemberMapper.findByTeamIdAndStudentId(teamId, studentId);
         return member != null && Boolean.TRUE.equals(member.getEnabled());
     }
+
+    // ── 权限检查 ──
 
     public void assertTeamLeader(Long userId, String role, Long teamId) {
         if (ROLE_ADMIN.equalsIgnoreCase(role)) {
@@ -218,6 +312,8 @@ public class TeamService {
             throw new BusinessException(ResultCode.FORBIDDEN, "该操作仅限教师或管理员使用");
         }
     }
+
+    // ── VO 映射 ──
 
     private TeamVO toTeamVO(TeamEntity entity) {
         TeamVO vo = new TeamVO();
@@ -248,6 +344,20 @@ public class TeamService {
         vo.setTeamId(entity.getTeamId());
         vo.setApplicantId(entity.getApplicantId());
         vo.setApplyMessage(entity.getApplyMessage());
+        vo.setStatus(entity.getStatus());
+        vo.setReviewerId(entity.getReviewerId());
+        vo.setReviewOpinion(entity.getReviewOpinion());
+        vo.setApplyTime(entity.getApplyTime());
+        vo.setReviewTime(entity.getReviewTime());
+        return vo;
+    }
+
+    private LeaveRequestVO toLeaveRequestVO(TeamLeaveRequestEntity entity) {
+        LeaveRequestVO vo = new LeaveRequestVO();
+        vo.setId(entity.getId());
+        vo.setTeamId(entity.getTeamId());
+        vo.setApplicantId(entity.getApplicantId());
+        vo.setLeaveMessage(entity.getLeaveMessage());
         vo.setStatus(entity.getStatus());
         vo.setReviewerId(entity.getReviewerId());
         vo.setReviewOpinion(entity.getReviewOpinion());

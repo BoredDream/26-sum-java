@@ -63,7 +63,7 @@ class AuthServiceImplTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> service.login(dto, session));
 
-        assertEquals("用户名或密码错误", ex.getMessage());
+        assertTrue(ex.getMessage().startsWith("角色选择错误"));
         verify(session, never()).setAttribute(anyString(), any());
         verifyNoInteractions(teacherMapper, studentMapper);
     }

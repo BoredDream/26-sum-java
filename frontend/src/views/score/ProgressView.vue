@@ -234,27 +234,29 @@ function openEvaluate(row?: ProgressVO) {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      const payload: StageEvaluationSubmitDTO = {
-        ...form,
-        innovationScore: form.innovationScore === undefined ? 0 : form.innovationScore,
-        techScore: form.techScore === undefined ? 0 : form.techScore,
-        isLate: form.isLate ?? 0,
-        lateDays: form.lateDays ?? 0,
-      }
-      await scoreApi.submitStageEvaluation(payload)
-      ElMessage.success('评价提交成功')
-      formVisible.value = false
-      loadProgress()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '提交失败')
-    } finally {
-      submitting.value = false
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    const payload: StageEvaluationSubmitDTO = {
+      ...form,
+      innovationScore: form.innovationScore === undefined ? 0 : form.innovationScore,
+      techScore: form.techScore === undefined ? 0 : form.techScore,
+      isLate: form.isLate ?? 0,
+      lateDays: form.lateDays ?? 0,
     }
-  })
+    await scoreApi.submitStageEvaluation(payload)
+    ElMessage.success('评价提交成功')
+    formVisible.value = false
+    loadProgress()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '提交失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(async () => {

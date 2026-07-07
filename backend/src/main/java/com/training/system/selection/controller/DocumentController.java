@@ -32,18 +32,20 @@ public class DocumentController {
     @OperationLog(type = "CREATE", description = "上传过程文档")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<ProcessDocumentVO> upload(HttpSession session,
+                                            @RequestParam Long teamId,
                                             @RequestParam String documentName,
                                             @RequestParam String documentType,
                                             @RequestParam String projectStage,
                                             @RequestPart MultipartFile file) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(documentService.upload(user.relatedId(), user.role(), documentName, documentType, projectStage, file));
+        return Result.success(documentService.upload(user.relatedId(), user.role(), teamId, documentName, documentType, projectStage, file));
     }
 
     @GetMapping
-    public Result<List<ProcessDocumentVO>> listMyScope(HttpSession session) {
+    public Result<List<ProcessDocumentVO>> listMyScope(HttpSession session,
+                                                        @RequestParam(required = false) Long teamId) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(documentService.listMyScope(user.relatedId(), user.role()));
+        return Result.success(documentService.listMyScope(user.relatedId(), user.role(), teamId));
     }
 
     @OperationLog(type = "UPDATE", description = "反馈过程文档")

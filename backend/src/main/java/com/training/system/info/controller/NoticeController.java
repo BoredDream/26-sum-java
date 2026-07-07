@@ -64,6 +64,7 @@ public class NoticeController {
         return Result.success(noticeService.pageNotices(query));
     }
 
+    @OperationLog(type = "UPDATE", description = "置顶/取消置顶公告")
     @PostMapping("/{noticeId}/top")
     public Result<Void> toggleTop(@PathVariable Long noticeId) {
         noticeService.toggleTop(noticeId);

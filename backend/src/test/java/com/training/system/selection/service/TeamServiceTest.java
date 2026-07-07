@@ -9,6 +9,7 @@ import com.training.system.selection.entity.TeamEntity;
 import com.training.system.selection.entity.TeamJoinRequestEntity;
 import com.training.system.selection.entity.TeamMemberEntity;
 import com.training.system.selection.mapper.TeamJoinRequestMapper;
+import com.training.system.selection.mapper.TeamLeaveRequestMapper;
 import com.training.system.selection.mapper.TeamMapper;
 import com.training.system.selection.mapper.TeamMemberMapper;
 import com.training.system.selection.vo.JoinRequestVO;
@@ -37,6 +38,8 @@ class TeamServiceTest {
     private TeamMemberMapper teamMemberMapper;
     @Mock
     private TeamJoinRequestMapper joinRequestMapper;
+    @Mock
+    private TeamLeaveRequestMapper leaveRequestMapper;
 
     @Captor
     private ArgumentCaptor<TeamEntity> teamCaptor;
@@ -49,7 +52,7 @@ class TeamServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new TeamService(teamMapper, teamMemberMapper, joinRequestMapper);
+        service = new TeamService(teamMapper, teamMemberMapper, joinRequestMapper, leaveRequestMapper);
     }
 
     @Test
@@ -112,7 +115,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 已加入团队时禁止重复申请")
     void applyJoin_alreadyInTeamThrows() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(member(10L, 2L, "MEMBER", true));
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of(member(10L, 2L, "MEMBER", true)));
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> service.applyJoin(2L, ROLE_STUDENT, 10L, new JoinTeamDTO()));
@@ -194,15 +197,17 @@ class TeamServiceTest {
     @Test
     @DisplayName("我的团队 - 学生查看当前团队详情")
     void getMyTeam_success() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(member(10L, 2L, "MEMBER", true));
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of(member(10L, 2L, "MEMBER", true)));
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
         when(teamMemberMapper.findActiveByTeamId(10L)).thenReturn(List.of(
                 member(10L, 1L, "LEADER", true),
                 member(10L, 2L, "MEMBER", true)
         ));
 
-        TeamVO result = service.getMyTeam(2L, ROLE_STUDENT);
+        List<TeamVO> results = service.getMyTeams(2L, ROLE_STUDENT);
 
+        assertEquals(1, results.size());
+        TeamVO result = results.get(0);
         assertEquals(10L, result.getId());
         assertEquals(2, result.getMemberCount());
         assertEquals(2, result.getMembers().size());
@@ -212,7 +217,7 @@ class TeamServiceTest {
     @DisplayName("我的团队 - 非学生禁止查看")
     void getMyTeam_nonStudentThrows() {
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> service.getMyTeam(1L, ROLE_TEACHER));
+                () -> service.getMyTeams(1L, ROLE_TEACHER));
 
         assertTrue(ex.getMessage().contains("仅限学生"));
     }

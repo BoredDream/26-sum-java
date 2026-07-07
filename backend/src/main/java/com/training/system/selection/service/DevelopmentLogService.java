@@ -36,7 +36,7 @@ public class DevelopmentLogService {
     @Transactional(rollbackFor = Exception.class)
     public DevelopmentLogVO create(Long userId, String role, CreateDevelopmentLogDTO dto) {
         teamService.requireStudent(role);
-        TeamEntity team = teamService.getCurrentTeamByStudent(userId);
+        TeamEntity team = teamService.getTeamForStudent(userId, dto.getTeamId());
         if (!TEAM_SELECTED.equals(team.getStatus())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请在选题审核通过后再填写开发日志");
         }
@@ -60,10 +60,17 @@ public class DevelopmentLogService {
         return toVO(log);
     }
 
-    public List<DevelopmentLogVO> listMyScope(Long userId, String role) {
+    public List<DevelopmentLogVO> listMyScope(Long userId, String role, Long teamId) {
         if (ROLE_STUDENT.equalsIgnoreCase(role)) {
-            TeamEntity team = teamService.getCurrentTeamByStudent(userId);
-            return logMapper.findByTeamId(team.getId()).stream().map(this::toVO).toList();
+            if (teamId != null) {
+                TeamEntity team = teamService.getTeamForStudent(userId, teamId);
+                return logMapper.findByTeamId(team.getId()).stream().map(this::toVO).toList();
+            }
+            // 列出学生所有团队的开发日志
+            List<TeamEntity> teams = teamService.getTeamsForStudent(userId);
+            return teams.stream()
+                    .flatMap(t -> logMapper.findByTeamId(t.getId()).stream())
+                    .map(this::toVO).toList();
         }
         if (ROLE_TEACHER.equalsIgnoreCase(role)) {
             return logMapper.findByTeacherId(userId).stream().map(this::toVO).toList();

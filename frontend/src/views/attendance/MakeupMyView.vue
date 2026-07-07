@@ -188,29 +188,31 @@ function handleFileRemove() {
 
 async function handleSubmit() {
   if (!applyFormRef.value) return
-  await applyFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      let proofPath = applyForm.proofFilePath
-      if (selectedFile.value) {
-        proofPath = await attendanceApi.uploadMakeupProof(selectedFile.value)
-      }
-      await attendanceApi.applyMakeup({
-        taskId: applyForm.taskId,
-        recordId: applyForm.recordId,
-        applyReason: applyForm.applyReason,
-        proofFilePath: proofPath,
-      })
-      ElMessage.success('申请提交成功')
-      applyVisible.value = false
-      loadApplications()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '申请提交失败')
-    } finally {
-      submitting.value = false
+  try {
+    await applyFormRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    let proofPath = applyForm.proofFilePath
+    if (selectedFile.value) {
+      proofPath = await attendanceApi.uploadMakeupProof(selectedFile.value)
     }
-  })
+    await attendanceApi.applyMakeup({
+      taskId: applyForm.taskId,
+      recordId: applyForm.recordId,
+      applyReason: applyForm.applyReason,
+      proofFilePath: proofPath,
+    })
+    ElMessage.success('申请提交成功')
+    applyVisible.value = false
+    loadApplications()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '申请提交失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(() => {

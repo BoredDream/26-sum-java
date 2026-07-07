@@ -62,34 +62,14 @@
           formatDateTime((scope.row as TopicListVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="240" fixed="right">
+      <el-table-column label="操作" width="260" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicListVO)"
-            >查看详情</el-button
-          >
-          <el-button
-            v-if="(scope.row as TopicListVO).openStatus !== 1"
-            type="success"
-            text
-            size="small"
-            :loading="actionId === (scope.row as TopicListVO).topicId"
-            @click="handleOpen(scope.row as TopicListVO)"
-          >
-            开放
-          </el-button>
-          <el-button
-            v-if="(scope.row as TopicListVO).openStatus === 1"
-            type="danger"
-            text
-            size="small"
-            :loading="actionId === (scope.row as TopicListVO).topicId"
-            @click="handleClose(scope.row as TopicListVO)"
-          >
-            关闭
-          </el-button>
-          <el-button type="danger" text size="small" @click="handleDelete(scope.row as TopicListVO)"
-            >删除</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="viewDetail(scope.row as TopicListVO)">查看详情</el-button>
+            <el-button v-if="(scope.row as TopicListVO).openStatus !== 1" type="success" link size="small" :loading="actionId === (scope.row as TopicListVO).topicId" @click="handleOpen(scope.row as TopicListVO)">开放</el-button>
+            <el-button v-if="(scope.row as TopicListVO).openStatus === 1" type="danger" link size="small" :loading="actionId === (scope.row as TopicListVO).topicId" @click="handleClose(scope.row as TopicListVO)">关闭</el-button>
+            <el-button type="danger" link size="small" @click="handleDelete(scope.row as TopicListVO)">删除</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -216,6 +196,12 @@ onMounted(loadTopics)
 .topic-manage-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

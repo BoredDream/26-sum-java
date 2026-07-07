@@ -67,16 +67,18 @@ const rules: FormRules = {
 
 async function handleLogin() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    try {
-      await auth.login(form)
-      ElMessage.success('登录成功')
-      router.push(auth.getHomePath(auth.role))
-    } catch (err: any) {
-      ElMessage.error(err?.message || '登录失败，请检查账号密码')
-    }
-  })
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  try {
+    await auth.login(form)
+    ElMessage.success('登录成功')
+    router.push(auth.getHomePath(auth.role))
+  } catch (err: any) {
+    ElMessage.error(err?.message || '登录失败，请检查账号密码')
+  }
 }
 </script>
 

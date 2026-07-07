@@ -15,11 +15,11 @@ INSERT INTO teacher (teacher_id, teacher_no, teacher_name, office, title, phone,
 (2, 'T2026002', '管理员', '综合实训办公室', '管理员', '13900000002', 'admin@example.com');
 
 INSERT INTO user_account (user_id, username, password, role, related_id, status) VALUES
-(1, '20260001', '$2a$10$D8rpYIHbWOdP3REkM7jOIuCO59y3XGd6n4q2uwTOOUdEVH/X3UtQm', 'STUDENT', 1, 1),
-(2, '20260002', '$2a$10$D8rpYIHbWOdP3REkM7jOIuCO59y3XGd6n4q2uwTOOUdEVH/X3UtQm', 'STUDENT', 2, 1),
-(3, '20260003', '$2a$10$D8rpYIHbWOdP3REkM7jOIuCO59y3XGd6n4q2uwTOOUdEVH/X3UtQm', 'STUDENT', 3, 1),
-(4, 'T2026001', '$2a$10$D8rpYIHbWOdP3REkM7jOIuCO59y3XGd6n4q2uwTOOUdEVH/X3UtQm', 'TEACHER', 1, 1),
-(5, 'admin', '$2a$10$D8rpYIHbWOdP3REkM7jOIuCO59y3XGd6n4q2uwTOOUdEVH/X3UtQm', 'ADMIN', 2, 1);
+(1, '20260001', '$2b$10$2N5wLHw5n5jX4TK4Ry5vLe8vpQ80bvAtj6Q4n/GkRt7SGTd9S.SS2', 'STUDENT', 1, 1),
+(2, '20260002', '$2b$10$2N5wLHw5n5jX4TK4Ry5vLe8vpQ80bvAtj6Q4n/GkRt7SGTd9S.SS2', 'STUDENT', 2, 1),
+(3, '20260003', '$2b$10$2N5wLHw5n5jX4TK4Ry5vLe8vpQ80bvAtj6Q4n/GkRt7SGTd9S.SS2', 'STUDENT', 3, 1),
+(4, 'T2026001', '$2b$10$2N5wLHw5n5jX4TK4Ry5vLe8vpQ80bvAtj6Q4n/GkRt7SGTd9S.SS2', 'TEACHER', 1, 1),
+(5, 'admin', '$2b$10$2N5wLHw5n5jX4TK4Ry5vLe8vpQ80bvAtj6Q4n/GkRt7SGTd9S.SS2', 'ADMIN', 2, 1);
 
 INSERT INTO project_topic (
   topic_id, topic_name, topic_type, difficulty, teacher_id, student_limit,
