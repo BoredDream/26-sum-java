@@ -80,13 +80,9 @@
         </el-table-column>
         <el-table-column label="操作" width="100" fixed="right">
           <template #default="scope">
-            <el-button
-              type="primary"
-              text
-              size="small"
-              @click="handleDownload(scope.row as TopicFileVO)"
-              >下载</el-button
-            >
+            <span class="action-btns">
+              <el-button type="primary" link size="small" @click="handleDownload(scope.row as TopicFileVO)">下载</el-button>
+            </span>
           </template>
         </el-table-column>
       </el-table>
@@ -224,6 +220,12 @@ onMounted(loadData)
     color: #606266;
     line-height: 1.6;
     white-space: pre-wrap;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

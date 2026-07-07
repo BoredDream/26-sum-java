@@ -37,18 +37,11 @@
             {{ formatDateTime(row.createTime) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="120">
+        <el-table-column label="操作" width="100">
           <template #default="{ row }">
-            <el-button
-              type="primary"
-              text
-              size="small"
-              :disabled="row.memberCount >= row.maxSize"
-              :loading="joinLoadingTeamId === row.id"
-              @click="handleJoin(row.id)"
-            >
-              申请入队
-            </el-button>
+            <span class="action-btns">
+              <el-button type="primary" link size="small" :disabled="row.memberCount >= row.maxSize" :loading="joinLoadingTeamId === row.id" @click="handleJoin(row.id)">申请入队</el-button>
+            </span>
           </template>
         </el-table-column>
       </el-table>
@@ -108,17 +101,11 @@
             </template>
           </el-table-column>
           <el-table-column prop="workContent" label="分工" show-overflow-tooltip />
-          <el-table-column v-if="isLeader" label="操作" width="120">
+          <el-table-column v-if="isLeader" label="操作" width="100">
             <template #default="scope">
-              <el-button
-                v-if="scope.row.studentId !== team.leaderId"
-                type="primary"
-                text
-                size="small"
-                @click="openWorkDialog(scope.row as TeamMemberVO)"
-              >
-                编辑分工
-              </el-button>
+              <span class="action-btns">
+                <el-button v-if="scope.row.studentId !== team.leaderId" type="primary" link size="small" @click="openWorkDialog(scope.row as TeamMemberVO)">编辑分工</el-button>
+              </span>
             </template>
           </el-table-column>
         </el-table>
@@ -141,24 +128,12 @@
               <status-tag category="joinRequest" :value="row.status" />
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="180">
+          <el-table-column label="操作" width="140">
             <template #default="{ row }">
-              <el-button
-                v-if="row.status === 'PENDING'"
-                type="success"
-                text
-                size="small"
-                @click="auditRequest(row.id, true)"
-                >通过</el-button
-              >
-              <el-button
-                v-if="row.status === 'PENDING'"
-                type="danger"
-                text
-                size="small"
-                @click="auditRequest(row.id, false)"
-                >驳回</el-button
-              >
+              <span class="action-btns">
+                <el-button v-if="row.status === 'PENDING'" type="success" link size="small" @click="auditRequest(row.id, true)">通过</el-button>
+                <el-button v-if="row.status === 'PENDING'" type="danger" link size="small" @click="auditRequest(row.id, false)">驳回</el-button>
+              </span>
             </template>
           </el-table-column>
         </el-table>
@@ -378,6 +353,12 @@ onMounted(loadTeam)
     font-size: 16px;
     font-weight: 600;
     color: #303133;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .mt-4 {

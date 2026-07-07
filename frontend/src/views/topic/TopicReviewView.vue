@@ -21,28 +21,14 @@
           formatDateTime((scope.row as TopicListVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="280" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="viewDetail(scope.row as TopicListVO)"
-            >查看详情</el-button
-          >
-          <el-button
-            type="success"
-            text
-            size="small"
-            @click="openAudit(scope.row as TopicListVO, 1)"
-            >通过</el-button
-          >
-          <el-button
-            type="warning"
-            text
-            size="small"
-            @click="openAudit(scope.row as TopicListVO, 2)"
-            >退回</el-button
-          >
-          <el-button type="danger" text size="small" @click="openAudit(scope.row as TopicListVO, 3)"
-            >不通过</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="viewDetail(scope.row as TopicListVO)">查看详情</el-button>
+            <el-button type="success" link size="small" @click="openAudit(scope.row as TopicListVO, 1)">通过</el-button>
+            <el-button type="warning" link size="small" @click="openAudit(scope.row as TopicListVO, 2)">退回</el-button>
+            <el-button type="danger" link size="small" @click="openAudit(scope.row as TopicListVO, 3)">不通过</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -194,6 +180,12 @@ onMounted(loadTopics)
 .topic-review-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

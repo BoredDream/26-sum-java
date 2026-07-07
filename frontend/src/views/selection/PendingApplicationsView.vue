@@ -21,25 +21,13 @@
       <el-table-column prop="applyTime" label="申请时间" width="170">
         <template #default="{ row }">{{ formatDateTime(row.applyTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="160" fixed="right">
         <template #default="scope">
-          <el-button
-            v-if="scope.row.status === 'PENDING'"
-            type="success"
-            text
-            size="small"
-            @click="openAudit(scope.row as SelectionVO, true)"
-            >通过</el-button
-          >
-          <el-button
-            v-if="scope.row.status === 'PENDING'"
-            type="danger"
-            text
-            size="small"
-            @click="openAudit(scope.row as SelectionVO, false)"
-            >驳回</el-button
-          >
-          <span v-else class="handled-text">已处理</span>
+          <span class="action-btns">
+            <el-button v-if="scope.row.status === 'PENDING'" type="success" link size="small" @click="openAudit(scope.row as SelectionVO, true)">通过</el-button>
+            <el-button v-if="scope.row.status === 'PENDING'" type="danger" link size="small" @click="openAudit(scope.row as SelectionVO, false)">驳回</el-button>
+            <span v-else class="handled-text">已处理</span>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -144,6 +132,12 @@ onMounted(loadApplications)
 .pending-applications-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {

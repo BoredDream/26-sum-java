@@ -22,22 +22,12 @@
       <el-table-column prop="uploadTime" label="上传时间" width="170">
         <template #default="{ row }">{{ formatDateTime(row.uploadTime) }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="140" fixed="right">
         <template #default="scope">
-          <el-button
-            type="primary"
-            text
-            size="small"
-            @click="handleDownload(scope.row as ProcessDocumentVO)"
-            >下载</el-button
-          >
-          <el-button
-            type="warning"
-            text
-            size="small"
-            @click="openFeedback(scope.row as ProcessDocumentVO)"
-            >反馈</el-button
-          >
+          <span class="action-btns">
+            <el-button type="primary" link size="small" @click="handleDownload(scope.row as ProcessDocumentVO)">下载</el-button>
+            <el-button type="warning" link size="small" @click="openFeedback(scope.row as ProcessDocumentVO)">反馈</el-button>
+          </span>
         </template>
       </el-table-column>
     </el-table>
@@ -141,6 +131,12 @@ onMounted(loadDocuments)
 .documents-feedback-page {
   .mb-4 {
     margin-bottom: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .data-table {
