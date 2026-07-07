@@ -55,7 +55,7 @@ public class DocumentService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ProcessDocumentVO upload(Long userId, String role, String documentName, String documentType,
+    public ProcessDocumentVO upload(Long userId, String role, Long teamId, String documentName, String documentType,
                                     String projectStage, MultipartFile file) {
         teamService.requireStudent(role);
         if (isBlank(documentName) || isBlank(documentType) || isBlank(projectStage)) {
@@ -65,7 +65,7 @@ public class DocumentService {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请选择需要上传的文件");
         }
 
-        TeamEntity team = teamService.getCurrentTeamByStudent(userId);
+        TeamEntity team = teamService.getTeamForStudent(userId, teamId);
         if (!TEAM_SELECTED.equals(team.getStatus()) || team.getSelectedTopicId() == null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请在选题审核通过后再提交过程文档");
         }
@@ -103,10 +103,17 @@ public class DocumentService {
         return toVO(document);
     }
 
-    public List<ProcessDocumentVO> listMyScope(Long userId, String role) {
+    public List<ProcessDocumentVO> listMyScope(Long userId, String role, Long teamId) {
         if (ROLE_STUDENT.equalsIgnoreCase(role)) {
-            TeamEntity team = teamService.getCurrentTeamByStudent(userId);
-            return documentMapper.findByTeamId(team.getId()).stream().map(this::toVO).toList();
+            if (teamId != null) {
+                TeamEntity team = teamService.getTeamForStudent(userId, teamId);
+                return documentMapper.findByTeamId(team.getId()).stream().map(this::toVO).toList();
+            }
+            // 列出学生所有团队的文档
+            List<TeamEntity> teams = teamService.getTeamsForStudent(userId);
+            return teams.stream()
+                    .flatMap(t -> documentMapper.findByTeamId(t.getId()).stream())
+                    .map(this::toVO).toList();
         }
         if (ROLE_TEACHER.equalsIgnoreCase(role)) {
             return documentMapper.findByTeacherId(userId).stream().map(this::toVO).toList();

@@ -273,33 +273,35 @@ function openAudit(row: MakeupApplyVO, action: number) {
 
 async function handleAudit() {
   if (!auditFormRef.value || !currentApply.value) return
-  await auditFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    const confirmText = auditAction.value === 1 ? '确认通过该补签申请？' : '确认驳回该补签申请？'
-    try {
-      await ElMessageBox.confirm(confirmText, '审核确认', { type: 'warning' })
-    } catch {
-      return
-    }
+  try {
+    await auditFormRef.value.validate()
+  } catch {
+    return
+  }
+  const confirmText = auditAction.value === 1 ? '确认通过该补签申请？' : '确认驳回该补签申请？'
+  try {
+    await ElMessageBox.confirm(confirmText, '审核确认', { type: 'warning' })
+  } catch {
+    return
+  }
 
-    auditLoading.value = true
-    const applyId = currentApply.value!.applyId
-    auditId.value = applyId
-    try {
-      await attendanceApi.reviewMakeup(applyId, {
-        auditStatus: auditAction.value,
-        auditComment: auditForm.auditComment,
-      })
-      ElMessage.success('审核完成')
-      auditVisible.value = false
-      loadApplications()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '审核失败')
-    } finally {
-      auditLoading.value = false
-      auditId.value = 0
-    }
-  })
+  auditLoading.value = true
+  const applyId = currentApply.value!.applyId
+  auditId.value = applyId
+  try {
+    await attendanceApi.reviewMakeup(applyId, {
+      auditStatus: auditAction.value,
+      auditComment: auditForm.auditComment,
+    })
+    ElMessage.success('审核完成')
+    auditVisible.value = false
+    loadApplications()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '审核失败')
+  } finally {
+    auditLoading.value = false
+    auditId.value = 0
+  }
 }
 
 // 详情

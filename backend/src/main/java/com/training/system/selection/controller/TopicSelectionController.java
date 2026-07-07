@@ -43,9 +43,10 @@ public class TopicSelectionController {
     }
 
     @GetMapping("/applications/my")
-    public Result<List<SelectionVO>> getMySelections(HttpSession session) {
+    public Result<List<SelectionVO>> getMySelections(HttpSession session,
+                                                      @RequestParam(required = false) Long teamId) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(selectionService.getMySelections(user.relatedId(), user.role()));
+        return Result.success(selectionService.getMySelections(user.relatedId(), user.role(), teamId));
     }
 
     @GetMapping("/applications/pending")

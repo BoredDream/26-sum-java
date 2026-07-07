@@ -259,20 +259,22 @@ function openCreate() {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      await scoreApi.createStageTask({ ...form })
-      ElMessage.success('创建成功')
-      formVisible.value = false
-      loadTasks()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '操作失败')
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    await scoreApi.createStageTask({ ...form })
+    ElMessage.success('创建成功')
+    formVisible.value = false
+    loadTasks()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '操作失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(loadTasks)

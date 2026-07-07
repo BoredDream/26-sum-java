@@ -264,30 +264,32 @@ function openEdit(row: StudentVO) {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      if (isEdit.value) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { password, ...dto } = form.value
-        await infoApi.updateStudent(currentId.value, dto as StudentUpdateDTO)
-      } else {
-        const dto: StudentCreateDTO = { ...form.value }
-        if (dto.password === '') {
-          dto.password = undefined
-        }
-        await infoApi.createStudent(dto)
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    if (isEdit.value) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...dto } = form.value
+      await infoApi.updateStudent(currentId.value, dto as StudentUpdateDTO)
+    } else {
+      const dto: StudentCreateDTO = { ...form.value }
+      if (dto.password === '') {
+        dto.password = undefined
       }
-      ElMessage.success('保存成功')
-      formVisible.value = false
-      loadStudents()
-    } catch (err: any) {
-      ElMessage.error(err?.message || '保存失败')
-    } finally {
-      submitting.value = false
+      await infoApi.createStudent(dto)
     }
-  })
+    ElMessage.success('保存成功')
+    formVisible.value = false
+    loadStudents()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '保存失败')
+  } finally {
+    submitting.value = false
+  }
 }
 
 // 状态切换

@@ -30,6 +30,9 @@ public class CreateDevelopmentLogDTO {
     @Size(max = 3000, message = "下一步计划不能超过3000个字符")
     private String nextPlan;
 
+    @NotNull(message = "请指定团队")
+    private Long teamId;
+
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public LocalDate getLogDate() { return logDate; }
@@ -42,4 +45,6 @@ public class CreateDevelopmentLogDTO {
     public void setProblemDescription(String problemDescription) { this.problemDescription = problemDescription; }
     public String getNextPlan() { return nextPlan; }
     public void setNextPlan(String nextPlan) { this.nextPlan = nextPlan; }
+    public Long getTeamId() { return teamId; }
+    public void setTeamId(Long teamId) { this.teamId = teamId; }
 }

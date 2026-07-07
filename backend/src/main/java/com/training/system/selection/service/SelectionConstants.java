@@ -17,6 +17,10 @@ public final class SelectionConstants {
     public static final String JOIN_APPROVED = "APPROVED";
     public static final String JOIN_REJECTED = "REJECTED";
 
+    public static final String LEAVE_PENDING = "PENDING";
+    public static final String LEAVE_APPROVED = "APPROVED";
+    public static final String LEAVE_REJECTED = "REJECTED";
+
     public static final String SELECTION_PENDING = "PENDING";
     public static final String SELECTION_APPROVED = "APPROVED";
     public static final String SELECTION_REJECTED = "REJECTED";

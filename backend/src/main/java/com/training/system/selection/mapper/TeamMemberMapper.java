@@ -15,8 +15,8 @@ public interface TeamMemberMapper {
 
     @Select("SELECT member_id AS id, team_id, student_id, CASE WHEN member_role = 1 THEN 'LEADER' ELSE 'MEMBER' END AS member_role, " +
             "work_content, CASE WHEN status = 1 THEN TRUE ELSE FALSE END AS enabled, join_time " +
-            "FROM team_member WHERE student_id = #{studentId} AND status = 1 LIMIT 1")
-    TeamMemberEntity findActiveByStudentId(@Param("studentId") Long studentId);
+            "FROM team_member WHERE student_id = #{studentId} AND status = 1 ORDER BY join_time ASC")
+    List<TeamMemberEntity> findActiveByStudentId(@Param("studentId") Long studentId);
 
     @Select("SELECT member_id AS id, team_id, student_id, CASE WHEN member_role = 1 THEN 'LEADER' ELSE 'MEMBER' END AS member_role, " +
             "work_content, CASE WHEN status = 1 THEN TRUE ELSE FALSE END AS enabled, join_time " +
@@ -38,4 +38,10 @@ public interface TeamMemberMapper {
 
     @Update("UPDATE team_member SET work_content = #{workContent} WHERE team_id = #{teamId} AND student_id = #{studentId} AND status = 1")
     int updateWorkContent(@Param("teamId") Long teamId, @Param("studentId") Long studentId, @Param("workContent") String workContent);
+
+    @Update("UPDATE team_member SET status = 0 WHERE team_id = #{teamId} AND student_id = #{studentId} AND status = 1")
+    int deactivateMember(@Param("teamId") Long teamId, @Param("studentId") Long studentId);
+
+    @Update("UPDATE team_member SET status = 1, join_time = NOW() WHERE team_id = #{teamId} AND student_id = #{studentId}")
+    int reactivateMember(@Param("teamId") Long teamId, @Param("studentId") Long studentId);
 }

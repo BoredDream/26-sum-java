@@ -41,7 +41,7 @@ async function loadApplications() {
   loading.value = true
   error.value = ''
   try {
-    applications.value = await selectionApi.getMySelection()
+    applications.value = await selectionApi.getMySelections()
   } catch (err: any) {
     error.value = err?.message || '加载申请记录失败'
   } finally {

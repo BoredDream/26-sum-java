@@ -40,6 +40,21 @@
     <!-- 新增日志弹窗 -->
     <el-dialog v-model="createVisible" title="新增开发日志" width="600px">
       <el-form ref="logFormRef" :model="logForm" :rules="logRules" label-width="100px">
+        <el-form-item label="所属团队" prop="teamId">
+          <el-select
+            v-model="logForm.teamId"
+            placeholder="请选择团队"
+            style="width: 100%"
+            :loading="myTeamsLoading"
+          >
+            <el-option
+              v-for="team in myTeams"
+              :key="team.id"
+              :label="team.teamName"
+              :value="team.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="日志标题" prop="title">
           <el-input v-model="logForm.title" placeholder="请输入日志标题" />
         </el-form-item>
@@ -47,6 +62,7 @@
           <el-date-picker
             v-model="logForm.logDate"
             type="date"
+            value-format="YYYY-MM-DD"
             placeholder="请选择日志日期"
             style="width: 100%"
           />
@@ -109,13 +125,17 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as selectionApi from '@/api/selection'
-import type { DevelopmentLogVO } from '@/types/selection'
+import type { DevelopmentLogVO, TeamVO } from '@/types/selection'
 import { formatDate, formatDateTime } from '@/utils/format'
 
 const loading = ref(false)
 const error = ref('')
 const logs = ref<DevelopmentLogVO[]>([])
 const completionStatusOptions = ['未开始', '进行中', '已完成', '已阻塞']
+
+// 我的团队（用于新增日志时选择）
+const myTeams = ref<TeamVO[]>([])
+const myTeamsLoading = ref(false)
 
 async function loadLogs() {
   loading.value = true
@@ -134,6 +154,7 @@ const createVisible = ref(false)
 const submitting = ref(false)
 const logFormRef = ref<FormInstance>()
 const logForm = ref({
+  teamId: 0,
   title: '',
   logDate: '',
   workContent: '',
@@ -143,14 +164,16 @@ const logForm = ref({
 })
 
 const logRules: FormRules = {
+  teamId: [{ required: true, message: '请选择所属团队', trigger: 'change' }],
   title: [{ required: true, message: '请输入日志标题', trigger: 'blur' }],
   logDate: [{ required: true, message: '请选择日志日期', trigger: 'change' }],
   completionStatus: [{ required: true, message: '请选择完成情况', trigger: 'change' }],
   workContent: [{ required: true, message: '请输入工作内容', trigger: 'blur' }],
 }
 
-function openCreate() {
+async function openCreate() {
   logForm.value = {
+    teamId: 0,
     title: '',
     logDate: formatDate(new Date()),
     workContent: '',
@@ -159,23 +182,36 @@ function openCreate() {
     nextPlan: '',
   }
   createVisible.value = true
+  // 加载团队列表
+  myTeamsLoading.value = true
+  try {
+    myTeams.value = await selectionApi.getMyTeams()
+  } catch {
+    myTeams.value = []
+  } finally {
+    myTeamsLoading.value = false
+  }
   logFormRef.value?.clearValidate()
 }
 
 async function handleCreate() {
   if (!logFormRef.value) return
-  await logFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    submitting.value = true
-    try {
-      await selectionApi.createLog(logForm.value)
-      ElMessage.success('提交成功')
-      createVisible.value = false
-      loadLogs()
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await logFormRef.value.validate()
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    await selectionApi.createLog(logForm.value)
+    ElMessage.success('提交成功')
+    createVisible.value = false
+    loadLogs()
+  } catch {
+    // 错误消息已由请求拦截器统一展示
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(loadLogs)

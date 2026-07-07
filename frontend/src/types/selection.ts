@@ -63,6 +63,7 @@ export interface SelectableTopicVO {
 export interface SubmitSelectionDTO {
   topicId: number
   selectionReason: string
+  teamId: number
 }
 
 export interface SelectionVO {
@@ -132,10 +133,28 @@ export interface CreateDevelopmentLogDTO {
   completionStatus: string
   problemDescription?: string
   nextPlan?: string
+  teamId: number
 }
 
 export interface LogFeedbackDTO {
   feedback: string
+}
+
+// 离队申请
+export interface RequestLeaveTeamDTO {
+  leaveMessage?: string
+}
+
+export interface LeaveRequestVO {
+  id: number
+  teamId: number
+  applicantId: number
+  leaveMessage?: string
+  status: 'PENDING' | 'APPROVED' | 'REJECTED'
+  reviewerId?: number
+  reviewOpinion?: string
+  applyTime: string
+  reviewTime?: string
 }
 
 export { AuditDTO }

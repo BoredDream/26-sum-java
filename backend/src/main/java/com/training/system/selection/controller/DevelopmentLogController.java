@@ -32,9 +32,10 @@ public class DevelopmentLogController {
     }
 
     @GetMapping
-    public Result<List<DevelopmentLogVO>> listMyScope(HttpSession session) {
+    public Result<List<DevelopmentLogVO>> listMyScope(HttpSession session,
+                                                       @RequestParam(required = false) Long teamId) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(developmentLogService.listMyScope(user.relatedId(), user.role()));
+        return Result.success(developmentLogService.listMyScope(user.relatedId(), user.role(), teamId));
     }
 
     @OperationLog(type = "UPDATE", description = "反馈开发日志")

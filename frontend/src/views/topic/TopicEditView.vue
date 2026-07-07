@@ -208,22 +208,24 @@ async function loadDetail() {
 
 async function handleSubmit() {
   if (!formRef.value) return
-  await formRef.value.validate(async (valid) => {
-    if (!valid) return
-    const topicId = Number(route.params.topicId)
-    submitting.value = true
-    try {
-      const payload: TopicUpdateDTO = { ...form }
-      await topicApi.updateTopic(topicId, payload)
-      ElMessage.success('修改已保存')
-      router.push('/topic/my-list')
-    } catch (err: any) {
-      // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
-      ElMessage.error('修改题目失败，请重试')
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await formRef.value.validate()
+  } catch {
+    return
+  }
+  const topicId = Number(route.params.topicId)
+  submitting.value = true
+  try {
+    const payload: TopicUpdateDTO = { ...form }
+    await topicApi.updateTopic(topicId, payload)
+    ElMessage.success('修改已保存')
+    router.push('/topic/my-list')
+  } catch (err: any) {
+    // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
+    ElMessage.error('修改题目失败，请重试')
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(loadDetail)

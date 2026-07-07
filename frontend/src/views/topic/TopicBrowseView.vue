@@ -106,6 +106,21 @@
         <el-form-item label="题目名称">
           <el-input :model-value="applyTopic?.topicName" disabled />
         </el-form-item>
+        <el-form-item label="申请团队" prop="teamId">
+          <el-select
+            v-model="applyForm.teamId"
+            placeholder="请选择团队"
+            style="width: 100%"
+            :loading="myTeamsLoading"
+          >
+            <el-option
+              v-for="team in myTeams"
+              :key="team.id"
+              :label="team.teamName"
+              :value="team.id"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="选题说明" prop="selectionReason">
           <el-input
             v-model="applyForm.selectionReason"
@@ -134,6 +149,7 @@ import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
 import * as selectionApi from '@/api/selection'
 import type { TopicListVO, TopicDetailVO } from '@/types/topic'
+import type { TeamVO } from '@/types/selection'
 import { formatDateTime } from '@/utils/format'
 
 const auth = useAuthStore()
@@ -144,6 +160,10 @@ const topics = ref<TopicListVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(9)
+
+// 我的团队（用于申请时选择）
+const myTeams = ref<TeamVO[]>([])
+const myTeamsLoading = ref(false)
 
 async function loadTopics() {
   loading.value = true
@@ -181,10 +201,12 @@ const applyFormRef = ref<FormInstance>()
 const applyTopic = ref<TopicListVO | null>(null)
 const applyForm = ref({
   topicId: 0,
+  teamId: 0,
   selectionReason: '',
 })
 
 const applyRules: FormRules = {
+  teamId: [{ required: true, message: '请选择申请团队', trigger: 'change' }],
   selectionReason: [{ required: true, message: '请输入选题说明', trigger: 'blur' }],
 }
 
@@ -202,32 +224,43 @@ async function openDetail(topic: TopicListVO) {
   }
 }
 
-function openApply(topic: TopicListVO) {
+async function openApply(topic: TopicListVO) {
   applyTopic.value = topic
-  applyForm.value = { topicId: topic.topicId, selectionReason: '' }
+  applyForm.value = { topicId: topic.topicId, teamId: 0, selectionReason: '' }
   applyVisible.value = true
+  // 加载用户团队列表
+  myTeamsLoading.value = true
+  try {
+    myTeams.value = await selectionApi.getMyTeams()
+  } catch {
+    myTeams.value = []
+  } finally {
+    myTeamsLoading.value = false
+  }
 }
 
 async function handleApply() {
   if (!applyFormRef.value) return
-  await applyFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    try {
-      await ElMessageBox.confirm('确认提交该选题申请？', '提交确认', { type: 'warning' })
-    } catch {
-      return
-    }
-    submitting.value = true
-    try {
-      await selectionApi.submitSelection(applyForm.value)
-      ElMessage.success('申请已提交')
-      applyVisible.value = false
-    } catch {
-      // 全局请求拦截器已显示错误提示，这里只需阻止未处理的 Promise 拒绝
-    } finally {
-      submitting.value = false
-    }
-  })
+  try {
+    await applyFormRef.value.validate()
+  } catch {
+    return
+  }
+  try {
+    await ElMessageBox.confirm('确认提交该选题申请？', '提交确认', { type: 'warning' })
+  } catch {
+    return
+  }
+  submitting.value = true
+  try {
+    await selectionApi.submitSelection(applyForm.value)
+    ElMessage.success('申请已提交')
+    applyVisible.value = false
+  } catch {
+    // 全局请求拦截器已显示错误提示，这里只需阻止未处理的 Promise 拒绝
+  } finally {
+    submitting.value = false
+  }
 }
 
 onMounted(loadTopics)

@@ -12,6 +12,7 @@ type Category =
   | 'topicOpen'
   | 'selection'
   | 'joinRequest'
+  | 'leaveRequest'
   | 'attendanceTask'
   | 'attendanceSign'
   | 'makeup'
@@ -54,6 +55,14 @@ const configs: Record<Category, Record<string | number, TagConfig>> = {
     WITHDRAWN: { label: '已撤回', type: 'info', effect: 'plain' },
   },
   joinRequest: {
+    0: { label: '待审核', type: 'warning', effect: 'plain' },
+    1: { label: '通过', type: 'success', effect: 'dark' },
+    2: { label: '驳回', type: 'danger', effect: 'dark' },
+    PENDING: { label: '待审核', type: 'warning', effect: 'plain' },
+    APPROVED: { label: '通过', type: 'success', effect: 'dark' },
+    REJECTED: { label: '驳回', type: 'danger', effect: 'dark' },
+  },
+  leaveRequest: {
     0: { label: '待审核', type: 'warning', effect: 'plain' },
     1: { label: '通过', type: 'success', effect: 'dark' },
     2: { label: '驳回', type: 'danger', effect: 'dark' },
