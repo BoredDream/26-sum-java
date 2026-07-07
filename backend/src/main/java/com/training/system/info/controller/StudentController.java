@@ -51,12 +51,14 @@ public class StudentController {
         return Result.success(studentService.pageStudents(keyword, status, pageNum, pageSize));
     }
 
+    @OperationLog(type = "UPDATE", description = "重置学生密码")
     @PostMapping("/{studentId}/reset-password")
     public Result<Void> resetPassword(@PathVariable Long studentId) {
         studentService.resetPassword(studentId);
         return Result.success();
     }
 
+    @OperationLog(type = "UPDATE", description = "切换学生账号状态")
     @PostMapping("/{studentId}/toggle-status")
     public Result<Void> toggleStatus(@PathVariable Long studentId) {
         studentService.toggleStatus(studentId);

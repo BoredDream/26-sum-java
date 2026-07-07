@@ -50,12 +50,14 @@ public class TeacherController {
         return Result.success(teacherService.pageTeachers(keyword, status, pageNum, pageSize));
     }
 
+    @OperationLog(type = "UPDATE", description = "重置教师密码")
     @PostMapping("/{teacherId}/reset-password")
     public Result<Void> resetPassword(@PathVariable Long teacherId) {
         teacherService.resetPassword(teacherId);
         return Result.success();
     }
 
+    @OperationLog(type = "UPDATE", description = "切换教师角色")
     @PostMapping("/{teacherId}/toggle-role")
     public Result<Void> toggleRole(@PathVariable Long teacherId) {
         teacherService.toggleRole(teacherId);
