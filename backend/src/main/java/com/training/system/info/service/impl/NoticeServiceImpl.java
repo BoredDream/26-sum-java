@@ -138,14 +138,15 @@ public class NoticeServiceImpl implements NoticeService {
     private String saveFile(MultipartFile file) {
         try {
             String subDir = uploadDir + File.separator + "notices";
-            Files.createDirectories(Paths.get(subDir));
+            Path dirPath = Paths.get(subDir).toAbsolutePath();
+            Files.createDirectories(dirPath);
             String ext = getExtension(file.getOriginalFilename());
-            String filename = UUID.randomUUID().toString().replace("-", "") + "." + ext;
-            Path filepath = Paths.get(subDir, filename);
+            String filename = UUID.randomUUID().toString().replace("-", "") + (ext.isEmpty() ? "" : "." + ext);
+            Path filepath = dirPath.resolve(filename);
             file.transferTo(filepath.toFile());
             return "notices/" + filename;
         } catch (IOException e) {
-            throw new BusinessException(ResultCode.ERROR, "文件上传失败");
+            throw new BusinessException(ResultCode.ERROR, "文件上传失败: " + e.getMessage());
         }
     }
 

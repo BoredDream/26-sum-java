@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { ElMessage } from 'element-plus'
 import type { Result } from '@/types/api'
 
 const request = axios.create({
@@ -22,24 +21,20 @@ request.interceptors.response.use(
     const { data } = response
     if (data.code !== 200) {
       if (data.code === 401) {
-        ElMessage.error(data.message || '登录已过期，请重新登录')
         redirectToLogin()
-        return Promise.reject(new Error(data.message || '请求失败'))
+        return Promise.reject(new Error(data.message || '登录已过期，请重新登录'))
       }
-      ElMessage.error(data.message || '请求失败')
       return Promise.reject(new Error(data.message || '请求失败'))
     }
     return response
   },
   (error: AxiosError<Result<unknown>>) => {
     const status = error.response?.status
-    const data = error.response?.data
     if (status === 401) {
       redirectToLogin()
     }
-    const msg = data?.message || error.message || '网络错误'
-    ElMessage.error(msg)
-    return Promise.reject(error)
+    const msg = error.response?.data?.message || error.message || '网络错误'
+    return Promise.reject(new Error(msg))
   }
 )
 
@@ -69,19 +64,13 @@ export function downloadFile(url: string, config?: AxiosRequestConfig) {
 
 export function uploadFile<T>(url: string, formData: FormData, config?: AxiosRequestConfig) {
   return request
-    .post<Result<T>>(url, formData, {
-      ...config,
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    .post<Result<T>>(url, formData, config)
     .then((res) => res.data.data)
 }
 
 export function putUploadFile<T>(url: string, formData: FormData, config?: AxiosRequestConfig) {
   return request
-    .put<Result<T>>(url, formData, {
-      ...config,
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    .put<Result<T>>(url, formData, config)
     .then((res) => res.data.data)
 }
 
