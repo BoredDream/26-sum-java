@@ -115,19 +115,19 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 已加入团队时禁止重复申请")
     void applyJoin_alreadyInTeamThrows() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of(member(10L, 2L, "MEMBER", true)));
+        when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(member(10L, 2L, "MEMBER", true));
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> service.applyJoin(2L, ROLE_STUDENT, 10L, new JoinTeamDTO()));
 
-        assertTrue(ex.getMessage().contains("不能重复申请"));
+        assertTrue(ex.getMessage().contains("已经是该团队的成员"));
         verify(joinRequestMapper, never()).insert(any());
     }
 
     @Test
     @DisplayName("申请入队 - 团队满员时拒绝申请")
     void applyJoin_fullTeamThrows() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(null);
+        when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 2));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
 
@@ -145,7 +145,7 @@ class TeamServiceTest {
         when(joinRequestMapper.findById(99L)).thenReturn(request);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 3));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(1);
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(null);
+        when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
 
         AuditJoinRequestDTO dto = new AuditJoinRequestDTO();
         dto.setApproved(true);
@@ -255,7 +255,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 学生成功提交申请")
     void applyJoin_success() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(null);
+        when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
         when(joinRequestMapper.findPending(10L, 2L)).thenReturn(null);
@@ -274,7 +274,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 人数达到上限前最后一个名额允许申请")
     void applyJoin_oneSlotRemaining_success() {
-        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(null);
+        when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 3));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
         when(joinRequestMapper.findPending(10L, 2L)).thenReturn(null);
