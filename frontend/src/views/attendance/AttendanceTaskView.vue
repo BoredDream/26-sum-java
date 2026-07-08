@@ -183,15 +183,16 @@
             />
           </el-form-item>
           <el-form-item label="签到位置" required>
-            <div id="location-map" style="width: 100%; height: 300px; border-radius: 4px"></div>
+            <div class="map-wrapper">
+              <div id="location-map" style="width: 100%; height: 300px; border-radius: 4px"></div>
+              <div v-if="locating" class="map-locating">
+                <span>定位中...</span>
+              </div>
+            </div>
             <span class="map-tip">拖拽标记选择签到位置，或点击地图移动标记</span>
           </el-form-item>
           <el-form-item label="地点名称">
-            <el-input
-              v-model="form.locationName"
-              placeholder="拖动标记后自动获取"
-              readonly
-            />
+            <el-input v-model="form.locationName" placeholder="拖动标记后自动获取" readonly />
           </el-form-item>
         </template>
       </el-form>
@@ -390,18 +391,26 @@ let mapInstance: any = null
 let locationMarker: any = null
 let locationCircle: any = null
 let geocoder: any = null
+const locating = ref(false)
+
+// 华中农业大学博物馆默认坐标（WGS-84，由小米手机 GPS 测得）
+const MUSEUM_NAME = '华中农业大学博物馆（默认位置）'
+const MUSEUM_LAT_WGS = 30 + 38 / 60 + 19 / 3600 // 北纬 30°38′19″
+const MUSEUM_LNG_WGS = 114 + 21 / 60 + 24 / 3600 // 东经 114°21′24″
 
 function onLocationToggle(value: string | number | boolean) {
   const enabled = Boolean(value)
   if (enabled) {
     form.requireLocation = 1
     form.locationRadius = form.locationRadius || 500
+    locating.value = true
     nextTick(() => initMap())
   } else {
     form.requireLocation = 0
     form.locationLng = undefined
     form.locationLat = undefined
     form.locationName = ''
+    locating.value = false
     destroyMap()
   }
 }
@@ -410,14 +419,97 @@ function initMap() {
   const container = document.getElementById('location-map')
   if (!container || mapInstance) return
 
-  mapInstance = new AMap.Map('location-map', {
-    zoom: 15,
-    center: [116.397428, 39.90923],
-    resizeEnable: true,
+  // 预先将博物馆 WGS-84 坐标转换为高德 GCJ-02 坐标作为地图初始中心
+  const initWithMuseumCenter = (lng: number, lat: number) => {
+    mapInstance = new AMap.Map('location-map', {
+      zoom: 15,
+      center: [lng, lat],
+      resizeEnable: true,
+    })
+
+    geocoder = new AMap.Geocoder({ map: mapInstance })
+
+    // 允许点击地图手动选点
+    mapInstance.on('click', (e: any) => {
+      setMarker(e.lnglat.lng, e.lnglat.lat)
+    })
+
+    if (!navigator.geolocation) {
+      tryAmapGeolocation()
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lng = position.coords.longitude
+        const lat = position.coords.latitude
+        setCenterAndMarkerFromGps(lng, lat, undefined, () => {
+          locating.value = false
+        })
+      },
+      () => {
+        tryAmapGeolocation()
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    )
+  }
+
+  if (typeof AMap.convertFrom !== 'function') {
+    AMap.plugin('AMap.ConvertFrom', () => {
+      AMap.convertFrom([MUSEUM_LNG_WGS, MUSEUM_LAT_WGS], 'gps', (status: string, result: any) => {
+        if (status === 'complete' && result.info === 'ok') {
+          const pos = result.locations[0]
+          initWithMuseumCenter(pos.lng, pos.lat)
+        } else {
+          initWithMuseumCenter(MUSEUM_LNG_WGS, MUSEUM_LAT_WGS)
+        }
+      })
+    })
+  } else {
+    AMap.convertFrom([MUSEUM_LNG_WGS, MUSEUM_LAT_WGS], 'gps', (status: string, result: any) => {
+      if (status === 'complete' && result.info === 'ok') {
+        const pos = result.locations[0]
+        initWithMuseumCenter(pos.lng, pos.lat)
+      } else {
+        initWithMuseumCenter(MUSEUM_LNG_WGS, MUSEUM_LAT_WGS)
+      }
+    })
+  }
+}
+
+function setCenterAndMarkerFromGps(
+  lng: number,
+  lat: number,
+  defaultName?: string,
+  onComplete?: () => void
+) {
+  const done = () => {
+    if (onComplete) onComplete()
+  }
+  if (typeof AMap.convertFrom !== 'function') {
+    AMap.plugin('AMap.ConvertFrom', () => {
+      convertAndSet(lng, lat, defaultName, done)
+    })
+  } else {
+    convertAndSet(lng, lat, defaultName, done)
+  }
+}
+
+function convertAndSet(lng: number, lat: number, defaultName?: string, onComplete?: () => void) {
+  AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
+    if (status === 'complete' && result.info === 'ok') {
+      const pos = result.locations[0]
+      mapInstance.setCenter([pos.lng, pos.lat])
+      setMarker(pos.lng, pos.lat, defaultName)
+    } else {
+      mapInstance.setCenter([lng, lat])
+      setMarker(lng, lat, defaultName)
+    }
+    if (onComplete) onComplete()
   })
+}
 
-  geocoder = new AMap.Geocoder({ map: mapInstance })
-
+function tryAmapGeolocation() {
   AMap.plugin('AMap.Geolocation', () => {
     const geo = new AMap.Geolocation({
       enableHighAccuracy: true,
@@ -428,19 +520,18 @@ function initMap() {
         const pos = [result.position.lng, result.position.lat]
         mapInstance.setCenter(pos)
         setMarker(pos[0], pos[1])
+        locating.value = false
       } else {
-        const center = mapInstance.getCenter()
-        setMarker(center.lng, center.lat)
+        // 定位失败，默认回到华中农业大学博物馆
+        setCenterAndMarkerFromGps(MUSEUM_LNG_WGS, MUSEUM_LAT_WGS, MUSEUM_NAME, () => {
+          locating.value = false
+        })
       }
     })
   })
-
-  mapInstance.on('click', (e: any) => {
-    setMarker(e.lnglat.lng, e.lnglat.lat)
-  })
 }
 
-function setMarker(lng: number, lat: number) {
+function setMarker(lng: number, lat: number, defaultName?: string) {
   if (locationMarker) {
     locationMarker.setPosition([lng, lat])
   } else {
@@ -459,7 +550,7 @@ function setMarker(lng: number, lat: number) {
   } else {
     locationCircle = new AMap.Circle({
       center: [lng, lat],
-      radius: (form.locationRadius || 500),
+      radius: form.locationRadius || 500,
       strokeColor: '#1890ff',
       strokeWeight: 2,
       strokeOpacity: 0.5,
@@ -468,12 +559,16 @@ function setMarker(lng: number, lat: number) {
       map: mapInstance,
     })
   }
-  updateLocation(lng, lat)
+  updateLocation(lng, lat, defaultName)
 }
 
-function updateLocation(lng: number, lat: number) {
+function updateLocation(lng: number, lat: number, defaultName?: string) {
   form.locationLng = Math.round(lng * 1e7) / 1e7
   form.locationLat = Math.round(lat * 1e7) / 1e7
+  if (defaultName) {
+    form.locationName = defaultName
+    return
+  }
   if (geocoder) {
     geocoder.getAddress([lng, lat], (status: string, result: any) => {
       if (status === 'complete' && result.regeocode) {
@@ -490,14 +585,18 @@ function destroyMap() {
     locationMarker = null
     locationCircle = null
     geocoder = null
+    locating.value = false
   }
 }
 
-watch(() => form.locationRadius, (newRadius) => {
-  if (locationCircle && newRadius) {
-    locationCircle.setRadius(newRadius)
+watch(
+  () => form.locationRadius,
+  (newRadius) => {
+    if (locationCircle && newRadius) {
+      locationCircle.setRadius(newRadius)
+    }
   }
-})
+)
 
 function asNumber(value: string | number | undefined): number | undefined {
   return typeof value === 'number' ? value : undefined
@@ -561,9 +660,13 @@ async function handleSubmit() {
 const deleteId = ref(0)
 async function handleDelete(row: AttendanceTaskVO) {
   try {
-    await ElMessageBox.confirm('确认删除该签到任务？将同时删除关联的考勤记录和补签申请。', '删除确认', {
-      type: 'warning',
-    })
+    await ElMessageBox.confirm(
+      '确认删除该签到任务？将同时删除关联的考勤记录和补签申请。',
+      '删除确认',
+      {
+        type: 'warning',
+      }
+    )
   } catch {
     return
   }
@@ -676,6 +779,27 @@ onMounted(loadTasks)
     color: #999;
     margin-top: 4px;
     display: inline-block;
+  }
+
+  .map-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .map-locating {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 4px;
+    color: #409eff;
+    font-size: 14px;
+    pointer-events: none;
   }
 
   .action-btns {
