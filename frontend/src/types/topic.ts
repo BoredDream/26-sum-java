@@ -102,3 +102,17 @@ export interface TopicQuery extends PageQuery {
   startTime?: string
   endTime?: string
 }
+export interface TopicAiSuggestionDTO {
+  topicName?: string
+  topicType?: string
+  difficulty?: string
+  studentLimit?: number
+  teamLimit?: number
+  topicContent?: string
+  developTools?: string
+  technicalRoute?: string
+}
+
+export interface TopicAiSuggestionVO {
+  suggestion: string
+}

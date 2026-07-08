@@ -8,6 +8,8 @@ import type {
   TopicFileVO,
   TopicReviewVO,
   TopicQuery,
+  TopicAiSuggestionDTO,
+  TopicAiSuggestionVO,
 } from '@/types/topic'
 import type { PageResult } from '@/types/api'
 
@@ -69,4 +71,8 @@ export function getTopicFileDownloadUrl(fileId: number) {
 // 审核记录
 export function listTopicReviews(topicId: number) {
   return get<TopicReviewVO[]>(`/topic/${topicId}/review`)
+}
+// AI 出题建议
+export function suggestTopic(data: TopicAiSuggestionDTO) {
+  return post<TopicAiSuggestionVO>('/topic/ai/suggestion', data, { timeout: 45000 })
 }

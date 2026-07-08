@@ -6,7 +6,8 @@
       </template>
     </page-header>
 
-    <el-card>
+    <div class="topic-create-layout">
+      <el-card class="topic-form-card">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="topic-form">
         <el-form-item label="题目名称" prop="topicName">
           <el-input
@@ -99,14 +100,26 @@
           <el-button @click="$router.back()">取消</el-button>
           <el-button type="info" :loading="submitting" @click="handleSaveDraft">保存草稿</el-button>
           <el-button type="primary" :loading="submitting" @click="handleSubmit">提交审核</el-button>
+          <el-button type="success" :loading="aiLoading" @click="handleAiSuggest">AI 建议</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
+      </el-card>
+      <el-card class="ai-suggestion-card">
+      <template #header>
+        <div class="ai-suggestion-header">
+          <span>AI 出题建议</span>
+          <el-button link type="primary" :loading="aiLoading" @click="handleAiSuggest">重新生成</el-button>
+        </div>
+      </template>
+      <div v-if="aiSuggestion" class="ai-suggestion-content" v-html="renderedAiSuggestion"></div>
+      <el-empty v-else description="填写题目信息后点击 AI 建议" />
+      </el-card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { computed, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -116,8 +129,72 @@ import type { TopicCreateDTO } from '@/types/topic'
 const router = useRouter()
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
+const aiLoading = ref(false)
+const aiSuggestion = ref("")
 
 const topicTypeOptions = ['理论研究', '应用开发', '工程设计', '数据分析', '其他']
+
+const renderedAiSuggestion = computed(() => renderMarkdown(aiSuggestion.value))
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function renderInlineMarkdown(value: string) {
+  return value
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+}
+
+function renderMarkdown(value: string) {
+  const lines = escapeHtml(value).split(/\r?\n/)
+  const html: string[] = []
+  let inList = false
+
+  const closeList = () => {
+    if (inList) {
+      html.push('</ul>')
+      inList = false
+    }
+  }
+
+  lines.forEach((line) => {
+    const trimmed = line.trim()
+    if (!trimmed) {
+      closeList()
+      return
+    }
+
+    const heading = /^(#{1,3})\s+(.+)$/.exec(trimmed)
+    if (heading) {
+      closeList()
+      const level = heading[1].length + 2
+      html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`)
+      return
+    }
+
+    const bullet = /^[-*]\s+(.+)$/.exec(trimmed)
+    if (bullet) {
+      if (!inList) {
+        html.push('<ul>')
+        inList = true
+      }
+      html.push(`<li>${renderInlineMarkdown(bullet[1])}</li>`)
+      return
+    }
+
+    closeList()
+    html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`)
+  })
+
+  closeList()
+  return html.join('')
+}
 const difficultyOptions = ['简单', '中等', '困难']
 
 const form = reactive<TopicCreateDTO>({
@@ -180,6 +257,30 @@ async function submit(status: number) {
   }
 }
 
+async function handleAiSuggest() {
+  if (!form.topicName && !form.topicContent && !form.technicalRoute) {
+    ElMessage.warning('请先填写题目名称、题目内容或技术路线中的至少一项')
+    return
+  }
+  aiLoading.value = true
+  try {
+    const res = await topicApi.suggestTopic({
+      topicName: form.topicName,
+      topicType: form.topicType,
+      difficulty: form.difficulty,
+      studentLimit: form.studentLimit,
+      teamLimit: form.teamLimit,
+      topicContent: form.topicContent,
+      technicalRoute: form.technicalRoute,
+      developTools: form.developTools,
+    })
+    aiSuggestion.value = res.suggestion
+  } catch (err: any) {
+    ElMessage.error(err?.message || '生成出题建议失败')
+  } finally {
+    aiLoading.value = false
+  }
+}
 function handleSaveDraft() {
   submit(0)
 }
@@ -191,9 +292,49 @@ function handleSubmit() {
 
 <style scoped lang="scss">
 .topic-create-page {
+  .topic-create-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .topic-form-card,
+  .ai-suggestion-card {
+    min-width: 0;
+  }
+
   .topic-form {
     max-width: 800px;
     margin: 0 auto;
+  }
+
+  .ai-suggestion-card {
+    position: sticky;
+    top: 16px;
+  }
+
+  .ai-suggestion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ai-suggestion-content {
+    max-height: calc(100vh - 180px);
+    overflow: auto;
+    line-height: 1.8;
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 1100px) {
+    .topic-create-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-suggestion-card {
+      position: static;
+    }
   }
 }
 </style>

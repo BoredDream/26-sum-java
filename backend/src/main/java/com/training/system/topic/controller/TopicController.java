@@ -5,11 +5,14 @@ import com.training.system.common.Result;
 import com.training.system.common.ResultCode;
 import com.training.system.exception.BusinessException;
 import com.training.system.info.annotation.OperationLog;
+import com.training.system.topic.dto.TopicAiSuggestionDTO;
 import com.training.system.topic.dto.TopicCreateDTO;
 import com.training.system.topic.dto.TopicQueryDTO;
 import com.training.system.topic.dto.TopicReviewDTO;
 import com.training.system.topic.dto.TopicUpdateDTO;
+import com.training.system.topic.service.TopicAiSuggestionService;
 import com.training.system.topic.service.TopicService;
+import com.training.system.topic.vo.TopicAiSuggestionVO;
 import com.training.system.topic.vo.TopicDetailVO;
 import com.training.system.topic.vo.TopicFileVO;
 import com.training.system.topic.vo.TopicListVO;
@@ -36,9 +39,11 @@ import java.util.List;
 public class TopicController {
 
     private final TopicService topicService;
+    private final TopicAiSuggestionService topicAiSuggestionService;
 
-    public TopicController(TopicService topicService) {
+    public TopicController(TopicService topicService, TopicAiSuggestionService topicAiSuggestionService) {
         this.topicService = topicService;
+        this.topicAiSuggestionService = topicAiSuggestionService;
     }
 
     // ==================== 题目 CRUD ====================
@@ -99,6 +104,20 @@ public class TopicController {
     }
 
     // ==================== 题目流程操作 ====================
+
+    /**
+     * DeepSeek 出题建议，仅教师和管理员可用。
+     */
+    @PostMapping("/ai/suggestion")
+    public Result<TopicAiSuggestionVO> suggestTopic(@Valid @RequestBody TopicAiSuggestionDTO dto,
+                                                    HttpSession session) {
+        UserSession user = getUserSession(session);
+        if (!"TEACHER".equals(user.role) && !"ADMIN".equals(user.role)) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "无权限使用出题建议");
+        }
+        return Result.success(topicAiSuggestionService.suggest(dto));
+    }
+
 
     /**
      * 提交题目审核
