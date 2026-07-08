@@ -89,7 +89,7 @@ public class TopicServiceImpl implements TopicService {
     // ==================== 新增题目 ====================
 
     @Override
-    public void createTopic(TopicCreateDTO dto, Long userId, String role, Long relatedId) {
+    public Long createTopic(TopicCreateDTO dto, Long userId, String role, Long relatedId) {
         // 权限校验
         if (!"TEACHER".equals(role) && !"ADMIN".equals(role)) {
             throw new BusinessException(ResultCode.FORBIDDEN, "无出题权限");
@@ -116,6 +116,7 @@ public class TopicServiceImpl implements TopicService {
         topic.setOpenStatus(0);                   // 默认未开放
 
         topicMapper.insert(topic);
+        return topic.getTopicId();
     }
 
     // ==================== 修改题目 ====================

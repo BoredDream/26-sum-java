@@ -90,10 +90,20 @@
     </el-card>
 
     <!-- 签到确认 -->
-    <el-dialog v-model="signVisible" title="签到确认" width="560px" @opened="initSignMap" @closed="destroySignMap">
+    <el-dialog
+      v-model="signVisible"
+      title="签到确认"
+      width="560px"
+      @opened="initSignMap"
+      @closed="destroySignMap"
+    >
       <div v-if="currentSignTask?.requireLocation === 1" class="location-info">
         <div class="sign-map-box">
-          <div id="sign-location-map" class="sign-location-map" :class="{ hidden: !mapReady }"></div>
+          <div
+            id="sign-location-map"
+            class="sign-location-map"
+            :class="{ hidden: !mapReady }"
+          ></div>
           <div v-if="!mapReady" class="map-placeholder">
             <div v-if="taskLocationMissing">签到任务未设置签到点，请联系教师重新发布</div>
             <div v-else-if="locating">正在获取当前位置...</div>
@@ -142,7 +152,8 @@
           :loading="signLoading"
           :disabled="signConfirmDisabled"
           @click="confirmSign"
-        >确认签到</el-button>
+          >确认签到</el-button
+        >
       </template>
     </el-dialog>
   </div>
@@ -231,7 +242,9 @@ const amapReady = computed(() => typeof window !== 'undefined' && !!(window as a
 
 const taskLocationMissing = computed(() => {
   const task = currentSignTask.value
-  return !!task && task.requireLocation === 1 && (task.locationLng == null || task.locationLat == null)
+  return (
+    !!task && task.requireLocation === 1 && (task.locationLng == null || task.locationLat == null)
+  )
 })
 
 // 到圆心的距离
@@ -298,11 +311,14 @@ const signConfirmDisabled = computed(() => {
 
 function haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLng = (lng2 - lng1) * Math.PI / 180
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-    + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
-    * Math.sin(dLng / 2) * Math.sin(dLng / 2)
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLng = ((lng2 - lng1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2)
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   return Math.round(R * c)
 }
@@ -335,13 +351,16 @@ function startLocate() {
   locateFailed.value = false
   mapReady.value = false
   // 优先使用浏览器原生 Geolocation API（不依赖高德 SDK 加载状态）
+  // 原生返回 WGS-84，需转换为高德 GCJ-02 后再与签到点（GCJ-02）比较
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        signForm.signLng = pos.coords.longitude
-        signForm.signLat = pos.coords.latitude
-        locating.value = false
-        locateFailed.value = false
+        convertGpsToAmap(pos.coords.longitude, pos.coords.latitude, (lng, lat) => {
+          signForm.signLng = lng
+          signForm.signLat = lat
+          locating.value = false
+          locateFailed.value = false
+        })
       },
       () => {
         // 浏览器定位失败，尝试高德
@@ -352,6 +371,34 @@ function startLocate() {
   } else {
     tryAmapLocate()
   }
+}
+
+function convertGpsToAmap(lng: number, lat: number, callback: (lng: number, lat: number) => void) {
+  if (typeof AMap === 'undefined' || typeof AMap.convertFrom !== 'function') {
+    if (typeof AMap === 'undefined') {
+      callback(lng, lat)
+      return
+    }
+    AMap.plugin('AMap.ConvertFrom', () => {
+      AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
+        if (status === 'complete' && result.info === 'ok') {
+          const pos = result.locations[0]
+          callback(pos.lng, pos.lat)
+        } else {
+          callback(lng, lat)
+        }
+      })
+    })
+    return
+  }
+  AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
+    if (status === 'complete' && result.info === 'ok') {
+      const pos = result.locations[0]
+      callback(pos.lng, pos.lat)
+    } else {
+      callback(lng, lat)
+    }
+  })
 }
 
 function tryAmapLocate() {
@@ -386,7 +433,10 @@ async function confirmSign() {
     return
   }
   // 如果任务要求定位但定位失败，阻止签到
-  if (currentSignTask.value?.requireLocation === 1 && (signForm.signLng == null || signForm.signLat == null)) {
+  if (
+    currentSignTask.value?.requireLocation === 1 &&
+    (signForm.signLng == null || signForm.signLat == null)
+  ) {
     ElMessage.warning('正在获取位置信息，请稍候...')
     return
   }
@@ -470,7 +520,10 @@ function initSignMap() {
       imageSize: new AMap.Size(24, 34),
     }),
     label: {
-      content: '<div style="background:#1890ff;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;white-space:nowrap">' + (task.locationName || '签到点') + '</div>',
+      content:
+        '<div style="background:#1890ff;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;white-space:nowrap">' +
+        (task.locationName || '签到点') +
+        '</div>',
       offset: new AMap.Pixel(0, -36),
     },
     map: signMap,
@@ -486,7 +539,8 @@ function initSignMap() {
       imageSize: new AMap.Size(24, 34),
     }),
     label: {
-      content: '<div style="background:#f56c6c;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;white-space:nowrap">我的位置</div>',
+      content:
+        '<div style="background:#f56c6c;color:#fff;padding:2px 6px;border-radius:3px;font-size:11px;white-space:nowrap">我的位置</div>',
       offset: new AMap.Pixel(0, -36),
     },
     map: signMap,
@@ -507,11 +561,14 @@ function destroySignMap() {
 }
 
 // 定位数据到达后重新初始化地图
-watch(() => signForm.signLng, (newVal) => {
-  if (newVal != null && signVisible.value) {
-    nextTick(() => initSignMap())
+watch(
+  () => signForm.signLng,
+  (newVal) => {
+    if (newVal != null && signVisible.value) {
+      nextTick(() => initSignMap())
+    }
   }
-})
+)
 
 onMounted(() => {
   loadRecords()

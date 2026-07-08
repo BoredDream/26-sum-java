@@ -21,7 +21,6 @@ export const menus: MenuItem[] = [
   { title: '题目审核', path: '/topic/review', icon: 'Finished', roles: ['ADMIN'] },
   { title: '题库管理', path: '/topic/manage', icon: 'Collection', roles: ['ADMIN'] },
   { title: '我的团队', path: '/selection/my-team', icon: 'UserFilled', roles: ['STUDENT'] },
-  { title: '可选课题', path: '/selection/topics', icon: 'List', roles: ['STUDENT'] },
   {
     title: '我的选题申请',
     path: '/selection/my-application',

@@ -26,6 +26,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,6 +98,13 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
 
         AttendanceTask task = new AttendanceTask();
         BeanUtils.copyProperties(dto, task);
+        // DTO 中使用 Double，实体中使用 BigDecimal，需显式转换
+        if (dto.getLocationLng() != null) {
+            task.setLocationLng(BigDecimal.valueOf(dto.getLocationLng()));
+        }
+        if (dto.getLocationLat() != null) {
+            task.setLocationLat(BigDecimal.valueOf(dto.getLocationLat()));
+        }
         task.setTeacherId(user.getRelatedId());
         task.setStatus(AttendanceTaskStatusEnum.NOT_STARTED.getCode());
         attendanceTaskMapper.insert(task);

@@ -8,111 +8,146 @@
 
     <div class="topic-create-layout">
       <el-card class="topic-form-card">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="topic-form">
-        <el-form-item label="题目名称" prop="topicName">
-          <el-input
-            v-model="form.topicName"
-            placeholder="请输入题目名称"
-            maxlength="100"
-            show-word-limit
-          />
-        </el-form-item>
+        <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" class="topic-form">
+          <el-form-item label="题目名称" prop="topicName">
+            <el-input
+              v-model="form.topicName"
+              placeholder="请输入题目名称"
+              maxlength="100"
+              show-word-limit
+            />
+          </el-form-item>
 
-        <el-form-item label="题目类型" prop="topicType">
-          <el-select v-model="form.topicType" placeholder="请选择题目类型" style="width: 100%">
-            <el-option v-for="item in topicTypeOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
+          <el-form-item label="题目类型" prop="topicType">
+            <el-select v-model="form.topicType" placeholder="请选择题目类型" style="width: 100%">
+              <el-option v-for="item in topicTypeOptions" :key="item" :label="item" :value="item" />
+            </el-select>
+          </el-form-item>
 
-        <el-form-item label="难度" prop="difficulty">
-          <el-select v-model="form.difficulty" placeholder="请选择难度" style="width: 100%">
-            <el-option v-for="item in difficultyOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
+          <el-form-item label="难度" prop="difficulty">
+            <el-select v-model="form.difficulty" placeholder="请选择难度" style="width: 100%">
+              <el-option
+                v-for="item in difficultyOptions"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
+          </el-form-item>
 
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <el-form-item label="限选人数" prop="studentLimit">
-              <el-input-number v-model="form.studentLimit" :min="1" :max="20" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="团队上限">
-              <el-input-number v-model="form.teamLimit" :min="1" :max="50" style="width: 100%" />
-            </el-form-item>
-          </el-col>
-        </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item label="限选人数" prop="studentLimit">
+                <el-input-number
+                  v-model="form.studentLimit"
+                  :min="1"
+                  :max="20"
+                  style="width: 100%"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="团队上限">
+                <el-input-number v-model="form.teamLimit" :min="1" :max="50" style="width: 100%" />
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-        <el-form-item label="选题开始" prop="selectionStartTime">
-          <el-date-picker
-            v-model="form.selectionStartTime"
-            type="datetime"
-            placeholder="请选择选题开始时间"
-            value-format="YYYY-MM-DD[T]HH:mm:ss"
-            style="width: 100%"
-          />
-        </el-form-item>
+          <el-form-item label="选题开始" prop="selectionStartTime">
+            <el-date-picker
+              v-model="form.selectionStartTime"
+              type="datetime"
+              placeholder="请选择选题开始时间"
+              value-format="YYYY-MM-DD[T]HH:mm:ss"
+              style="width: 100%"
+            />
+          </el-form-item>
 
-        <el-form-item label="选题结束" prop="selectionEndTime">
-          <el-date-picker
-            v-model="form.selectionEndTime"
-            type="datetime"
-            placeholder="请选择选题结束时间"
-            value-format="YYYY-MM-DD[T]HH:mm:ss"
-            style="width: 100%"
-          />
-        </el-form-item>
+          <el-form-item label="选题结束" prop="selectionEndTime">
+            <el-date-picker
+              v-model="form.selectionEndTime"
+              type="datetime"
+              placeholder="请选择选题结束时间"
+              value-format="YYYY-MM-DD[T]HH:mm:ss"
+              style="width: 100%"
+            />
+          </el-form-item>
 
-        <el-form-item label="题目内容" prop="topicContent">
-          <el-input
-            v-model="form.topicContent"
-            type="textarea"
-            :rows="6"
-            placeholder="请输入题目内容及要求"
-            maxlength="2000"
-            show-word-limit
-          />
-        </el-form-item>
+          <el-form-item label="题目内容" prop="topicContent">
+            <el-input
+              v-model="form.topicContent"
+              type="textarea"
+              :rows="6"
+              placeholder="请输入题目内容及要求"
+              maxlength="2000"
+              show-word-limit
+            />
+          </el-form-item>
 
-        <el-form-item label="技术路线" prop="technicalRoute">
-          <el-input
-            v-model="form.technicalRoute"
-            type="textarea"
-            :rows="4"
-            placeholder="请输入技术路线"
-            maxlength="1000"
-            show-word-limit
-          />
-        </el-form-item>
+          <el-form-item label="技术路线" prop="technicalRoute">
+            <el-input
+              v-model="form.technicalRoute"
+              type="textarea"
+              :rows="4"
+              placeholder="请输入技术路线"
+              maxlength="1000"
+              show-word-limit
+            />
+          </el-form-item>
 
-        <el-form-item label="开发工具">
-          <el-input
-            v-model="form.developTools"
-            type="textarea"
-            :rows="3"
-            placeholder="请输入开发工具及环境（选填）"
-            maxlength="500"
-            show-word-limit
-          />
-        </el-form-item>
+          <el-form-item label="开发工具">
+            <el-input
+              v-model="form.developTools"
+              type="textarea"
+              :rows="3"
+              placeholder="请输入开发工具及环境（选填）"
+              maxlength="500"
+              show-word-limit
+            />
+          </el-form-item>
 
-        <el-form-item>
-          <el-button @click="$router.back()">取消</el-button>
-          <el-button type="info" :loading="submitting" @click="handleSaveDraft">保存草稿</el-button>
-          <el-button type="primary" :loading="submitting" @click="handleSubmit">提交审核</el-button>
-          <el-button type="success" :loading="aiLoading" @click="handleAiSuggest">AI 建议</el-button>
-        </el-form-item>
-      </el-form>
+          <el-form-item label="相关资料">
+            <el-upload
+              ref="uploadRef"
+              :auto-upload="false"
+              :multiple="true"
+              :on-change="handleFileChange"
+              :on-remove="handleFileRemove"
+            >
+              <template #trigger>
+                <el-button type="primary">选择文件</el-button>
+              </template>
+              <template #tip>
+                <div class="upload-tip">选题资料将在题目创建成功后自动上传</div>
+              </template>
+            </el-upload>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button @click="$router.back()">取消</el-button>
+            <el-button type="info" :loading="submitting" @click="handleSaveDraft"
+              >保存草稿</el-button
+            >
+            <el-button type="primary" :loading="submitting" @click="handleSubmit"
+              >提交审核</el-button
+            >
+            <el-button type="success" :loading="aiLoading" @click="handleAiSuggest"
+              >AI 建议</el-button
+            >
+          </el-form-item>
+        </el-form>
       </el-card>
       <el-card class="ai-suggestion-card">
-      <template #header>
-        <div class="ai-suggestion-header">
-          <span>AI 出题建议</span>
-          <el-button link type="primary" :loading="aiLoading" @click="handleAiSuggest">重新生成</el-button>
-        </div>
-      </template>
-      <div v-if="aiSuggestion" class="ai-suggestion-content" v-html="renderedAiSuggestion"></div>
-      <el-empty v-else description="填写题目信息后点击 AI 建议" />
+        <template #header>
+          <div class="ai-suggestion-header">
+            <span>AI 出题建议</span>
+            <el-button link type="primary" :loading="aiLoading" @click="handleAiSuggest"
+              >重新生成</el-button
+            >
+          </div>
+        </template>
+        <div v-if="aiSuggestion" class="ai-suggestion-content" v-html="renderedAiSuggestion"></div>
+        <el-empty v-else description="填写题目信息后点击 AI 建议" />
       </el-card>
     </div>
   </div>
@@ -122,7 +157,7 @@
 import { computed, ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, UploadInstance, UploadFile } from 'element-plus'
 import * as topicApi from '@/api/topic'
 import type { TopicCreateDTO } from '@/types/topic'
 
@@ -130,7 +165,9 @@ const router = useRouter()
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
 const aiLoading = ref(false)
-const aiSuggestion = ref("")
+const aiSuggestion = ref('')
+const uploadRef = ref<UploadInstance>()
+const selectedFiles = ref<File[]>([])
 
 const topicTypeOptions = ['理论研究', '应用开发', '工程设计', '数据分析', '其他']
 
@@ -246,14 +283,48 @@ async function submit(status: number) {
   submitting.value = true
   try {
     const payload: TopicCreateDTO = { ...form, status }
-    await topicApi.createTopic(payload)
+    const topicId = await topicApi.createTopic(payload)
     ElMessage.success(status === 0 ? '草稿已保存' : '题目已提交审核')
+
+    if (topicId && selectedFiles.value.length > 0) {
+      await uploadTopicFiles(topicId)
+    }
+
     router.push('/topic/my-list')
   } catch (err: any) {
     // 全局拦截器已提示后端错误，此处兜底避免未处理的 Promise 拒绝
     ElMessage.error('创建题目失败，请重试')
   } finally {
     submitting.value = false
+  }
+}
+
+async function uploadTopicFiles(topicId: number) {
+  let successCount = 0
+  for (const file of selectedFiles.value) {
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      await topicApi.uploadTopicFile(topicId, formData)
+      successCount++
+    } catch (err: any) {
+      ElMessage.error(`文件 "${file.name}" 上传失败`)
+    }
+  }
+  if (successCount > 0) {
+    ElMessage.success(`成功上传 ${successCount} 个资料文件`)
+  }
+}
+
+function handleFileChange(uploadFile: UploadFile) {
+  if (uploadFile.raw) {
+    selectedFiles.value.push(uploadFile.raw)
+  }
+}
+
+function handleFileRemove(uploadFile: UploadFile) {
+  if (uploadFile.raw) {
+    selectedFiles.value = selectedFiles.value.filter((f) => f !== uploadFile.raw)
   }
 }
 
@@ -325,6 +396,12 @@ function handleSubmit() {
     overflow: auto;
     line-height: 1.8;
     white-space: pre-wrap;
+  }
+
+  .upload-tip {
+    color: #909399;
+    font-size: 12px;
+    margin-top: 8px;
   }
 
   @media (max-width: 1100px) {
