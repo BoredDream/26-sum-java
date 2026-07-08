@@ -210,8 +210,8 @@ async function handleCreate() {
     ElMessage.success('提交成功')
     createVisible.value = false
     loadLogs()
-  } catch {
-    // 错误消息已由请求拦截器统一展示
+  } catch (e: any) {
+    ElMessage.error(e?.message || '提交失败')
   } finally {
     submitting.value = false
   }

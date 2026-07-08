@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { ElMessage } from 'element-plus'
 import type { Result } from '@/types/api'
 
 const request = axios.create({
@@ -24,7 +25,9 @@ request.interceptors.response.use(
         redirectToLogin()
         return Promise.reject(new Error(data.message || '登录已过期，请重新登录'))
       }
-      return Promise.reject(new Error(data.message || '请求失败'))
+      const msg = data.message || '请求失败'
+      ElMessage.error(msg)
+      return Promise.reject(new Error(msg))
     }
     return response
   },
@@ -34,6 +37,7 @@ request.interceptors.response.use(
       redirectToLogin()
     }
     const msg = error.response?.data?.message || error.message || '网络错误'
+    ElMessage.error(msg)
     return Promise.reject(new Error(msg))
   }
 )

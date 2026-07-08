@@ -237,6 +237,8 @@ async function handleUpload() {
     ElMessage.success('上传成功')
     uploadVisible.value = false
     loadDocuments()
+  } catch (e: any) {
+    ElMessage.error(e?.message || '上传失败')
   } finally {
     submitting.value = false
   }
