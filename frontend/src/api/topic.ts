@@ -15,7 +15,7 @@ import type { PageResult } from '@/types/api'
 
 // 题目 CRUD
 export function createTopic(data: TopicCreateDTO) {
-  return post<void>('/topic', data)
+  return post<number>('/topic', data)
 }
 
 export function updateTopic(topicId: number, data: TopicUpdateDTO) {

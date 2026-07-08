@@ -21,8 +21,9 @@ public interface TopicService {
 
     /**
      * 新增题目（保存草稿或提交审核）
+     * @return 新建题目的 topicId
      */
-    void createTopic(TopicCreateDTO dto, Long userId, String role, Long relatedId);
+    Long createTopic(TopicCreateDTO dto, Long userId, String role, Long relatedId);
 
     /**
      * 修改题目

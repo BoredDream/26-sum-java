@@ -53,10 +53,10 @@ public class TopicController {
      */
     @OperationLog(type = "CREATE", description = "新增题目")
     @PostMapping
-    public Result<Void> createTopic(@Valid @RequestBody TopicCreateDTO dto, HttpSession session) {
+    public Result<Long> createTopic(@Valid @RequestBody TopicCreateDTO dto, HttpSession session) {
         UserSession user = getUserSession(session);
-        topicService.createTopic(dto, user.userId, user.role, user.relatedId);
-        return Result.success();
+        Long topicId = topicService.createTopic(dto, user.userId, user.role, user.relatedId);
+        return Result.success(topicId);
     }
 
     /**
