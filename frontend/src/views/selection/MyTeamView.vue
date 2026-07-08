@@ -2,11 +2,55 @@
   <div class="my-team-page">
     <page-header title="我的团队">
       <template #extra>
-        <el-button type="primary" @click="openCreateDialog">创建团队</el-button>
+        <el-button v-if="teams.length === 0" type="primary" @click="openCreateDialog">创建团队</el-button>
       </template>
     </page-header>
 
     <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon class="mb-4" />
+
+    <!-- 可加入团队 -->
+    <el-card v-loading="teamsLoading" class="mb-4">
+      <template #header>
+        <div class="card-header">
+          <span>可加入团队</span>
+          <el-input v-model="teamKeyword" :prefix-icon="Search" clearable placeholder="按团队名筛选" class="team-search" />
+        </div>
+      </template>
+      <el-form :model="joinForm" inline class="mb-4">
+        <el-form-item label="申请留言">
+          <el-input v-model="joinForm.applyMessage" placeholder="选填" />
+        </el-form-item>
+      </el-form>
+      <el-empty v-if="filteredTeams.length === 0" description="暂无可加入团队" />
+      <el-table v-else :data="filteredTeams" border>
+        <el-table-column prop="id" label="团队ID" width="100" />
+        <el-table-column prop="teamName" label="团队名称" min-width="160" />
+        <el-table-column prop="leaderId" label="队长ID" width="100" />
+        <el-table-column label="人数" width="120">
+          <template #default="{ row }"> {{ row.memberCount }}/{{ row.maxSize }} </template>
+        </el-table-column>
+        <el-table-column prop="introduction" label="团队介绍" show-overflow-tooltip />
+        <el-table-column label="操作" width="140">
+          <template #default="{ row }">
+            <el-button
+              v-if="teams.length > 0"
+              type="info" text size="small" disabled
+            >
+              已加入团队
+            </el-button>
+            <el-button
+              v-else
+              type="primary" text size="small"
+              :disabled="row.memberCount >= row.maxSize"
+              :loading="joinLoadingTeamId === row.id"
+              @click="handleJoin(row.id)"
+            >
+              申请入队
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
 
     <!-- 我的团队卡片区 -->
     <div v-if="teams.length > 0" v-loading="loading" class="team-cards">
@@ -22,6 +66,15 @@
             </div>
             <div class="header-right">
               <span class="member-count">{{ t.memberCount }}/{{ t.maxSize }} 人</span>
+              <el-button
+                v-if="isLeaderOfTeam(t)"
+                type="danger"
+                text
+                size="small"
+                @click="handleDisbandTeam(t.id)"
+              >
+                解散团队
+              </el-button>
               <el-button
                 v-if="!isLeaderOfTeam(t)"
                 type="danger"
@@ -121,43 +174,6 @@
 
     <!-- 无团队时也显示加入/创建入口 -->
     <el-empty v-if="!loading && teams.length === 0 && !error" description="暂无团队，请创建或加入团队" />
-
-    <!-- 可加入团队 -->
-    <el-card v-loading="teamsLoading" class="mt-4">
-      <template #header>
-        <div class="card-header">
-          <span>可加入团队</span>
-          <el-input v-model="teamKeyword" :prefix-icon="Search" clearable placeholder="按团队名筛选" class="team-search" />
-        </div>
-      </template>
-      <el-form :model="joinForm" inline class="mb-4">
-        <el-form-item label="申请留言">
-          <el-input v-model="joinForm.applyMessage" placeholder="选填" />
-        </el-form-item>
-      </el-form>
-      <el-empty v-if="filteredTeams.length === 0" description="暂无可加入团队" />
-      <el-table v-else :data="filteredTeams" border>
-        <el-table-column prop="id" label="团队ID" width="100" />
-        <el-table-column prop="teamName" label="团队名称" min-width="160" />
-        <el-table-column prop="leaderId" label="队长ID" width="100" />
-        <el-table-column label="人数" width="120">
-          <template #default="{ row }"> {{ row.memberCount }}/{{ row.maxSize }} </template>
-        </el-table-column>
-        <el-table-column prop="introduction" label="团队介绍" show-overflow-tooltip />
-        <el-table-column label="操作" width="120">
-          <template #default="{ row }">
-            <el-button
-              type="primary" text size="small"
-              :disabled="row.memberCount >= row.maxSize"
-              :loading="joinLoadingTeamId === row.id"
-              @click="handleJoin(row.id)"
-            >
-              申请入队
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
 
     <!-- 创建团队弹窗 -->
     <el-dialog v-model="createVisible" title="创建团队" width="500px">
@@ -351,6 +367,20 @@ async function handleJoin(teamId: number) {
   } catch { /* 错误已由拦截器展示 */ } finally {
     joinLoadingTeamId.value = null
   }
+}
+
+// ── 解散团队 ──
+async function handleDisbandTeam(teamId: number) {
+  try {
+    await ElMessageBox.confirm(
+      '解散后所有成员将被移除，此操作不可撤销，确认继续？',
+      '解散团队',
+      { type: 'error', confirmButtonText: '确认解散', cancelButtonText: '取消' }
+    )
+    await selectionApi.disbandTeam(teamId)
+    ElMessage.success('团队已解散')
+    await loadTeams()
+  } catch { /* 取消 */ }
 }
 
 // ── 离队 ──
