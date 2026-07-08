@@ -21,20 +21,28 @@ public class TeamService {
     private final TeamMemberMapper teamMemberMapper;
     private final TeamJoinRequestMapper joinRequestMapper;
     private final TeamLeaveRequestMapper leaveRequestMapper;
+    private final TopicSelectionMapper topicSelectionMapper;
 
     public TeamService(TeamMapper teamMapper,
                        TeamMemberMapper teamMemberMapper,
                        TeamJoinRequestMapper joinRequestMapper,
-                       TeamLeaveRequestMapper leaveRequestMapper) {
+                       TeamLeaveRequestMapper leaveRequestMapper,
+                       TopicSelectionMapper topicSelectionMapper) {
         this.teamMapper = teamMapper;
         this.teamMemberMapper = teamMemberMapper;
         this.joinRequestMapper = joinRequestMapper;
         this.leaveRequestMapper = leaveRequestMapper;
+        this.topicSelectionMapper = topicSelectionMapper;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public TeamVO createTeam(Long userId, String role, CreateTeamDTO dto) {
         requireStudent(role);
+        // 一人一队：检查是否已在任何团队中
+        List<TeamMemberEntity> existingMemberships = teamMemberMapper.findActiveByStudentId(userId);
+        if (!existingMemberships.isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "您已加入其他团队，不能创建新团队");
+        }
         String teamName = dto.getTeamName().trim();
         if (teamMapper.findByName(teamName) != null) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "团队名称已存在");
@@ -101,6 +109,11 @@ public class TeamService {
     @Transactional(rollbackFor = Exception.class)
     public JoinRequestVO applyJoin(Long userId, String role, Long teamId, JoinTeamDTO dto) {
         requireStudent(role);
+        // 一人一队：检查是否已在任何团队中
+        List<TeamMemberEntity> existingMemberships = teamMemberMapper.findActiveByStudentId(userId);
+        if (!existingMemberships.isEmpty()) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "您已加入其他团队，不能重复加入");
+        }
         // 检查是否已是该团队成员
         TeamMemberEntity existingMembership = teamMemberMapper.findByTeamIdAndStudentId(teamId, userId);
         if (existingMembership != null && Boolean.TRUE.equals(existingMembership.getEnabled())) {
@@ -244,6 +257,26 @@ public class TeamService {
             throw new BusinessException(ResultCode.NOT_FOUND, "团队成员不存在或已退出");
         }
         teamMemberMapper.updateWorkContent(teamId, studentId, dto.getWorkContent().trim());
+    }
+
+    // ── 解散团队 ──
+
+    @Transactional(rollbackFor = Exception.class)
+    public void disbandTeam(Long userId, String role, Long teamId) {
+        assertTeamLeader(userId, role, teamId);
+        TeamEntity team = getTeamById(teamId);
+        if (TEAM_DISSOLVED.equals(team.getStatus())) {
+            throw new BusinessException(ResultCode.BAD_REQUEST, "团队已解散");
+        }
+        // 驳回所有待审核的入队/离队申请
+        joinRequestMapper.rejectAllPending(teamId);
+        leaveRequestMapper.rejectAllPending(teamId);
+        // 取消待审核的选题申请
+        topicSelectionMapper.cancelPending(teamId);
+        // 将所有活跃成员标记为 inactive
+        teamMemberMapper.deactivateAllMembers(teamId);
+        // 将团队状态改为 DISSOLVED
+        teamMapper.disbandTeam(teamId);
     }
 
     // ── 团队查询辅助方法 ──

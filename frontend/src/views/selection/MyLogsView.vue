@@ -186,6 +186,9 @@ async function openCreate() {
   myTeamsLoading.value = true
   try {
     myTeams.value = await selectionApi.getMyTeams()
+    if (myTeams.value.length === 1) {
+      logForm.value.teamId = myTeams.value[0].id
+    }
   } catch {
     myTeams.value = []
   } finally {

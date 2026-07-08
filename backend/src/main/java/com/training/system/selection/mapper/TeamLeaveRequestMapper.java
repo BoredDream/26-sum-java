@@ -35,4 +35,8 @@ public interface TeamLeaveRequestMapper {
             "reviewer_id = #{reviewerId}, review_opinion = #{reviewOpinion}, review_time = NOW() " +
             "WHERE request_id = #{id}")
     int audit(TeamLeaveRequestEntity request);
+
+    @Update("UPDATE team_leave_request SET audit_status = 2, review_opinion = '团队已解散', review_time = NOW() " +
+            "WHERE team_id = #{teamId} AND audit_status = 0")
+    int rejectAllPending(@Param("teamId") Long teamId);
 }

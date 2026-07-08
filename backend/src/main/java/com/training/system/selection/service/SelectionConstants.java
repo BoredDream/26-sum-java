@@ -12,6 +12,7 @@ public final class SelectionConstants {
 
     public static final String TEAM_BUILDING = "BUILDING";
     public static final String TEAM_SELECTED = "SELECTED";
+    public static final String TEAM_DISSOLVED = "DISSOLVED";
 
     public static final String JOIN_PENDING = "PENDING";
     public static final String JOIN_APPROVED = "APPROVED";

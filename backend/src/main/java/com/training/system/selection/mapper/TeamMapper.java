@@ -37,4 +37,7 @@ public interface TeamMapper {
 
     @Update("UPDATE team_info SET team_status = CASE WHEN #{status} = 'SELECTED' THEN 2 ELSE 0 END, update_time = NOW() WHERE team_id = #{id}")
     int updateSelectionStatus(TeamEntity team);
+
+    @Update("UPDATE team_info SET team_status = 3, update_time = NOW() WHERE team_id = #{teamId} AND is_deleted = 0")
+    int disbandTeam(@Param("teamId") Long teamId);
 }

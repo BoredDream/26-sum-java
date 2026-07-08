@@ -44,4 +44,7 @@ public interface TeamMemberMapper {
 
     @Update("UPDATE team_member SET status = 1, join_time = NOW() WHERE team_id = #{teamId} AND student_id = #{studentId}")
     int reactivateMember(@Param("teamId") Long teamId, @Param("studentId") Long studentId);
+
+    @Update("UPDATE team_member SET status = 0 WHERE team_id = #{teamId} AND status = 1")
+    int deactivateAllMembers(@Param("teamId") Long teamId);
 }

@@ -1,4 +1,4 @@
-import { get, post, put, patch, uploadFile } from '@/utils/request'
+import { get, post, put, patch, del, uploadFile } from '@/utils/request'
 import type {
   CreateTeamDTO,
   TeamVO,
@@ -21,6 +21,10 @@ import type { AuditDTO } from '@/types/api'
 // 团队管理
 export function createTeam(data: CreateTeamDTO) {
   return post<TeamVO>('/selection/teams', data)
+}
+
+export function disbandTeam(teamId: number) {
+  return del<void>(`/selection/teams/${teamId}`)
 }
 
 export function listJoinableTeams() {

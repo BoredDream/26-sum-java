@@ -29,6 +29,10 @@ public interface TopicSelectionMapper {
             "audit_teacher_id = #{auditTeacherId}, audit_opinion = #{auditOpinion}, audit_time = NOW() WHERE selection_id = #{id}")
     int audit(TopicSelectionEntity selection);
 
+    @Update("UPDATE topic_selection SET audit_status = 2, audit_opinion = '团队已解散', audit_time = NOW() " +
+            "WHERE team_id = #{teamId} AND audit_status = 0")
+    int cancelPending(@Param("teamId") Long teamId);
+
     @Select("SELECT s.selection_id, s.team_id, tm.team_name, s.topic_id, tp.topic_name AS topic_title, " +
             "s.selection_reason, CASE s.audit_status WHEN 0 THEN 'PENDING' WHEN 1 THEN 'APPROVED' WHEN 2 THEN 'REJECTED' ELSE 'WITHDRAWN' END AS status, " +
             "s.audit_teacher_id, s.audit_opinion, s.apply_time, s.audit_time " +

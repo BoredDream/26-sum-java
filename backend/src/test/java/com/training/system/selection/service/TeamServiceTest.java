@@ -12,6 +12,7 @@ import com.training.system.selection.mapper.TeamJoinRequestMapper;
 import com.training.system.selection.mapper.TeamLeaveRequestMapper;
 import com.training.system.selection.mapper.TeamMapper;
 import com.training.system.selection.mapper.TeamMemberMapper;
+import com.training.system.selection.mapper.TopicSelectionMapper;
 import com.training.system.selection.vo.JoinRequestVO;
 import com.training.system.selection.vo.TeamVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +41,8 @@ class TeamServiceTest {
     private TeamJoinRequestMapper joinRequestMapper;
     @Mock
     private TeamLeaveRequestMapper leaveRequestMapper;
+    @Mock
+    private TopicSelectionMapper topicSelectionMapper;
 
     @Captor
     private ArgumentCaptor<TeamEntity> teamCaptor;
@@ -52,12 +55,13 @@ class TeamServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new TeamService(teamMapper, teamMemberMapper, joinRequestMapper, leaveRequestMapper);
+        service = new TeamService(teamMapper, teamMemberMapper, joinRequestMapper, leaveRequestMapper, topicSelectionMapper);
     }
 
     @Test
     @DisplayName("创建团队 - 学生创建成功并自动成为负责人")
     void createTeam_success() {
+        when(teamMemberMapper.findActiveByStudentId(1L)).thenReturn(List.of());
         CreateTeamDTO dto = new CreateTeamDTO();
         dto.setTeamName("  第一小组  ");
         dto.setIntroduction("综合实训项目组");
@@ -97,6 +101,20 @@ class TeamServiceTest {
     }
 
     @Test
+    @DisplayName("创建团队 - 已在其他团队时禁止创建")
+    void createTeam_alreadyInTeamThrows() {
+        when(teamMemberMapper.findActiveByStudentId(1L)).thenReturn(List.of(member(20L, 1L, "MEMBER", true)));
+        CreateTeamDTO dto = new CreateTeamDTO();
+        dto.setTeamName("新团队");
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> service.createTeam(1L, ROLE_STUDENT, dto));
+
+        assertTrue(ex.getMessage().contains("已加入其他团队"));
+        verify(teamMapper, never()).insert(any());
+    }
+
+    @Test
     @DisplayName("查询可加入团队 - 返回团队列表并包含人数")
     void listJoinableTeams_success() {
         TeamEntity team = team(10L, 1L, TEAM_BUILDING, null, 5);
@@ -113,8 +131,21 @@ class TeamServiceTest {
     }
 
     @Test
-    @DisplayName("申请入队 - 已加入团队时禁止重复申请")
+    @DisplayName("申请入队 - 已在其他团队时禁止申请")
+    void applyJoin_alreadyInAnotherTeamThrows() {
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of(member(20L, 2L, "MEMBER", true)));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> service.applyJoin(2L, ROLE_STUDENT, 10L, new JoinTeamDTO()));
+
+        assertTrue(ex.getMessage().contains("已加入其他团队"));
+        verify(joinRequestMapper, never()).insert(any());
+    }
+
+    @Test
+    @DisplayName("申请入队 - 已加入该团队时禁止重复申请")
     void applyJoin_alreadyInTeamThrows() {
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of());
         when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(member(10L, 2L, "MEMBER", true));
 
         BusinessException ex = assertThrows(BusinessException.class,
@@ -127,6 +158,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 团队满员时拒绝申请")
     void applyJoin_fullTeamThrows() {
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of());
         when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 2));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
@@ -255,6 +287,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 学生成功提交申请")
     void applyJoin_success() {
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of());
         when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
@@ -274,6 +307,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("申请入队 - 人数达到上限前最后一个名额允许申请")
     void applyJoin_oneSlotRemaining_success() {
+        when(teamMemberMapper.findActiveByStudentId(2L)).thenReturn(List.of());
         when(teamMemberMapper.findByTeamIdAndStudentId(10L, 2L)).thenReturn(null);
         when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 3));
         when(teamMemberMapper.countActiveByTeamId(10L)).thenReturn(2);
@@ -317,6 +351,56 @@ class TeamServiceTest {
         service.updateMemberWork(1L, ROLE_STUDENT, 10L, 2L, dto);
 
         verify(teamMemberMapper).updateWorkContent(10L, 2L, "负责前端页面开发");
+    }
+
+    // ── 解散团队 ──
+
+    @Test
+    @DisplayName("解散团队 - 队长成功解散")
+    void disbandTeam_success() {
+        when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
+
+        service.disbandTeam(1L, ROLE_STUDENT, 10L);
+
+        verify(joinRequestMapper).rejectAllPending(10L);
+        verify(leaveRequestMapper).rejectAllPending(10L);
+        verify(topicSelectionMapper).cancelPending(10L);
+        verify(teamMemberMapper).deactivateAllMembers(10L);
+        verify(teamMapper).disbandTeam(10L);
+    }
+
+    @Test
+    @DisplayName("解散团队 - 非队长禁止解散")
+    void disbandTeam_nonLeaderThrows() {
+        when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> service.disbandTeam(2L, ROLE_STUDENT, 10L));
+
+        assertTrue(ex.getMessage().contains("负责人"));
+        verify(teamMapper, never()).disbandTeam(anyLong());
+    }
+
+    @Test
+    @DisplayName("解散团队 - 管理员可以解散任何团队")
+    void disbandTeam_adminCanDisband() {
+        when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_BUILDING, null, 5));
+
+        service.disbandTeam(999L, ROLE_ADMIN, 10L);
+
+        verify(teamMapper).disbandTeam(10L);
+    }
+
+    @Test
+    @DisplayName("解散团队 - 已解散团队禁止重复解散")
+    void disbandTeam_alreadyDissolvedThrows() {
+        when(teamMapper.findById(10L)).thenReturn(team(10L, 1L, TEAM_DISSOLVED, null, 5));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> service.disbandTeam(1L, ROLE_STUDENT, 10L));
+
+        assertTrue(ex.getMessage().contains("已解散"));
+        verify(teamMapper, never()).disbandTeam(anyLong());
     }
 
     private TeamEntity team(Long id, Long leaderId, String status, Long selectedTopicId, Integer maxSize) {

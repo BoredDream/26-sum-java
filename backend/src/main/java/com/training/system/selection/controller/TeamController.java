@@ -108,4 +108,13 @@ public class TeamController {
         teamService.updateMemberWork(user.relatedId(), user.role(), teamId, studentId, dto);
         return Result.success();
     }
+
+    @OperationLog(type = "DELETE", description = "解散团队")
+    @DeleteMapping("/{teamId}")
+    public Result<Void> disbandTeam(HttpSession session,
+                                     @PathVariable Long teamId) {
+        CurrentUser user = SelectionSessionUtil.currentUser(session);
+        teamService.disbandTeam(user.relatedId(), user.role(), teamId);
+        return Result.success();
+    }
 }

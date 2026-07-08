@@ -184,6 +184,9 @@ async function openUpload() {
   myTeamsLoading.value = true
   try {
     myTeams.value = await selectionApi.getMyTeams()
+    if (myTeams.value.length === 1) {
+      uploadForm.value.teamId = myTeams.value[0].id
+    }
   } catch {
     myTeams.value = []
   } finally {
