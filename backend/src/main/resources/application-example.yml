@@ -1,4 +1,4 @@
-﻿server:
+server:
   port: 8080
 
 spring:
@@ -9,12 +9,42 @@ spring:
     url: jdbc:mysql://localhost:3306/training_selection_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: your_password
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 55MB
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
 
+# 通用文件上传目录
+file:
+  upload:
+    dir: ./uploads
+
+# 出题管理模块-文件上传目录
+topic:
+  file:
+    upload-dir: ./uploads/topic
+
+# 考勤/补签附件上传目录
+app:
+  upload:
+    path: D:/training-uploads/
+
+# 数据备份配置
+backup:
+  cron: "0 0 2 * * ?"
+  dir: ./backup
+  retention-days: 30
+
 logging:
   level:
     com.training.system: debug
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:}
+  api-url: https://api.deepseek.com/chat/completions
+  model: deepseek-chat

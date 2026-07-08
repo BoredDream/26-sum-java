@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.score.mapper.ScoreMapper">
+
+    <select id="selectById" resultType="com.training.system.score.entity.ScoreRecord">
+        SELECT * FROM score WHERE score_id = #{scoreId}
+    </select>
+
+    <select id="selectByTeamId" resultType="com.training.system.score.entity.ScoreRecord">
+        SELECT * FROM score WHERE team_id = #{teamId}
+    </select>
+
+    <insert id="insertScore" parameterType="com.training.system.score.entity.ScoreRecord"
+            useGeneratedKeys="true" keyProperty="scoreId">
+        INSERT INTO score (
+            team_id, teacher_id, ai_report_id, doc_score, attendance_score,
+            system_score, defense_score, total_score, teacher_comment, status
+        ) VALUES (
+            #{teamId}, #{teacherId}, #{aiReportId}, #{docScore}, #{attendanceScore},
+            #{systemScore}, #{defenseScore}, #{totalScore}, #{teacherComment}, #{status}
+        )
+    </insert>
+
+    <update id="updateScore" parameterType="com.training.system.score.entity.ScoreRecord">
+        UPDATE score SET
+            teacher_id = #{teacherId},
+            ai_report_id = #{aiReportId},
+            doc_score = #{docScore},
+            attendance_score = #{attendanceScore},
+            system_score = #{systemScore},
+            defense_score = #{defenseScore},
+            total_score = #{totalScore},
+            teacher_comment = #{teacherComment},
+            status = #{status}
+        WHERE score_id = #{scoreId}
+    </update>
+
+    <update id="updateScoreStatus">
+        UPDATE score SET status = #{status} WHERE score_id = #{scoreId}
+    </update>
+
+    <delete id="deleteStudentScoresByScoreId">
+        DELETE FROM student_score WHERE score_id = #{scoreId}
+    </delete>
+
+    <insert id="insertStudentScore" parameterType="com.training.system.score.entity.StudentScore"
+            useGeneratedKeys="true" keyProperty="studentScoreId">
+        INSERT INTO student_score (
+            score_id, team_id, student_id, contribution_factor,
+            personal_score, grade, teacher_comment
+        ) VALUES (
+            #{scoreId}, #{teamId}, #{studentId}, #{contributionFactor},
+            #{personalScore}, #{grade}, #{teacherComment}
+        )
+    </insert>
+
+    <select id="selectScorePage" resultType="com.training.system.score.vo.ScoreVO">
+        SELECT s.score_id, s.team_id, ti.team_name, s.teacher_id, t.teacher_name,
+               s.doc_score, s.attendance_score, s.system_score, s.defense_score,
+               s.total_score, s.teacher_comment, s.status, s.create_time, s.update_time
+        FROM score s
+        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
+        WHERE 1 = 1
+        <if test="keyword != null and keyword != ''">
+            AND (ti.team_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR t.teacher_name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="teamId != null">
+            AND s.team_id = #{teamId}
+        </if>
+        <if test="teacherId != null">
+            AND s.teacher_id = #{teacherId}
+        </if>
+        <if test="status != null">
+            AND s.status = #{status}
+        </if>
+        ORDER BY s.create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countScorePage" resultType="long">
+        SELECT COUNT(*)
+        FROM score s
+        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
+        WHERE 1 = 1
+        <if test="keyword != null and keyword != ''">
+            AND (ti.team_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR t.teacher_name LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="teamId != null">
+            AND s.team_id = #{teamId}
+        </if>
+        <if test="teacherId != null">
+            AND s.teacher_id = #{teacherId}
+        </if>
+        <if test="status != null">
+            AND s.status = #{status}
+        </if>
+    </select>
+
+    <select id="selectStudentScores" resultType="com.training.system.score.vo.StudentScoreVO">
+        SELECT ss.student_score_id, ss.score_id, ss.team_id, ti.team_name,
+               ss.student_id, st.student_name, ss.contribution_factor,
+               ss.personal_score, ss.grade, ss.teacher_comment
+        FROM student_score ss
+        LEFT JOIN team_info ti ON ss.team_id = ti.team_id
+        LEFT JOIN student st ON ss.student_id = st.student_id
+        WHERE ss.student_id = #{studentId}
+        ORDER BY ss.create_time DESC
+    </select>
+
+    <select id="selectProgress" resultType="com.training.system.score.vo.ProgressVO">
+        SELECT ti.team_id,
+               ti.team_name,
+               pt.topic_id,
+               pt.topic_name,
+               (SELECT COUNT(*) FROM stage_task) AS total_stage_count,
+               COUNT(DISTINCT se.stage_id) AS evaluated_stage_count,
+               COALESCE(AVG(se.total_score), 0) AS average_stage_score
+        FROM team_info ti
+        LEFT JOIN topic_selection ts
+               ON ti.team_id = ts.team_id AND ts.audit_status = 1
+        LEFT JOIN project_topic pt
+               ON ts.topic_id = pt.topic_id
+        LEFT JOIN stage_evaluation se
+               ON ti.team_id = se.team_id
+        WHERE ti.is_deleted = 0
+        <if test="teamId != null">
+            AND ti.team_id = #{teamId}
+        </if>
+        GROUP BY ti.team_id, ti.team_name, pt.topic_id, pt.topic_name
+        ORDER BY ti.team_id ASC
+    </select>
+
+    <select id="selectScoreExport" resultType="com.training.system.score.vo.ScoreVO">
+        SELECT s.score_id, s.team_id, ti.team_name, s.teacher_id, t.teacher_name,
+               s.doc_score, s.attendance_score, s.system_score, s.defense_score,
+               s.total_score, s.teacher_comment, s.status, s.create_time, s.update_time
+        FROM score s
+        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
+        WHERE 1 = 1
+        <if test="teacherId != null">
+            AND s.teacher_id = #{teacherId}
+        </if>
+        ORDER BY s.total_score DESC
+    </select>
+</mapper>
+

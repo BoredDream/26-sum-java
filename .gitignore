@@ -11,9 +11,11 @@ target/
 # Node / Vue
 node_modules/
 dist/
+frontend/coverage/
 
 # Environment
 .env
+application.yml
 application-local.yml
 application-dev.yml
 
@@ -24,3 +26,9 @@ Thumbs.db
 # Database backups
 *.sql.bak
 *.dump
+
+# Uploaded files
+uploads/
+
+# Claude
+CLAUDE.md

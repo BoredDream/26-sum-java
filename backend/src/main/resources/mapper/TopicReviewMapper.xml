@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.training.system.topic.mapper.TopicReviewMapper">
+
+    <!-- 审核记录VO结果映射（关联user_account和teacher表获取审核人姓名） -->
+    <resultMap id="TopicReviewVOMap" type="com.training.system.topic.vo.TopicReviewVO">
+        <id property="reviewId" column="review_id"/>
+        <result property="topicId" column="topic_id"/>
+        <result property="adminName" column="admin_name"/>
+        <result property="reviewResult" column="review_result"/>
+        <result property="reviewComment" column="review_comment"/>
+        <result property="reviewTime" column="review_time"/>
+    </resultMap>
+
+    <!-- ==================== 新增审核记录 ==================== -->
+    <insert id="insert" parameterType="com.training.system.topic.entity.TopicReview"
+            useGeneratedKeys="true" keyProperty="reviewId">
+        INSERT INTO topic_review (
+            topic_id, admin_id, review_result, review_comment, review_time
+        ) VALUES (
+            #{topicId}, #{adminId}, #{reviewResult}, #{reviewComment}, NOW()
+        )
+    </insert>
+
+    <!-- ==================== 查询审核记录列表 ==================== -->
+    <select id="selectByTopicId" resultMap="TopicReviewVOMap">
+        SELECT tr.review_id, tr.topic_id, tr.review_result, tr.review_comment, tr.review_time,
+               COALESCE(t.teacher_name, '管理员') AS admin_name
+        FROM topic_review tr
+        LEFT JOIN user_account ua ON tr.admin_id = ua.user_id
+        LEFT JOIN teacher t ON ua.related_id = t.teacher_id AND ua.role = 'ADMIN'
+        WHERE tr.topic_id = #{topicId}
+        ORDER BY tr.review_time DESC
+    </select>
+
+</mapper>

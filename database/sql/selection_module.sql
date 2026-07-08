@@ -1,0 +1,15 @@
+-- 选题管理模块数据库说明
+--
+-- 选题模块不再维护独立建表脚本，所有表结构以项目统一的
+-- database/sql/schema-v1.sql 为准。
+--
+-- 相关表：
+-- - team_info
+-- - team_member
+-- - team_join_request
+-- - topic_selection
+-- - process_document
+-- - development_log
+--
+-- 如需调整字段，请同步修改 schema-v1.sql 和 database/docs/data-dictionary.md，
+-- 并在 PR 中说明数据库变更。
