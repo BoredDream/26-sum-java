@@ -46,20 +46,6 @@ export interface TeamVO {
   createTime: string
 }
 
-export interface SelectableTopicVO {
-  id: number
-  title: string
-  description?: string
-  direction?: string
-  difficulty: string
-  teacherId: number
-  minMembers?: number
-  maxMembers?: number
-  status: 'OPEN' | 'SELECTED'
-  selectionStart?: string
-  selectionEnd?: string
-}
-
 export interface SubmitSelectionDTO {
   topicId: number
   selectionReason: string

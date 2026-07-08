@@ -5,7 +5,6 @@ import type {
   JoinTeamDTO,
   JoinRequestVO,
   UpdateMemberWorkDTO,
-  SelectableTopicVO,
   SubmitSelectionDTO,
   SelectionVO,
   ProcessDocumentVO,
@@ -69,14 +68,6 @@ export function auditLeaveRequest(requestId: number, data: AuditDTO) {
 }
 
 // 选题申请
-export function listSelectableTopics(keyword?: string) {
-  return get<SelectableTopicVO[]>('/selection/topics', { params: { keyword } })
-}
-
-export function getSelectableTopic(topicId: number) {
-  return get<SelectableTopicVO>(`/selection/topics/${topicId}`)
-}
-
 export function submitSelection(data: SubmitSelectionDTO) {
   return post<SelectionVO>('/selection/applications', data)
 }

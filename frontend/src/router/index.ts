@@ -40,11 +40,6 @@ const router = createRouter({
           component: () => import('@/views/selection/MyTeamView.vue'),
         },
         {
-          path: '/selection/topics',
-          name: 'SelectionTopicBrowse',
-          component: () => import('@/views/selection/TopicBrowseView.vue'),
-        },
-        {
           path: '/selection/my-application',
           name: 'MyApplication',
           component: () => import('@/views/selection/MyApplicationView.vue'),
