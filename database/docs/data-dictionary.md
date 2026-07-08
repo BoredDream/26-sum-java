@@ -126,6 +126,7 @@
 | `team_join_request` | `team_id`、`applicant_id`、`reviewer_id` | `team_info`、`student` |
 | `topic_selection` | `team_id`、`topic_id` | `team_info`、`project_topic` |
 | `process_document` | `team_id`、`topic_id`、`uploader_id` | `team_info`、`project_topic`、`student` |
+| `process_document` | `stage_id` | `stage_task.stage_id` |
 | `attendance_record` | `task_id`、`student_id` | `attendance_task`、`student` |
 | `makeup_sign_apply` | `task_id`、`record_id`、`student_id` | `attendance_task`、`attendance_record`、`student` |
 | `score` | `team_id`、`teacher_id`、`ai_report_id` | `team_info`、`teacher`、`ai_report` |
