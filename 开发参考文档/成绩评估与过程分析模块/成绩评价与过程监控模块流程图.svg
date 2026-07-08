@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="1710" viewBox="0 0 360 1710">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#111"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .text { font: 12px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .small { font: 11px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .node { fill: #fff; stroke: #111; stroke-width: .8; }
+      .line { stroke: #111; stroke-width: .85; fill: none; marker-end: url(#arrow); }
+      .plain-line { stroke: #111; stroke-width: .85; fill: none; }
+      .dot { fill: #111; stroke: #111; stroke-width: .8; }
+      .end-ring { fill: #fff; stroke: #111; stroke-width: .8; }
+    ]]></style>
+  </defs>
+
+  <rect x="0" y="0" width="360" height="1710" fill="#fff"/>
+  <text class="title" x="180" y="35" text-anchor="middle">成绩评价与过程监控模块流程图</text>
+
+  <!-- Start -->
+  <circle class="dot" cx="180" cy="60" r="10"/>
+  <path class="line" d="M180 70 L180 88"/>
+
+  <!-- 1 -->
+  <rect class="node" x="107" y="90" width="146" height="36" rx="13"/>
+  <text class="text" x="180" y="112" text-anchor="middle">教师发布阶段任务</text>
+  <path class="line" d="M180 126 L180 148"/>
+
+  <!-- 2 -->
+  <rect class="node" x="95" y="150" width="170" height="36" rx="13"/>
+  <text class="text" x="180" y="172" text-anchor="middle">学生查看阶段任务要求</text>
+  <path class="line" d="M180 186 L180 208"/>
+
+  <!-- 3 -->
+  <rect class="node" x="101" y="210" width="158" height="36" rx="13"/>
+  <text class="text" x="180" y="232" text-anchor="middle">学生提交阶段成果</text>
+  <path class="line" d="M180 246 L180 268"/>
+
+  <!-- 4 -->
+  <rect class="node" x="68" y="270" width="224" height="44" rx="13"/>
+  <text class="text" x="180" y="288" text-anchor="middle">系统记录过程文档、开发日志</text>
+  <text class="text" x="180" y="304" text-anchor="middle">和提交情况</text>
+  <path class="line" d="M180 314 L180 338"/>
+
+  <!-- 5 -->
+  <rect class="node" x="103" y="340" width="154" height="36" rx="13"/>
+  <text class="text" x="180" y="362" text-anchor="middle">教师查看过程材料</text>
+  <path class="line" d="M180 376 L180 398"/>
+
+  <!-- 6 -->
+  <rect class="node" x="65" y="400" width="230" height="44" rx="13"/>
+  <text class="text" x="180" y="418" text-anchor="middle">教师填写过程反馈</text>
+  <text class="text" x="180" y="434" text-anchor="middle">并进行阶段评价</text>
+  <path class="line" d="M180 444 L180 468"/>
+
+  <!-- D1 -->
+  <path class="node" d="M180 470 L238 494 L180 518 L122 494 Z"/>
+  <text class="text" x="180" y="498" text-anchor="middle">是否需要修改?</text>
+
+  <!-- D1 yes branch -->
+  <path class="plain-line" d="M122 494 L76 494 L76 545"/>
+  <path class="line" d="M76 545 L76 548"/>
+  <text class="small" x="97" y="488" text-anchor="middle">是</text>
+  <rect class="node" x="28" y="550" width="96" height="44" rx="13"/>
+  <text class="text" x="76" y="568" text-anchor="middle">学生根据反馈</text>
+  <text class="text" x="76" y="584" text-anchor="middle">修改成果</text>
+  <path class="line" d="M76 594 L76 618"/>
+  <rect class="node" x="18" y="620" width="116" height="36" rx="13"/>
+  <text class="text" x="76" y="642" text-anchor="middle">重新提交阶段成果</text>
+  <path class="plain-line" d="M76 656 L76 684 L300 684 L300 358 L258 358"/>
+  <path class="line" d="M258 358 L257 358"/>
+
+  <!-- D1 no branch -->
+  <path class="line" d="M180 518 L180 708"/>
+  <text class="small" x="195" y="538">否</text>
+
+  <!-- 7 -->
+  <rect class="node" x="105" y="710" width="150" height="36" rx="13"/>
+  <text class="text" x="180" y="732" text-anchor="middle">系统记录阶段成绩</text>
+  <path class="line" d="M180 746 L180 768"/>
+
+  <!-- D2 -->
+  <path class="node" d="M180 770 L246 795 L180 820 L114 795 Z"/>
+  <text class="text" x="180" y="799" text-anchor="middle">是否全部阶段完成?</text>
+
+  <!-- D2 no branch -->
+  <path class="plain-line" d="M114 795 L75 795 L75 848"/>
+  <path class="line" d="M75 848 L75 850"/>
+  <text class="small" x="98" y="789" text-anchor="middle">否</text>
+  <rect class="node" x="23" y="852" width="104" height="36" rx="13"/>
+  <text class="text" x="75" y="874" text-anchor="middle">进入下一阶段任务</text>
+  <path class="plain-line" d="M75 888 L75 915 L308 915 L308 168 L266 168"/>
+  <path class="line" d="M266 168 L265 168"/>
+
+  <!-- D2 yes branch -->
+  <path class="line" d="M180 820 L180 918"/>
+  <text class="small" x="196" y="842">是</text>
+
+  <!-- 8 -->
+  <rect class="node" x="87" y="920" width="186" height="36" rx="13"/>
+  <text class="text" x="180" y="942" text-anchor="middle">学生进行成员贡献度互评</text>
+  <path class="line" d="M180 956 L180 978"/>
+
+  <!-- 9 -->
+  <rect class="node" x="83" y="980" width="194" height="36" rx="13"/>
+  <text class="text" x="180" y="1002" text-anchor="middle">教师汇总并确认贡献度</text>
+  <path class="line" d="M180 1016 L180 1038"/>
+
+  <!-- 10 -->
+  <rect class="node" x="58" y="1040" width="244" height="44" rx="13"/>
+  <text class="text" x="180" y="1058" text-anchor="middle">系统读取考勤、阶段评价</text>
+  <text class="text" x="180" y="1074" text-anchor="middle">和过程数据</text>
+  <path class="line" d="M180 1084 L180 1108"/>
+
+  <!-- 11 -->
+  <rect class="node" x="53" y="1110" width="254" height="44" rx="13"/>
+  <text class="text" x="180" y="1128" text-anchor="middle">教师录入平时成绩、阶段成绩</text>
+  <text class="text" x="180" y="1144" text-anchor="middle">和答辩成绩</text>
+  <path class="line" d="M180 1154 L180 1178"/>
+
+  <!-- 12 -->
+  <rect class="node" x="105" y="1180" width="150" height="36" rx="13"/>
+  <text class="text" x="180" y="1202" text-anchor="middle">系统计算综合成绩</text>
+  <path class="line" d="M180 1216 L180 1238"/>
+
+  <!-- D3 -->
+  <path class="node" d="M180 1240 L246 1265 L180 1290 L114 1265 Z"/>
+  <text class="text" x="180" y="1269" text-anchor="middle">教师是否确认成绩?</text>
+
+  <!-- D3 no branch -->
+  <path class="plain-line" d="M246 1265 L296 1265 L296 1320"/>
+  <path class="line" d="M296 1320 L296 1322"/>
+  <text class="small" x="269" y="1259" text-anchor="middle">否</text>
+  <rect class="node" x="238" y="1324" width="116" height="44" rx="13"/>
+  <text class="text" x="296" y="1342" text-anchor="middle">教师调整成绩</text>
+  <text class="text" x="296" y="1358" text-anchor="middle">或评语</text>
+  <path class="plain-line" d="M296 1368 L296 1398 L318 1398 L318 1198 L256 1198"/>
+  <path class="line" d="M256 1198 L255 1198"/>
+
+  <!-- D3 yes branch -->
+  <path class="line" d="M180 1290 L180 1408"/>
+  <text class="small" x="195" y="1310">是</text>
+
+  <!-- 13 -->
+  <rect class="node" x="95" y="1410" width="170" height="36" rx="13"/>
+  <text class="text" x="180" y="1432" text-anchor="middle">成绩状态改为已确认</text>
+  <path class="line" d="M180 1446 L180 1468"/>
+
+  <!-- 14 -->
+  <rect class="node" x="103" y="1470" width="154" height="36" rx="13"/>
+  <text class="text" x="180" y="1492" text-anchor="middle">学生查看个人成绩</text>
+  <path class="line" d="M180 1506 L180 1528"/>
+
+  <!-- 15 -->
+  <rect class="node" x="78" y="1530" width="204" height="36" rx="13"/>
+  <text class="text" x="180" y="1552" text-anchor="middle">教师/管理员导出成绩报表</text>
+  <path class="line" d="M180 1566 L180 1595"/>
+
+  <!-- End -->
+  <circle class="end-ring" cx="180" cy="1610" r="11"/>
+  <circle class="dot" cx="180" cy="1610" r="7"/>
+</svg>

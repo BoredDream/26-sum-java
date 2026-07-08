@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -247,6 +248,77 @@ class AttendanceRecordServiceImplTest {
 
             assertNotNull(result);
             assertEquals(AttendanceSignStatusEnum.LATE.getCode(), result.getSignStatus());
+        }
+
+        @Test
+        @DisplayName("任务要求定位但学生未提供坐标 → 拒绝")
+        void shouldRejectWhenLocationRequiredButNoCoordinates() {
+            activeTask.setRequireLocation(1);
+            activeTask.setLocationLng(new BigDecimal("116.397428"));
+            activeTask.setLocationLat(new BigDecimal("39.909230"));
+            activeTask.setLocationRadius(500);
+
+            when(attendanceTaskMapper.selectById(1L)).thenReturn(activeTask);
+            when(scopeValidator.isStudentInScope(activeTask, 100L)).thenReturn(true);
+
+            AttendanceSignDTO dto = new AttendanceSignDTO();
+            dto.setTaskId(1L);
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.sign(dto, studentUser));
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("定位"));
+        }
+
+        @Test
+        @DisplayName("学生定位超出签到范围 → 拒绝")
+        void shouldRejectWhenOutsideLocationRadius() {
+            activeTask.setRequireLocation(1);
+            activeTask.setLocationLng(new BigDecimal("116.397428"));
+            activeTask.setLocationLat(new BigDecimal("39.909230"));
+            activeTask.setLocationRadius(200);
+
+            when(attendanceTaskMapper.selectById(1L)).thenReturn(activeTask);
+            when(scopeValidator.isStudentInScope(activeTask, 100L)).thenReturn(true);
+
+            AttendanceSignDTO dto = new AttendanceSignDTO();
+            dto.setTaskId(1L);
+            dto.setSignLng(116.321000);
+            dto.setSignLat(39.894900);
+
+            BusinessException ex = assertThrows(BusinessException.class,
+                    () -> service.sign(dto, studentUser));
+            assertEquals(400, ex.getResultCode().getCode());
+            assertTrue(ex.getMessage().contains("签到范围边缘"));
+        }
+
+        @Test
+        @DisplayName("定位签到在范围内 → 签到成功")
+        void shouldSignSuccessWhenWithinLocationRadius() {
+            activeTask.setRequireLocation(1);
+            activeTask.setLocationLng(new BigDecimal("116.397428"));
+            activeTask.setLocationLat(new BigDecimal("39.909230"));
+            activeTask.setLocationRadius(500);
+
+            AttendanceRecord freshRecord = new AttendanceRecord();
+            freshRecord.setRecordId(1L);
+            freshRecord.setTaskId(1L);
+            freshRecord.setStudentId(100L);
+            freshRecord.setSignStatus(AttendanceSignStatusEnum.ABSENT.getCode());
+
+            when(attendanceTaskMapper.selectById(1L)).thenReturn(activeTask);
+            when(scopeValidator.isStudentInScope(activeTask, 100L)).thenReturn(true);
+            when(attendanceRecordMapper.selectByTaskAndStudent(1L, 100L)).thenReturn(freshRecord);
+
+            AttendanceSignDTO dto = new AttendanceSignDTO();
+            dto.setTaskId(1L);
+            dto.setSignLng(116.397500);
+            dto.setSignLat(39.909300);
+
+            AttendanceRecordVO result = service.sign(dto, studentUser);
+
+            assertNotNull(result);
+            verify(attendanceRecordMapper).update(any(AttendanceRecord.class));
         }
     }
 

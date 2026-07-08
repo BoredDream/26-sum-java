@@ -84,6 +84,14 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
         if ((scopeType == 1 || scopeType == 2) && (scopeValue == null || scopeValue.isBlank())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请至少选择一个班级或团队");
         }
+        if (Integer.valueOf(1).equals(dto.getRequireLocation())) {
+            if (dto.getLocationLng() == null || dto.getLocationLat() == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "定位签到必须设置签到位置");
+            }
+            if (dto.getLocationRadius() == null) {
+                dto.setLocationRadius(500);
+            }
+        }
 
         List<Long> studentIds = resolveScopeStudents(scopeType, scopeValue);
 

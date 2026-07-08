@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +73,7 @@ public class ScoreServiceImpl implements ScoreService {
         stageTask.setScoringCriteria(dto.getScoringCriteria());
         stageTask.setWeight(dto.getWeight());
         stageTask.setTeacherId(relatedId);
-        stageTask.setStatus(dto.getStatus() == null ? 0 : dto.getStatus());
+        stageTask.setStatus(calculateStageStatus(dto.getStartTime(), dto.getEndTime()));
         stageTaskMapper.insert(stageTask);
     }
 
@@ -135,7 +136,8 @@ public class ScoreServiceImpl implements ScoreService {
 
     @Override
     public List<ProgressVO> queryProgress(Long teamId, String role, Long relatedId) {
-        return scoreMapper.selectProgress(teamId);
+        Long teacherId = "TEACHER".equals(role) ? relatedId : null;
+        return scoreMapper.selectProgress(teamId, teacherId);
     }
 
     @Override
@@ -317,12 +319,27 @@ public class ScoreServiceImpl implements ScoreService {
 
     private void fillScoreStatus(List<ScoreVO> scores) {
         for (ScoreVO score : scores) {
-            score.setStatusText(scoreStatusText(score.getStatus()));
+            if (score.getScoreId() == null) {
+                score.setStatusText("未生成");
+            } else {
+                score.setStatusText(scoreStatusText(score.getStatus()));
+            }
         }
     }
 
     private String stageStatusText(Integer status) {
         return status == null ? "未知" : STAGE_STATUS_TEXT.getOrDefault(status, "未知");
+    }
+
+    private Integer calculateStageStatus(LocalDateTime startTime, LocalDateTime endTime) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isBefore(startTime)) {
+            return 0;
+        }
+        if (now.isAfter(endTime)) {
+            return 2;
+        }
+        return 1;
     }
 
     private String scoreStatusText(Integer status) {

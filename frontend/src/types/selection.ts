@@ -93,6 +93,9 @@ export interface ProcessDocumentVO {
   status: 'SUBMITTED' | 'REVIEWED' | 'RETURNED'
   teacherFeedback?: string
   feedbackTeacherId?: number
+  stageId?: number
+  remark?: string
+  stageName?: string
   uploadTime?: string
   feedbackTime?: string
 }

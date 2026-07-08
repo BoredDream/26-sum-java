@@ -40,7 +40,7 @@ public interface ScoreMapper {
 
     List<StudentScoreVO> selectStudentScores(@Param("studentId") Long studentId);
 
-    List<ProgressVO> selectProgress(@Param("teamId") Long teamId);
+    List<ProgressVO> selectProgress(@Param("teamId") Long teamId, @Param("teacherId") Long teacherId);
 
     List<ScoreVO> selectScoreExport(@Param("teacherId") Long teacherId);
 }

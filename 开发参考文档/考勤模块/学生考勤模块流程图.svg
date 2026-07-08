@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="1865" viewBox="0 0 380 1865">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#111"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .text { font: 12px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .small { font: 11px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .node { fill: #fff; stroke: #111; stroke-width: .8; }
+      .line { stroke: #111; stroke-width: .85; fill: none; marker-end: url(#arrow); }
+      .plain-line { stroke: #111; stroke-width: .85; fill: none; }
+      .dot { fill: #111; stroke: #111; stroke-width: .8; }
+      .end-ring { fill: #fff; stroke: #111; stroke-width: .8; }
+    ]]></style>
+  </defs>
+
+  <rect x="0" y="0" width="380" height="1865" fill="#fff"/>
+  <text class="title" x="190" y="35" text-anchor="middle">学生考勤模块流程图</text>
+
+  <!-- Start -->
+  <circle class="dot" cx="190" cy="60" r="10"/>
+  <path class="line" d="M190 70 L190 88"/>
+
+  <!-- Publish task -->
+  <rect class="node" x="82" y="90" width="216" height="36" rx="13"/>
+  <text class="text" x="190" y="112" text-anchor="middle">教师/管理员发布签到任务</text>
+  <path class="line" d="M190 126 L190 148"/>
+
+  <rect class="node" x="58" y="150" width="264" height="44" rx="13"/>
+  <text class="text" x="190" y="168" text-anchor="middle">系统校验任务时间、类型</text>
+  <text class="text" x="190" y="184" text-anchor="middle">和适用范围</text>
+  <path class="line" d="M190 194 L190 218"/>
+
+  <path class="node" d="M190 220 L250 245 L190 270 L130 245 Z"/>
+  <text class="text" x="190" y="249" text-anchor="middle">发布校验通过?</text>
+
+  <!-- publish no -->
+  <path class="plain-line" d="M130 245 L70 245 L70 300"/>
+  <path class="line" d="M70 300 L70 302"/>
+  <text class="small" x="98" y="238" text-anchor="middle">否</text>
+  <rect class="node" x="18" y="304" width="104" height="44" rx="13"/>
+  <text class="text" x="70" y="322" text-anchor="middle">提示修改</text>
+  <text class="text" x="70" y="338" text-anchor="middle">签到任务信息</text>
+  <path class="plain-line" d="M70 348 L70 372 L338 372 L338 108 L299 108"/>
+  <path class="line" d="M299 108 L298 108"/>
+
+  <!-- publish yes -->
+  <path class="line" d="M190 270 L190 388"/>
+  <text class="small" x="205" y="292">是</text>
+
+  <rect class="node" x="64" y="390" width="252" height="44" rx="13"/>
+  <text class="text" x="190" y="408" text-anchor="middle">系统为范围内学生生成</text>
+  <text class="text" x="190" y="424" text-anchor="middle">缺勤考勤记录</text>
+  <path class="line" d="M190 434 L190 458"/>
+
+  <rect class="node" x="83" y="460" width="214" height="36" rx="13"/>
+  <text class="text" x="190" y="482" text-anchor="middle">学生查看进行中签到任务</text>
+  <path class="line" d="M190 496 L190 518"/>
+
+  <!-- time decision -->
+  <path class="node" d="M190 520 L252 545 L190 570 L128 545 Z"/>
+  <text class="text" x="190" y="549" text-anchor="middle">是否在签到时间内?</text>
+
+  <!-- not in time -->
+  <path class="plain-line" d="M128 545 L72 545 L72 668"/>
+  <path class="line" d="M72 668 L72 670"/>
+  <text class="small" x="100" y="538" text-anchor="middle">否</text>
+  <rect class="node" x="20" y="672" width="104" height="44" rx="13"/>
+  <text class="text" x="72" y="690" text-anchor="middle">任务结束后</text>
+  <text class="text" x="72" y="706" text-anchor="middle">记录保持缺勤</text>
+  <path class="plain-line" d="M72 716 L72 1195 L128 1195"/>
+  <path class="line" d="M128 1195 L129 1195"/>
+
+  <!-- in time -->
+  <path class="line" d="M190 570 L190 598"/>
+  <text class="small" x="205" y="592">是</text>
+  <rect class="node" x="103" y="600" width="174" height="36" rx="13"/>
+  <text class="text" x="190" y="622" text-anchor="middle">学生点击在线签到</text>
+  <path class="line" d="M190 636 L190 658"/>
+
+  <!-- location decision -->
+  <path class="node" d="M190 660 L254 685 L190 710 L126 685 Z"/>
+  <text class="text" x="190" y="689" text-anchor="middle">是否需要定位校验?</text>
+
+  <!-- location no -->
+  <path class="plain-line" d="M126 685 L96 685 L96 915 L132 915"/>
+  <path class="line" d="M132 915 L133 915"/>
+  <text class="small" x="110" y="678" text-anchor="middle">否</text>
+
+  <!-- location yes -->
+  <path class="line" d="M190 710 L190 738"/>
+  <text class="small" x="206" y="732">是</text>
+  <rect class="node" x="124" y="740" width="132" height="36" rx="13"/>
+  <text class="text" x="190" y="762" text-anchor="middle">获取当前位置</text>
+  <path class="line" d="M190 776 L190 798"/>
+
+  <path class="node" d="M190 800 L252 825 L190 850 L128 825 Z"/>
+  <text class="text" x="190" y="829" text-anchor="middle">是否在签到范围内?</text>
+
+  <!-- location fail -->
+  <path class="plain-line" d="M252 825 L305 825 L305 878"/>
+  <path class="line" d="M305 878 L305 880"/>
+  <text class="small" x="278" y="818" text-anchor="middle">否</text>
+  <rect class="node" x="251" y="882" width="108" height="44" rx="13"/>
+  <text class="text" x="305" y="900" text-anchor="middle">签到失败</text>
+  <text class="text" x="305" y="916" text-anchor="middle">并提示原因</text>
+  <path class="plain-line" d="M305 926 L305 1195 L252 1195"/>
+  <path class="line" d="M252 1195 L251 1195"/>
+
+  <!-- location pass -->
+  <path class="line" d="M190 850 L190 888"/>
+  <text class="small" x="206" y="872">是</text>
+
+  <!-- duplicate check -->
+  <rect class="node" x="90" y="890" width="200" height="36" rx="13"/>
+  <text class="text" x="190" y="912" text-anchor="middle">系统校验是否重复签到</text>
+  <path class="line" d="M190 926 L190 948"/>
+
+  <path class="node" d="M190 950 L244 975 L190 1000 L136 975 Z"/>
+  <text class="text" x="190" y="979" text-anchor="middle">是否已签到?</text>
+
+  <!-- duplicate yes -->
+  <path class="plain-line" d="M244 975 L306 975 L306 1028"/>
+  <path class="line" d="M306 1028 L306 1030"/>
+  <text class="small" x="276" y="968" text-anchor="middle">是</text>
+  <rect class="node" x="250" y="1032" width="112" height="36" rx="13"/>
+  <text class="text" x="306" y="1054" text-anchor="middle">提示已完成签到</text>
+  <path class="plain-line" d="M306 1068 L306 1440 L260 1440"/>
+  <path class="line" d="M260 1440 L259 1440"/>
+
+  <!-- duplicate no -->
+  <path class="line" d="M190 1000 L190 1028"/>
+  <text class="small" x="206" y="1020">否</text>
+  <rect class="node" x="96" y="1030" width="188" height="36" rx="13"/>
+  <text class="text" x="190" y="1052" text-anchor="middle">系统判定正常或迟到</text>
+  <path class="line" d="M190 1066 L190 1088"/>
+
+  <rect class="node" x="89" y="1090" width="202" height="36" rx="13"/>
+  <text class="text" x="190" y="1112" text-anchor="middle">保存签到时间和状态</text>
+  <path class="line" d="M190 1126 L190 1168"/>
+
+  <!-- makeup decision -->
+  <path class="node" d="M190 1170 L252 1195 L190 1220 L128 1195 Z"/>
+  <text class="text" x="190" y="1199" text-anchor="middle">是否需要补签?</text>
+
+  <!-- no makeup -->
+  <path class="plain-line" d="M128 1195 L92 1195 L92 1440 L120 1440"/>
+  <path class="line" d="M120 1440 L121 1440"/>
+  <text class="small" x="112" y="1188" text-anchor="middle">否</text>
+
+  <!-- makeup yes -->
+  <path class="line" d="M190 1220 L190 1248"/>
+  <text class="small" x="205" y="1242">是</text>
+  <rect class="node" x="101" y="1250" width="178" height="36" rx="13"/>
+  <text class="text" x="190" y="1272" text-anchor="middle">学生提交补签申请</text>
+  <path class="line" d="M190 1286 L190 1308"/>
+
+  <rect class="node" x="72" y="1310" width="236" height="36" rx="13"/>
+  <text class="text" x="190" y="1332" text-anchor="middle">教师/管理员查看待审核申请</text>
+  <path class="line" d="M190 1346 L190 1368"/>
+
+  <path class="node" d="M190 1370 L250 1395 L190 1420 L130 1395 Z"/>
+  <text class="text" x="190" y="1399" text-anchor="middle">审核是否通过?</text>
+
+  <!-- audit yes -->
+  <path class="plain-line" d="M130 1395 L72 1395 L72 1488"/>
+  <path class="line" d="M72 1488 L72 1490"/>
+  <text class="small" x="101" y="1388" text-anchor="middle">是</text>
+  <rect class="node" x="18" y="1492" width="108" height="44" rx="13"/>
+  <text class="text" x="72" y="1510" text-anchor="middle">考勤记录状态</text>
+  <text class="text" x="72" y="1526" text-anchor="middle">改为补签</text>
+  <path class="plain-line" d="M72 1536 L72 1572 L190 1572"/>
+
+  <!-- audit no -->
+  <path class="plain-line" d="M250 1395 L306 1395 L306 1488"/>
+  <path class="line" d="M306 1488 L306 1490"/>
+  <text class="small" x="279" y="1388" text-anchor="middle">否</text>
+  <rect class="node" x="248" y="1492" width="116" height="44" rx="13"/>
+  <text class="text" x="306" y="1510" text-anchor="middle">补签申请驳回</text>
+  <text class="text" x="306" y="1526" text-anchor="middle">记录保持原状态</text>
+  <path class="plain-line" d="M306 1536 L306 1572 L190 1572"/>
+
+  <!-- final shared flow -->
+  <path class="line" d="M190 1572 L190 1588"/>
+  <rect class="node" x="101" y="1590" width="178" height="36" rx="13"/>
+  <text class="text" x="190" y="1612" text-anchor="middle">学生查看本人考勤记录</text>
+  <path class="line" d="M190 1626 L190 1648"/>
+
+  <rect class="node" x="82" y="1650" width="216" height="36" rx="13"/>
+  <text class="text" x="190" y="1672" text-anchor="middle">教师/管理员查询考勤记录</text>
+  <path class="line" d="M190 1686 L190 1708"/>
+
+  <rect class="node" x="101" y="1710" width="178" height="36" rx="13"/>
+  <text class="text" x="190" y="1732" text-anchor="middle">系统生成考勤统计</text>
+  <path class="line" d="M190 1746 L190 1760"/>
+
+  <rect class="node" x="81" y="1762" width="218" height="36" rx="13"/>
+  <text class="text" x="190" y="1784" text-anchor="middle">教师/管理员导出考勤报表</text>
+  <path class="line" d="M190 1798 L190 1827"/>
+
+  <circle class="end-ring" cx="190" cy="1842" r="11"/>
+  <circle class="dot" cx="190" cy="1842" r="7"/>
+</svg>

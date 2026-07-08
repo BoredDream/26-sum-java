@@ -36,9 +36,11 @@ public class DocumentController {
                                             @RequestParam String documentName,
                                             @RequestParam String documentType,
                                             @RequestParam String projectStage,
-                                            @RequestPart MultipartFile file) {
+                                            @RequestPart MultipartFile file,
+                                            @RequestParam(required = false) Long stageId,
+                                            @RequestParam(required = false) String remark) {
         CurrentUser user = SelectionSessionUtil.currentUser(session);
-        return Result.success(documentService.upload(user.relatedId(), user.role(), teamId, documentName, documentType, projectStage, file));
+        return Result.success(documentService.upload(user.relatedId(), user.role(), teamId, documentName, documentType, projectStage, file, stageId, remark));
     }
 
     @GetMapping

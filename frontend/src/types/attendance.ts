@@ -17,6 +17,11 @@ export interface AttendanceTaskVO {
   teacherName: string
   signedCount?: number
   totalCount?: number
+  requireLocation?: number
+  locationLng?: number
+  locationLat?: number
+  locationRadius?: number
+  locationName?: string
   createTime: string
 }
 
@@ -33,6 +38,11 @@ export interface AttendanceTaskCreateDTO {
   startTime: string
   endTime: string
   description?: string
+  requireLocation?: number
+  locationLng?: number
+  locationLat?: number
+  locationRadius?: number
+  locationName?: string
 }
 
 export interface AttendanceTaskUpdateDTO {
@@ -69,6 +79,8 @@ export interface AttendanceRecordVO {
 export interface AttendanceSignDTO {
   taskId: number
   remark?: string
+  signLng?: number
+  signLat?: number
 }
 
 export interface AttendanceRecordQuery extends PageQuery {

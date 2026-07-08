@@ -24,36 +24,50 @@
       </el-form-item>
     </el-form>
 
-    <el-empty v-if="!loading && scores.length === 0 && !error" description="暂无成绩记录" />
+    <el-empty v-if="!loading && scores.length === 0 && !error" description="暂无可管理团队" />
 
     <el-table v-loading="loading" :data="scores" border class="data-table">
       <el-table-column prop="teamName" label="团队名称" show-overflow-tooltip />
+      <el-table-column prop="topicName" label="选题" min-width="180" show-overflow-tooltip>
+        <template #default="scope">{{ (scope.row as ScoreVO).topicName || '-' }}</template>
+      </el-table-column>
       <el-table-column prop="teacherName" label="评分教师" width="120" />
+      <el-table-column label="过程评价" width="190">
+        <template #default="scope">
+          <div class="process-cell">
+            <span>{{ stageProgressText(scope.row as ScoreVO) }}</span>
+            <span>加权 {{ formatScore((scope.row as ScoreVO).processScore) }}</span>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column label="文档成绩" width="110">
-        <template #default="scope">{{ (scope.row as ScoreVO).docScore }}</template>
+        <template #default="scope">{{ formatScore((scope.row as ScoreVO).docScore) }}</template>
       </el-table-column>
       <el-table-column label="考勤成绩" width="110">
-        <template #default="scope">{{ (scope.row as ScoreVO).attendanceScore }}</template>
+        <template #default="scope">{{ formatScore((scope.row as ScoreVO).attendanceScore) }}</template>
       </el-table-column>
       <el-table-column label="系统实现" width="110">
-        <template #default="scope">{{ (scope.row as ScoreVO).systemScore }}</template>
+        <template #default="scope">{{ formatScore((scope.row as ScoreVO).systemScore) }}</template>
       </el-table-column>
       <el-table-column label="答辩成绩" width="110">
-        <template #default="scope">{{ (scope.row as ScoreVO).defenseScore }}</template>
+        <template #default="scope">{{ formatScore((scope.row as ScoreVO).defenseScore) }}</template>
       </el-table-column>
       <el-table-column label="总分" width="110">
         <template #default="scope">
-          <strong>{{ (scope.row as ScoreVO).totalScore }}</strong>
+          <strong>{{ formatScore((scope.row as ScoreVO).totalScore) }}</strong>
         </template>
       </el-table-column>
       <el-table-column label="状态" width="120">
         <template #default="scope">
-          <status-tag category="score" :value="(scope.row as ScoreVO).status" />
+          <el-tag v-if="!(scope.row as ScoreVO).scoreId" type="info" effect="plain" size="small">
+            未生成
+          </el-tag>
+          <status-tag v-else category="score" :value="(scope.row as ScoreVO).status" />
         </template>
       </el-table-column>
       <el-table-column label="更新时间" width="170">
         <template #default="scope">{{
-          formatDateTime((scope.row as ScoreVO).updateTime)
+          (scope.row as ScoreVO).updateTime ? formatDateTime((scope.row as ScoreVO).updateTime) : '-'
         }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" fixed="right">
@@ -65,7 +79,7 @@
             >编辑</el-button
           >
           <el-button
-            v-if="(scope.row as ScoreVO).status !== 2"
+            v-if="(scope.row as ScoreVO).scoreId && (scope.row as ScoreVO).status !== 2"
             type="success"
             text
             size="small"
@@ -95,24 +109,37 @@
       <template v-if="currentScore">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="团队名称">{{ currentScore.teamName }}</el-descriptions-item>
+          <el-descriptions-item label="选题">{{ currentScore.topicName || '-' }}</el-descriptions-item>
           <el-descriptions-item label="评分教师">{{
             currentScore.teacherName
           }}</el-descriptions-item>
-          <el-descriptions-item label="文档成绩">{{ currentScore.docScore }}</el-descriptions-item>
+          <el-descriptions-item label="过程评价">{{
+            stageProgressText(currentScore)
+          }}</el-descriptions-item>
+          <el-descriptions-item label="过程加权得分">{{
+            formatScore(currentScore.processScore)
+          }}</el-descriptions-item>
+          <el-descriptions-item label="过程建议分">{{
+            processSuggestionText(currentScore)
+          }}</el-descriptions-item>
+          <el-descriptions-item label="文档成绩">{{
+            formatScore(currentScore.docScore)
+          }}</el-descriptions-item>
           <el-descriptions-item label="考勤成绩">{{
-            currentScore.attendanceScore
+            formatScore(currentScore.attendanceScore)
           }}</el-descriptions-item>
           <el-descriptions-item label="系统实现与测试">{{
-            currentScore.systemScore
+            formatScore(currentScore.systemScore)
           }}</el-descriptions-item>
           <el-descriptions-item label="答辩成绩">{{
-            currentScore.defenseScore
+            formatScore(currentScore.defenseScore)
           }}</el-descriptions-item>
           <el-descriptions-item label="总分">
-            <strong>{{ currentScore.totalScore }}</strong>
+            <strong>{{ formatScore(currentScore.totalScore) }}</strong>
           </el-descriptions-item>
           <el-descriptions-item label="状态">
-            <status-tag category="score" :value="currentScore.status" />
+            <el-tag v-if="!currentScore.scoreId" type="info" effect="plain" size="small">未生成</el-tag>
+            <status-tag v-else category="score" :value="currentScore.status" />
           </el-descriptions-item>
         </el-descriptions>
         <div v-if="currentScore.teacherComment" class="comment-block">
@@ -120,7 +147,10 @@
           <div class="comment-content">{{ currentScore.teacherComment }}</div>
         </div>
         <h4 class="section-title">个人成绩</h4>
-        <el-empty v-if="currentScore.studentScores.length === 0" description="暂无个人成绩明细" />
+        <el-empty
+          v-if="!currentScore.scoreId || currentScore.studentScores.length === 0"
+          description="保存团队成绩后生成个人成绩明细"
+        />
         <el-table v-else :data="currentScore.studentScores" border>
           <el-table-column prop="studentName" label="姓名" width="120" />
           <el-table-column prop="studentNo" label="学号" width="140" />
@@ -133,7 +163,7 @@
     </el-dialog>
 
     <!-- 编辑成绩 -->
-    <el-dialog v-model="formVisible" title="编辑成绩" width="700px">
+    <el-dialog v-model="formVisible" title="编辑成绩" width="760px">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="团队" prop="teamId">
           <el-select v-model="form.teamId" placeholder="请选择团队" style="width: 100%" disabled>
@@ -145,41 +175,71 @@
             />
           </el-select>
         </el-form-item>
+        <div v-if="currentEditingScore" class="process-summary">
+          <div class="summary-grid">
+            <div>
+              <span class="summary-label">过程评价</span>
+              <strong>{{ stageProgressText(currentEditingScore) }}</strong>
+            </div>
+            <div>
+              <span class="summary-label">过程加权</span>
+              <strong>{{ formatScore(currentEditingScore.processScore) }}</strong>
+            </div>
+            <div>
+              <span class="summary-label">建议文档</span>
+              <strong>{{ formatScore(currentEditingScore.suggestedDocScore) }} / 15</strong>
+            </div>
+            <div>
+              <span class="summary-label">建议系统</span>
+              <strong>{{ formatScore(currentEditingScore.suggestedSystemScore) }} / 50</strong>
+            </div>
+          </div>
+          <el-button size="small" type="primary" plain @click="syncProcessScores">
+            同步过程评价分
+          </el-button>
+        </div>
         <el-form-item label="文档编写成绩" prop="docScore">
           <el-input-number
             v-model="form.docScore"
             :min="0"
-            :max="100"
+            :max="15"
             :precision="2"
             style="width: 200px"
           />
+          <span class="form-tip">/ 15</span>
         </el-form-item>
         <el-form-item label="考勤成绩" prop="attendanceScore">
           <el-input-number
             v-model="form.attendanceScore"
             :min="0"
-            :max="100"
+            :max="15"
             :precision="2"
             style="width: 200px"
           />
+          <span class="form-tip">/ 15</span>
         </el-form-item>
         <el-form-item label="系统实现与测试" prop="systemScore">
           <el-input-number
             v-model="form.systemScore"
             :min="0"
-            :max="100"
+            :max="50"
             :precision="2"
             style="width: 200px"
           />
+          <span class="form-tip">/ 50</span>
         </el-form-item>
         <el-form-item label="答辩成绩" prop="defenseScore">
           <el-input-number
             v-model="form.defenseScore"
             :min="0"
-            :max="100"
+            :max="20"
             :precision="2"
             style="width: 200px"
           />
+          <span class="form-tip">/ 20</span>
+        </el-form-item>
+        <el-form-item label="当前总分">
+          <strong>{{ formatScore(formTotal) }}</strong>
         </el-form-item>
         <el-form-item label="教师总评">
           <el-input
@@ -226,7 +286,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as scoreApi from '@/api/score'
@@ -261,6 +321,27 @@ const queryForm = reactive({
   status: undefined as number | undefined,
   keyword: '',
 })
+
+function formatScore(value?: number | null) {
+  if (value === undefined || value === null || Number.isNaN(Number(value))) {
+    return '0.00'
+  }
+  return Number(value).toFixed(2)
+}
+
+function stageProgressText(score: Pick<ScoreVO, 'evaluatedStageCount' | 'totalStageCount' | 'evaluatedStageWeight' | 'totalStageWeight'>) {
+  const evaluatedCount = score.evaluatedStageCount ?? 0
+  const totalCount = score.totalStageCount ?? 0
+  const evaluatedWeight = score.evaluatedStageWeight ?? 0
+  const totalWeight = score.totalStageWeight ?? 0
+  return `${evaluatedCount}/${totalCount} 阶段，权重 ${formatScore(evaluatedWeight)}/${formatScore(totalWeight)}`
+}
+
+function processSuggestionText(score: ScoreVO) {
+  return `文档 ${formatScore(score.suggestedDocScore)} / 15，系统 ${formatScore(
+    score.suggestedSystemScore
+  )} / 50`
+}
 
 async function loadScores() {
   loading.value = true
@@ -301,17 +382,21 @@ const currentScore = ref<(ScoreVO & { studentScores: StudentScoreVO[] }) | null>
 async function openDetail(row: ScoreVO) {
   detailVisible.value = true
   currentScore.value = { ...row, studentScores: [] }
+  if (!row.scoreId) {
+    return
+  }
+  const scoreId = row.scoreId
   try {
     const team = await selectionApi.getTeam(row.teamId)
     const members = team.members ?? []
     const studentScores = await Promise.all(
       members.map((m: TeamMemberVO) =>
         scoreApi.queryStudentScore(m.studentId).then((list) => {
-          const matched = list.find((item) => item.scoreId === row.scoreId)
+          const matched = list.find((item) => item.scoreId === scoreId)
           return (
             matched || {
               studentScoreId: 0,
-              scoreId: row.scoreId,
+              scoreId,
               teamId: row.teamId,
               studentId: m.studentId,
               studentName: `学生${m.studentId}`,
@@ -350,6 +435,7 @@ async function loadTeamOptions() {
 const formVisible = ref(false)
 const submitting = ref(false)
 const formRef = ref<FormInstance>()
+const currentEditingScore = ref<ScoreVO | null>(null)
 const form = reactive<ScoreSaveDTO & { studentScores: StudentScoreFormItem[] }>({
   teamId: undefined as unknown as number,
   docScore: 0,
@@ -359,6 +445,14 @@ const form = reactive<ScoreSaveDTO & { studentScores: StudentScoreFormItem[] }>(
   teacherComment: '',
   studentScores: [],
 })
+
+const formTotal = computed(
+  () =>
+    Number(form.docScore || 0) +
+    Number(form.attendanceScore || 0) +
+    Number(form.systemScore || 0) +
+    Number(form.defenseScore || 0)
+)
 
 const rules: FormRules = {
   teamId: [{ required: true, message: '请选择团队', trigger: 'change' }],
@@ -370,6 +464,7 @@ const rules: FormRules = {
 
 async function openEdit(row: ScoreVO) {
   await loadTeamOptions()
+  currentEditingScore.value = row
   form.teamId = row.teamId
   form.docScore = row.docScore
   form.attendanceScore = row.attendanceScore
@@ -381,13 +476,16 @@ async function openEdit(row: ScoreVO) {
   try {
     const team: TeamVO = await selectionApi.getTeam(row.teamId)
     const members = team.members ?? []
-    const existingScores = await Promise.all(
-      members.map((m: TeamMemberVO) =>
-        scoreApi
-          .queryStudentScore(m.studentId)
-          .then((list) => list.find((item) => item.scoreId === row.scoreId))
-      )
-    )
+    const scoreId = row.scoreId
+    const existingScores = scoreId
+      ? await Promise.all(
+          members.map((m: TeamMemberVO) =>
+            scoreApi
+              .queryStudentScore(m.studentId)
+              .then((list) => list.find((item) => item.scoreId === scoreId))
+          )
+        )
+      : []
     form.studentScores = members.map((m: TeamMemberVO, index: number) => {
       const existing = existingScores[index]
       return {
@@ -403,6 +501,12 @@ async function openEdit(row: ScoreVO) {
   }
 
   formVisible.value = true
+}
+
+function syncProcessScores() {
+  if (!currentEditingScore.value) return
+  form.docScore = Number(currentEditingScore.value.suggestedDocScore ?? 0)
+  form.systemScore = Number(currentEditingScore.value.suggestedSystemScore ?? 0)
 }
 
 async function handleSubmit() {
@@ -440,6 +544,11 @@ async function handleSubmit() {
 
 const confirmingId = ref(0)
 async function handleConfirm(row: ScoreVO) {
+  if (!row.scoreId) {
+    ElMessage.warning('请先保存团队成绩，再进行确认')
+    return
+  }
+  const scoreId = row.scoreId
   try {
     await ElMessageBox.confirm('确认后成绩将变为已确认状态，是否继续？', '确认成绩', {
       type: 'warning',
@@ -447,9 +556,9 @@ async function handleConfirm(row: ScoreVO) {
   } catch {
     return
   }
-  confirmingId.value = row.scoreId
+  confirmingId.value = scoreId
   try {
-    await scoreApi.confirmScore(row.scoreId)
+    await scoreApi.confirmScore(scoreId)
     ElMessage.success('成绩已确认')
     loadScores()
   } catch (err: any) {
@@ -477,6 +586,13 @@ onMounted(() => {
 
   .data-table {
     margin-top: 8px;
+  }
+
+  .process-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.35;
   }
 
   .pagination-wrapper {
@@ -509,6 +625,41 @@ onMounted(() => {
     font-size: 16px;
     font-weight: 600;
     color: #303133;
+  }
+
+  .process-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 16px 120px;
+    padding: 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    background: #f8fafc;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(100px, 1fr));
+    gap: 12px;
+    flex: 1;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  .summary-label,
+  .form-tip {
+    color: #909399;
+    font-size: 13px;
+  }
+
+  .form-tip {
+    margin-left: 8px;
   }
 }
 </style>

@@ -134,13 +134,6 @@
             show-word-limit
           />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态" style="width: 100%">
-            <el-option label="未开始" :value="0" />
-            <el-option label="进行中" :value="1" />
-            <el-option label="已结束" :value="2" />
-          </el-select>
-        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="formVisible = false">取消</el-button>
@@ -212,7 +205,6 @@ const form = reactive<StageTaskCreateDTO>({
   deliverables: '',
   scoringCriteria: '',
   weight: 0,
-  status: 0,
 })
 
 const rules: FormRules = {
@@ -249,7 +241,6 @@ function resetForm() {
   form.deliverables = ''
   form.scoringCriteria = ''
   form.weight = 0
-  form.status = 0
 }
 
 function openCreate() {

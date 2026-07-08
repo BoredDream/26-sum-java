@@ -12,6 +12,9 @@ public class AttendanceSignDTO {
 
     private String remark;
 
+    private Double signLng;
+    private Double signLat;
+
     public Long getTaskId() {
         return taskId;
     }
@@ -26,5 +29,21 @@ public class AttendanceSignDTO {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Double getSignLng() {
+        return signLng;
+    }
+
+    public void setSignLng(Double signLng) {
+        this.signLng = signLng;
+    }
+
+    public Double getSignLat() {
+        return signLat;
+    }
+
+    public void setSignLat(Double signLat) {
+        this.signLat = signLat;
     }
 }

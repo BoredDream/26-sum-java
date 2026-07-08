@@ -12,6 +12,7 @@ import com.training.system.attendance.mapper.AttendanceTaskMapper;
 import com.training.system.attendance.service.AttendanceRecordService;
 import com.training.system.attendance.utils.ScopeValidator;
 import com.training.system.attendance.vo.AttendanceRecordVO;
+import com.training.system.common.DistanceUtils;
 import com.training.system.common.PageResult;
 import com.training.system.common.ResultCode;
 import com.training.system.exception.BusinessException;
@@ -67,6 +68,27 @@ public class AttendanceRecordServiceImpl implements AttendanceRecordService {
         LocalDateTime now = LocalDateTime.now();
         if (now.isBefore(task.getStartTime()) || now.isAfter(task.getEndTime())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "当前不在签到时间内，请在规定时间内签到");
+        }
+
+        // 定位签到校验
+        if (task.getRequireLocation() != null && task.getRequireLocation() == 1) {
+            if (dto.getSignLng() == null || dto.getSignLat() == null) {
+                throw new BusinessException(ResultCode.BAD_REQUEST, "本次签到需要定位，请开启位置权限后重试");
+            }
+            if (task.getLocationLng() == null || task.getLocationLat() == null) {
+                throw new BusinessException(ResultCode.ERROR, "签到任务定位信息不完整，请联系教师");
+            }
+            double distance = DistanceUtils.haversine(
+                    task.getLocationLat().doubleValue(), task.getLocationLng().doubleValue(),
+                    dto.getSignLat(), dto.getSignLng()
+            );
+            int radius = task.getLocationRadius() != null ? task.getLocationRadius() : 500;
+            if (distance > radius) {
+                double distanceToEdge = distance - radius;
+                throw new BusinessException(ResultCode.BAD_REQUEST,
+                        String.format("您距离签到范围边缘还有约 %.0f 米（距中心 %.0f 米，允许半径 %d 米），请在指定地点签到",
+                                distanceToEdge, distance, radius));
+            }
         }
 
         AttendanceRecord record = attendanceRecordMapper.selectByTaskAndStudent(dto.getTaskId(), studentId);

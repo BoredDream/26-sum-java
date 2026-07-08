@@ -32,9 +32,15 @@
           {{ (scope.row as ProgressVO).totalStageCount }}
         </template>
       </el-table-column>
-      <el-table-column label="平均阶段得分" width="140">
+      <el-table-column label="权重完成" width="150">
         <template #default="scope">
-          {{ (scope.row as ProgressVO).averageStageScore ?? '-' }}
+          {{ formatScore((scope.row as ProgressVO).evaluatedStageWeight) }} /
+          {{ formatScore((scope.row as ProgressVO).totalStageWeight) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="加权过程得分" width="140">
+        <template #default="scope">
+          {{ formatScore((scope.row as ProgressVO).weightedStageScore) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="160" fixed="right">
@@ -153,6 +159,13 @@ const stageTaskOptions = ref<StageTaskVO[]>([])
 const queryForm = reactive({
   teamId: '',
 })
+
+function formatScore(value?: number | null) {
+  if (value === undefined || value === null || Number.isNaN(Number(value))) {
+    return '0.00'
+  }
+  return Number(value).toFixed(2)
+}
 
 async function loadProgress() {
   loading.value = true

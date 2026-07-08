@@ -56,7 +56,7 @@ public class DocumentService {
 
     @Transactional(rollbackFor = Exception.class)
     public ProcessDocumentVO upload(Long userId, String role, Long teamId, String documentName, String documentType,
-                                    String projectStage, MultipartFile file) {
+                                    String projectStage, MultipartFile file, Long stageId, String remark) {
         teamService.requireStudent(role);
         if (isBlank(documentName) || isBlank(documentType) || isBlank(projectStage)) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "文档名称、文档类型和所属阶段不能为空");
@@ -98,6 +98,8 @@ public class DocumentService {
         document.setFileSize(file.getSize());
         document.setUploaderId(userId);
         document.setStatus(DOCUMENT_SUBMITTED);
+        document.setStageId(stageId);
+        document.setRemark(remark);
         document.setUploadTime(LocalDateTime.now());
         documentMapper.insert(document);
         return toVO(document);
@@ -186,6 +188,8 @@ public class DocumentService {
         vo.setStatus(entity.getStatus());
         vo.setTeacherFeedback(entity.getTeacherFeedback());
         vo.setFeedbackTeacherId(entity.getFeedbackTeacherId());
+        vo.setStageId(entity.getStageId());
+        vo.setRemark(entity.getRemark());
         vo.setUploadTime(entity.getUploadTime());
         vo.setFeedbackTime(entity.getFeedbackTime());
         return vo;

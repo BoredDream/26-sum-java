@@ -17,13 +17,23 @@ public class SessionUtil {
         if (session == null) {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "未登录");
         }
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = toLong(session.getAttribute("userId"));
         String role = (String) session.getAttribute("role");
-        Long relatedId = (Long) session.getAttribute("relatedId");
+        Long relatedId = toLong(session.getAttribute("relatedId"));
         if (userId == null || role == null || relatedId == null) {
             throw new BusinessException(ResultCode.UNAUTHORIZED, "未登录");
         }
         return new CurrentUserDTO(userId, role, relatedId);
+    }
+
+    private static Long toLong(Object value) {
+        if (value instanceof Long) {
+            return (Long) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        return null;
     }
 
     public static void requireRole(CurrentUserDTO user, String... roles) {

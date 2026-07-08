@@ -163,6 +163,37 @@
             show-word-limit
           />
         </el-form-item>
+        <el-divider />
+        <el-form-item label="定位签到">
+          <el-switch
+            v-model="locationEnabled"
+            active-text="开启定位签到"
+            @change="onLocationToggle"
+          />
+        </el-form-item>
+        <template v-if="locationEnabled">
+          <el-form-item label="签到半径(米)" prop="locationRadius">
+            <el-input-number
+              v-model="form.locationRadius"
+              :min="50"
+              :max="5000"
+              :step="50"
+              placeholder="默认500米"
+              style="width: 200px"
+            />
+          </el-form-item>
+          <el-form-item label="签到位置" required>
+            <div id="location-map" style="width: 100%; height: 300px; border-radius: 4px"></div>
+            <span class="map-tip">拖拽标记选择签到位置，或点击地图移动标记</span>
+          </el-form-item>
+          <el-form-item label="地点名称">
+            <el-input
+              v-model="form.locationName"
+              placeholder="拖动标记后自动获取"
+              readonly
+            />
+          </el-form-item>
+        </template>
       </el-form>
       <template #footer>
         <el-button @click="formVisible = false">取消</el-button>
@@ -195,6 +226,14 @@
             {{ currentTask.signedCount || 0 }} / {{ currentTask.totalCount || 0 }}
           </el-descriptions-item>
         </el-descriptions>
+        <div v-if="currentTask.requireLocation === 1" class="task-desc">
+          <div class="desc-label">定位签到信息</div>
+          <div class="desc-content">
+            📍 签到地点：{{ currentTask.locationName || '未命名' }}<br />
+            允许半径：{{ currentTask.locationRadius || 500 }} 米<br />
+            中心坐标：{{ currentTask.locationLng }}, {{ currentTask.locationLat }}
+          </div>
+        </div>
         <div v-if="currentTask.description" class="task-desc">
           <div class="desc-label">任务说明</div>
           <div class="desc-content">{{ currentTask.description }}</div>
@@ -229,7 +268,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as attendanceApi from '@/api/attendance'
@@ -240,6 +279,8 @@ import type {
   AttendanceRecordVO,
 } from '@/types/attendance'
 import { formatDateTime } from '@/utils/format'
+
+declare const AMap: any
 
 const loading = ref(false)
 const error = ref('')
@@ -288,7 +329,7 @@ function resetQuery() {
 const formVisible = ref(false)
 const submitting = ref(false)
 const formRef = ref<FormInstance>()
-const form = reactive<AttendanceTaskCreateDTO>({
+const form = reactive<AttendanceTaskCreateDTO & { locationRadius?: number }>({
   taskTitle: '',
   taskType: 1,
   scopeType: 3,
@@ -296,6 +337,11 @@ const form = reactive<AttendanceTaskCreateDTO>({
   startTime: '',
   endTime: '',
   description: '',
+  requireLocation: 0,
+  locationLng: undefined,
+  locationLat: undefined,
+  locationRadius: 500,
+  locationName: '',
 })
 
 const rules: FormRules = {
@@ -338,6 +384,121 @@ const rules: FormRules = {
   ],
 }
 
+// 定位签到
+const locationEnabled = ref(false)
+let mapInstance: any = null
+let locationMarker: any = null
+let locationCircle: any = null
+let geocoder: any = null
+
+function onLocationToggle(value: string | number | boolean) {
+  const enabled = Boolean(value)
+  if (enabled) {
+    form.requireLocation = 1
+    form.locationRadius = form.locationRadius || 500
+    nextTick(() => initMap())
+  } else {
+    form.requireLocation = 0
+    form.locationLng = undefined
+    form.locationLat = undefined
+    form.locationName = ''
+    destroyMap()
+  }
+}
+
+function initMap() {
+  const container = document.getElementById('location-map')
+  if (!container || mapInstance) return
+
+  mapInstance = new AMap.Map('location-map', {
+    zoom: 15,
+    center: [116.397428, 39.90923],
+    resizeEnable: true,
+  })
+
+  geocoder = new AMap.Geocoder({ map: mapInstance })
+
+  AMap.plugin('AMap.Geolocation', () => {
+    const geo = new AMap.Geolocation({
+      enableHighAccuracy: true,
+      timeout: 5000,
+    })
+    geo.getCurrentPosition((status: string, result: any) => {
+      if (status === 'complete' && result.position) {
+        const pos = [result.position.lng, result.position.lat]
+        mapInstance.setCenter(pos)
+        setMarker(pos[0], pos[1])
+      } else {
+        const center = mapInstance.getCenter()
+        setMarker(center.lng, center.lat)
+      }
+    })
+  })
+
+  mapInstance.on('click', (e: any) => {
+    setMarker(e.lnglat.lng, e.lnglat.lat)
+  })
+}
+
+function setMarker(lng: number, lat: number) {
+  if (locationMarker) {
+    locationMarker.setPosition([lng, lat])
+  } else {
+    locationMarker = new AMap.Marker({
+      position: [lng, lat],
+      draggable: true,
+      map: mapInstance,
+    })
+    locationMarker.on('dragend', () => {
+      const pos = locationMarker.getPosition()
+      updateLocation(pos.lng, pos.lat)
+    })
+  }
+  if (locationCircle) {
+    locationCircle.setCenter([lng, lat])
+  } else {
+    locationCircle = new AMap.Circle({
+      center: [lng, lat],
+      radius: (form.locationRadius || 500),
+      strokeColor: '#1890ff',
+      strokeWeight: 2,
+      strokeOpacity: 0.5,
+      fillColor: '#1890ff',
+      fillOpacity: 0.15,
+      map: mapInstance,
+    })
+  }
+  updateLocation(lng, lat)
+}
+
+function updateLocation(lng: number, lat: number) {
+  form.locationLng = Math.round(lng * 1e7) / 1e7
+  form.locationLat = Math.round(lat * 1e7) / 1e7
+  if (geocoder) {
+    geocoder.getAddress([lng, lat], (status: string, result: any) => {
+      if (status === 'complete' && result.regeocode) {
+        form.locationName = result.regeocode.formattedAddress || ''
+      }
+    })
+  }
+}
+
+function destroyMap() {
+  if (mapInstance) {
+    mapInstance.destroy()
+    mapInstance = null
+    locationMarker = null
+    locationCircle = null
+    geocoder = null
+  }
+}
+
+watch(() => form.locationRadius, (newRadius) => {
+  if (locationCircle && newRadius) {
+    locationCircle.setRadius(newRadius)
+  }
+})
+
 function asNumber(value: string | number | undefined): number | undefined {
   return typeof value === 'number' ? value : undefined
 }
@@ -350,6 +511,13 @@ function openCreate() {
   form.startTime = ''
   form.endTime = ''
   form.description = ''
+  form.requireLocation = 0
+  form.locationLng = undefined
+  form.locationLat = undefined
+  form.locationRadius = 500
+  form.locationName = ''
+  locationEnabled.value = false
+  destroyMap()
   formVisible.value = true
 }
 
@@ -360,14 +528,26 @@ async function handleSubmit() {
   } catch {
     return
   }
+  if (locationEnabled.value && (form.locationLng == null || form.locationLat == null)) {
+    ElMessage.warning('请先在地图上选择签到位置')
+    return
+  }
   submitting.value = true
   try {
     const payload: AttendanceTaskCreateDTO = {
       ...form,
       scopeValue: form.scopeType === 3 ? undefined : String(form.scopeValue),
     }
+    if (!locationEnabled.value) {
+      delete payload.requireLocation
+      delete payload.locationLng
+      delete payload.locationLat
+      delete payload.locationRadius
+      delete payload.locationName
+    }
     await attendanceApi.createAttendanceTask(payload)
     ElMessage.success('任务发布成功')
+    destroyMap()
     formVisible.value = false
     loadTasks()
   } catch (err: any) {
@@ -434,6 +614,14 @@ async function openDetail(row: AttendanceTaskVO) {
   }
 }
 
+// 关闭对话框时清理地图
+watch(formVisible, (visible) => {
+  if (!visible) {
+    destroyMap()
+    locationEnabled.value = false
+  }
+})
+
 onMounted(loadTasks)
 </script>
 
@@ -481,6 +669,13 @@ onMounted(loadTasks)
     font-size: 16px;
     font-weight: 600;
     color: #303133;
+  }
+
+  .map-tip {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+    display: inline-block;
   }
 
   .action-btns {

@@ -23,6 +23,11 @@ public class AttendanceTaskVO {
     private String teacherName;
     private Integer signedCount;
     private Integer totalCount;
+    private Integer requireLocation;
+    private java.math.BigDecimal locationLng;
+    private java.math.BigDecimal locationLat;
+    private Integer locationRadius;
+    private String locationName;
     private LocalDateTime createTime;
 
     public Long getTaskId() {
@@ -151,6 +156,46 @@ public class AttendanceTaskVO {
 
     public void setTotalCount(Integer totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public Integer getRequireLocation() {
+        return requireLocation;
+    }
+
+    public void setRequireLocation(Integer requireLocation) {
+        this.requireLocation = requireLocation;
+    }
+
+    public java.math.BigDecimal getLocationLng() {
+        return locationLng;
+    }
+
+    public void setLocationLng(java.math.BigDecimal locationLng) {
+        this.locationLng = locationLng;
+    }
+
+    public java.math.BigDecimal getLocationLat() {
+        return locationLat;
+    }
+
+    public void setLocationLat(java.math.BigDecimal locationLat) {
+        this.locationLat = locationLat;
+    }
+
+    public Integer getLocationRadius() {
+        return locationRadius;
+    }
+
+    public void setLocationRadius(Integer locationRadius) {
+        this.locationRadius = locationRadius;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
     public LocalDateTime getCreateTime() {

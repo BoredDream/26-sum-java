@@ -199,9 +199,13 @@ const applyVisible = ref(false)
 const submitting = ref(false)
 const applyFormRef = ref<FormInstance>()
 const applyTopic = ref<TopicListVO | null>(null)
-const applyForm = ref({
+const applyForm = ref<{
+  topicId: number
+  teamId?: number
+  selectionReason: string
+}>({
   topicId: 0,
-  teamId: 0,
+  teamId: undefined,
   selectionReason: '',
 })
 
@@ -226,14 +230,21 @@ async function openDetail(topic: TopicListVO) {
 
 async function openApply(topic: TopicListVO) {
   applyTopic.value = topic
-  applyForm.value = { topicId: topic.topicId, teamId: 0, selectionReason: '' }
+  applyForm.value = { topicId: topic.topicId, teamId: undefined, selectionReason: '' }
   applyVisible.value = true
   // 加载用户团队列表
   myTeamsLoading.value = true
   try {
     myTeams.value = await selectionApi.getMyTeams()
-  } catch {
+    if (myTeams.value.length === 1) {
+      applyForm.value.teamId = myTeams.value[0].id
+    }
+    if (myTeams.value.length === 0) {
+      ElMessage.warning('请先创建或加入团队，再申请选题')
+    }
+  } catch (err: any) {
     myTeams.value = []
+    ElMessage.error(err?.message || '加载团队列表失败')
   } finally {
     myTeamsLoading.value = false
   }
@@ -246,6 +257,10 @@ async function handleApply() {
   } catch {
     return
   }
+  if (applyForm.value.teamId == null) {
+    ElMessage.warning('请选择申请团队')
+    return
+  }
   try {
     await ElMessageBox.confirm('确认提交该选题申请？', '提交确认', { type: 'warning' })
   } catch {
@@ -253,11 +268,15 @@ async function handleApply() {
   }
   submitting.value = true
   try {
-    await selectionApi.submitSelection(applyForm.value)
+    await selectionApi.submitSelection({
+      topicId: applyForm.value.topicId,
+      teamId: applyForm.value.teamId,
+      selectionReason: applyForm.value.selectionReason,
+    })
     ElMessage.success('申请已提交')
     applyVisible.value = false
-  } catch {
-    // 全局请求拦截器已显示错误提示，这里只需阻止未处理的 Promise 拒绝
+  } catch (err: any) {
+    ElMessage.error(err?.message || '提交选题申请失败')
   } finally {
     submitting.value = false
   }

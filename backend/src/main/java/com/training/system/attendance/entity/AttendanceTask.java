@@ -1,5 +1,6 @@
 package com.training.system.attendance.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -17,6 +18,11 @@ public class AttendanceTask {
     private Long teacherId;
     private String description;
     private Integer status;
+    private Integer requireLocation;
+    private BigDecimal locationLng;
+    private BigDecimal locationLat;
+    private Integer locationRadius;
+    private String locationName;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 
@@ -98,6 +104,46 @@ public class AttendanceTask {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getRequireLocation() {
+        return requireLocation;
+    }
+
+    public void setRequireLocation(Integer requireLocation) {
+        this.requireLocation = requireLocation;
+    }
+
+    public BigDecimal getLocationLng() {
+        return locationLng;
+    }
+
+    public void setLocationLng(BigDecimal locationLng) {
+        this.locationLng = locationLng;
+    }
+
+    public BigDecimal getLocationLat() {
+        return locationLat;
+    }
+
+    public void setLocationLat(BigDecimal locationLat) {
+        this.locationLat = locationLat;
+    }
+
+    public Integer getLocationRadius() {
+        return locationRadius;
+    }
+
+    public void setLocationRadius(Integer locationRadius) {
+        this.locationRadius = locationRadius;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 
     public LocalDateTime getCreateTime() {

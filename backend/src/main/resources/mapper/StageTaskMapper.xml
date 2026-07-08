@@ -21,7 +21,13 @@
     <select id="selectPage" resultType="com.training.system.score.vo.StageTaskVO">
         SELECT st.stage_id, st.stage_name, st.stage_desc, st.start_time, st.end_time,
                st.deliverables, st.scoring_criteria, st.weight, st.teacher_id,
-               t.teacher_name, st.status, st.create_time
+               t.teacher_name,
+               CASE
+                   WHEN CURRENT_TIMESTAMP &lt; st.start_time THEN 0
+                   WHEN CURRENT_TIMESTAMP &gt; st.end_time THEN 2
+                   ELSE 1
+               END AS status,
+               st.create_time
         FROM stage_task st
         LEFT JOIN teacher t ON st.teacher_id = t.teacher_id
         WHERE 1 = 1
@@ -32,7 +38,11 @@
             AND st.teacher_id = #{teacherId}
         </if>
         <if test="status != null">
-            AND st.status = #{status}
+            AND CASE
+                    WHEN CURRENT_TIMESTAMP &lt; st.start_time THEN 0
+                    WHEN CURRENT_TIMESTAMP &gt; st.end_time THEN 2
+                    ELSE 1
+                END = #{status}
         </if>
         ORDER BY st.create_time DESC
         LIMIT #{offset}, #{limit}
@@ -49,7 +59,11 @@
             AND st.teacher_id = #{teacherId}
         </if>
         <if test="status != null">
-            AND st.status = #{status}
+            AND CASE
+                    WHEN CURRENT_TIMESTAMP &lt; st.start_time THEN 0
+                    WHEN CURRENT_TIMESTAMP &gt; st.end_time THEN 2
+                    ELSE 1
+                END = #{status}
         </if>
     </select>
 

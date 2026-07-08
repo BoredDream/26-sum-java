@@ -14,9 +14,11 @@ import java.util.List;
 public interface AttendanceTaskMapper {
 
     @Insert("INSERT INTO attendance_task(task_title, task_type, scope_type, scope_value, start_time, end_time, " +
-            "teacher_id, description, status, create_time, update_time) " +
+            "teacher_id, description, status, require_location, location_lng, location_lat, location_radius, location_name, " +
+            "create_time, update_time) " +
             "VALUES(#{taskTitle}, #{taskType}, #{scopeType}, #{scopeValue}, #{startTime}, #{endTime}, " +
-            "#{teacherId}, #{description}, #{status}, NOW(), NOW())")
+            "#{teacherId}, #{description}, #{status}, #{requireLocation}, #{locationLng}, #{locationLat}, " +
+            "#{locationRadius}, #{locationName}, NOW(), NOW())")
     @Options(useGeneratedKeys = true, keyProperty = "taskId")
     int insert(AttendanceTask task);
 

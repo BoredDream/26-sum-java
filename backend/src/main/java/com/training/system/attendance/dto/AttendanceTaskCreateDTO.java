@@ -31,6 +31,12 @@ public class AttendanceTaskCreateDTO {
 
     private String description;
 
+    private Integer requireLocation;
+    private Double locationLng;
+    private Double locationLat;
+    private Integer locationRadius;
+    private String locationName;
+
     public String getTaskTitle() {
         return taskTitle;
     }
@@ -85,5 +91,45 @@ public class AttendanceTaskCreateDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getRequireLocation() {
+        return requireLocation;
+    }
+
+    public void setRequireLocation(Integer requireLocation) {
+        this.requireLocation = requireLocation;
+    }
+
+    public Double getLocationLng() {
+        return locationLng;
+    }
+
+    public void setLocationLng(Double locationLng) {
+        this.locationLng = locationLng;
+    }
+
+    public Double getLocationLat() {
+        return locationLat;
+    }
+
+    public void setLocationLat(Double locationLat) {
+        this.locationLat = locationLat;
+    }
+
+    public Integer getLocationRadius() {
+        return locationRadius;
+    }
+
+    public void setLocationRadius(Integer locationRadius) {
+        this.locationRadius = locationRadius;
+    }
+
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
     }
 }

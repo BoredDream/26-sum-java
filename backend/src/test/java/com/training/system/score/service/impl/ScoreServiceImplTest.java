@@ -75,7 +75,7 @@ class ScoreServiceImplTest {
         StageTask saved = stageTaskCaptor.getValue();
         assertEquals("需求分析阶段", saved.getStageName());
         assertEquals(TEACHER_ID, saved.getTeacherId());
-        assertEquals(0, saved.getStatus());
+        assertEquals(1, saved.getStatus());
     }
 
     @Test

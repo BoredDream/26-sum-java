@@ -33,16 +33,22 @@ public class AuthController {
 
     @GetMapping("/me")
     public Result<LoginVO> me(HttpSession session) {
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = toLong(session.getAttribute("userId"));
         if (userId == null) {
             return Result.fail(com.training.system.common.ResultCode.UNAUTHORIZED);
         }
         LoginVO vo = new LoginVO();
         vo.setUserId(userId);
-        vo.setRelatedId((Long) session.getAttribute("relatedId"));
+        vo.setRelatedId(toLong(session.getAttribute("relatedId")));
         vo.setUsername((String) session.getAttribute("username"));
         vo.setRole((String) session.getAttribute("role"));
         vo.setName((String) session.getAttribute("name"));
         return Result.success(vo);
+    }
+
+    private static Long toLong(Object value) {
+        if (value instanceof Long) return (Long) value;
+        if (value instanceof Number) return ((Number) value).longValue();
+        return null;
     }
 }

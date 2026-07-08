@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1520" viewBox="0 0 1000 1520">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#111"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 22px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .label { font: 14px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .small { font: 13px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .module { font: 700 16px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #111; }
+      .usecase text { font: 15px "Microsoft YaHei", "SimHei", Arial, sans-serif; fill: #fff; }
+      .usecase ellipse { fill: #050505; stroke: #050505; stroke-width: 1.2; }
+      .association { stroke: #111; stroke-width: 1.4; fill: none; marker-end: url(#arrow); }
+      .include { stroke: #111; stroke-width: 1.2; stroke-dasharray: 7 7; fill: none; marker-end: url(#arrow); }
+      .boundary { fill: #fff; stroke: #111; stroke-width: 1.4; }
+      .actor-line { stroke: #111; stroke-width: 1.2; fill: none; }
+    ]]></style>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="1520" fill="#fff"/>
+  <text class="title" x="500" y="38" text-anchor="middle">学生考勤模块用例图</text>
+
+  <g>
+    <path d="M85 62 H520 L545 87 V128 H85 Z" fill="#fffbd6" stroke="#111" stroke-width="1"/>
+    <path d="M520 62 V87 H545" fill="none" stroke="#111" stroke-width="1"/>
+    <text class="small" x="105" y="88">考勤任务状态：未开始 -&gt; 进行中 -&gt; 已结束</text>
+    <text class="small" x="105" y="112">考勤结果：缺勤 / 正常 / 迟到 / 补签 / 请假</text>
+  </g>
+
+  <rect class="boundary" x="200" y="145" width="630" height="1265" rx="2"/>
+  <text class="module" x="515" y="177" text-anchor="middle">学生考勤模块</text>
+
+  <g class="actor" transform="translate(70 300)">
+    <circle class="actor-line" cx="0" cy="0" r="10"/>
+    <line class="actor-line" x1="0" y1="10" x2="0" y2="56"/>
+    <line class="actor-line" x1="-24" y1="28" x2="24" y2="28"/>
+    <line class="actor-line" x1="0" y1="56" x2="-24" y2="88"/>
+    <line class="actor-line" x1="0" y1="56" x2="24" y2="88"/>
+    <text class="label" x="0" y="115" text-anchor="middle">学生</text>
+  </g>
+
+  <g class="actor" transform="translate(70 790)">
+    <circle class="actor-line" cx="0" cy="0" r="10"/>
+    <line class="actor-line" x1="0" y1="10" x2="0" y2="56"/>
+    <line class="actor-line" x1="-24" y1="28" x2="24" y2="28"/>
+    <line class="actor-line" x1="0" y1="56" x2="-24" y2="88"/>
+    <line class="actor-line" x1="0" y1="56" x2="24" y2="88"/>
+    <text class="label" x="0" y="115" text-anchor="middle">教师</text>
+  </g>
+
+  <g class="actor" transform="translate(70 1235)">
+    <circle class="actor-line" cx="0" cy="0" r="10"/>
+    <line class="actor-line" x1="0" y1="10" x2="0" y2="56"/>
+    <line class="actor-line" x1="-24" y1="28" x2="24" y2="28"/>
+    <line class="actor-line" x1="0" y1="56" x2="-24" y2="88"/>
+    <line class="actor-line" x1="0" y1="56" x2="24" y2="88"/>
+    <text class="label" x="0" y="115" text-anchor="middle">管理员</text>
+  </g>
+
+  <g class="actor" transform="translate(925 560)">
+    <circle class="actor-line" cx="0" cy="0" r="10"/>
+    <line class="actor-line" x1="0" y1="10" x2="0" y2="56"/>
+    <line class="actor-line" x1="-24" y1="28" x2="24" y2="28"/>
+    <line class="actor-line" x1="0" y1="56" x2="-24" y2="88"/>
+    <line class="actor-line" x1="0" y1="56" x2="24" y2="88"/>
+    <text class="label" x="0" y="115" text-anchor="middle">高德地图</text>
+    <text class="label" x="0" y="136" text-anchor="middle">API服务</text>
+  </g>
+
+  <!-- Student main use cases -->
+  <g class="usecase" transform="translate(320 220)">
+    <ellipse rx="92" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">查看签到任务</text>
+  </g>
+  <g class="usecase" transform="translate(320 330)">
+    <ellipse rx="92" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">在线签到</text>
+  </g>
+  <g class="usecase" transform="translate(320 480)">
+    <ellipse rx="92" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">提交补签申请</text>
+  </g>
+  <g class="usecase" transform="translate(320 590)">
+    <ellipse rx="104" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">查看个人考勤记录</text>
+  </g>
+
+  <!-- Teacher main use cases -->
+  <g class="usecase" transform="translate(320 730)">
+    <ellipse rx="96" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">发布考勤任务</text>
+  </g>
+  <g class="usecase" transform="translate(320 850)">
+    <ellipse rx="96" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">管理签到任务</text>
+  </g>
+  <g class="usecase" transform="translate(320 970)">
+    <ellipse rx="96" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">查看考勤统计</text>
+  </g>
+  <g class="usecase" transform="translate(320 1090)">
+    <ellipse rx="102" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">审核补签申请</text>
+  </g>
+
+  <!-- Admin main use cases -->
+  <g class="usecase" transform="translate(320 1240)">
+    <ellipse rx="118" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">管理考勤任务与规则</text>
+  </g>
+  <g class="usecase" transform="translate(320 1340)">
+    <ellipse rx="112" ry="26"/>
+    <text x="0" y="5" text-anchor="middle">查看全校考勤数据</text>
+  </g>
+
+  <!-- Included and extended use cases -->
+  <g class="usecase" transform="translate(675 200)">
+    <ellipse rx="106" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">查询进行中任务</text>
+  </g>
+  <g class="usecase" transform="translate(675 250)">
+    <ellipse rx="112" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">查看任务时间范围</text>
+  </g>
+  <g class="usecase" transform="translate(675 315)">
+    <ellipse rx="102" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">获取当前位置</text>
+  </g>
+  <g class="usecase" transform="translate(675 365)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">校验签到范围</text>
+  </g>
+  <g class="usecase" transform="translate(675 415)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">生成签到记录</text>
+  </g>
+  <g class="usecase" transform="translate(675 480)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">填写补签原因</text>
+  </g>
+  <g class="usecase" transform="translate(675 530)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">上传证明材料</text>
+  </g>
+  <g class="usecase" transform="translate(675 580)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">查看签到状态</text>
+  </g>
+  <g class="usecase" transform="translate(675 630)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">查看补签结果</text>
+  </g>
+  <g class="usecase" transform="translate(675 700)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">设置签到时间</text>
+  </g>
+  <g class="usecase" transform="translate(675 750)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">设置签到范围</text>
+  </g>
+  <g class="usecase" transform="translate(675 800)">
+    <ellipse rx="125" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">设置签到地点与半径</text>
+  </g>
+  <g class="usecase" transform="translate(675 850)">
+    <ellipse rx="92" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">开始签到</text>
+  </g>
+  <g class="usecase" transform="translate(675 900)">
+    <ellipse rx="92" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">结束签到</text>
+  </g>
+  <g class="usecase" transform="translate(675 960)">
+    <ellipse rx="102" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">按任务统计</text>
+  </g>
+  <g class="usecase" transform="translate(675 1010)">
+    <ellipse rx="106" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">导出考勤报表</text>
+  </g>
+  <g class="usecase" transform="translate(675 1060)">
+    <ellipse rx="112" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">查看待审核申请</text>
+  </g>
+  <g class="usecase" transform="translate(675 1110)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">填写审核意见</text>
+  </g>
+  <g class="usecase" transform="translate(675 1160)">
+    <ellipse rx="92" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">审核通过</text>
+  </g>
+  <g class="usecase" transform="translate(675 1210)">
+    <ellipse rx="92" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">驳回申请</text>
+  </g>
+  <g class="usecase" transform="translate(675 1280)">
+    <ellipse rx="104" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">维护签到规则</text>
+  </g>
+  <g class="usecase" transform="translate(675 1330)">
+    <ellipse rx="112" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">全校统计汇总</text>
+  </g>
+  <g class="usecase" transform="translate(675 1380)">
+    <ellipse rx="106" ry="24"/>
+    <text x="0" y="5" text-anchor="middle">导出全校报表</text>
+  </g>
+
+  <!-- Actor associations -->
+  <path class="association" d="M95 330 L228 220"/>
+  <path class="association" d="M95 330 L228 330"/>
+  <path class="association" d="M95 330 L228 480"/>
+  <path class="association" d="M95 330 L216 590"/>
+
+  <path class="association" d="M95 820 L224 730"/>
+  <path class="association" d="M95 820 L224 850"/>
+  <path class="association" d="M95 820 L224 970"/>
+  <path class="association" d="M95 820 L218 1090"/>
+
+  <path class="association" d="M95 1265 L224 850"/>
+  <path class="association" d="M95 1265 L218 1090"/>
+  <path class="association" d="M95 1265 L202 1240"/>
+  <path class="association" d="M95 1265 L208 1340"/>
+
+  <path class="association" d="M900 590 L777 315"/>
+  <path class="association" d="M900 590 L800 800"/>
+
+  <!-- Include / extend relationships -->
+  <path class="include" d="M412 220 L569 200"/>
+  <text class="small" x="472" y="203">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M412 220 L563 250"/>
+  <text class="small" x="470" y="252">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M412 330 L573 315"/>
+  <text class="small" x="475" y="312">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M412 330 L571 365"/>
+  <text class="small" x="475" y="362">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M412 330 L571 415"/>
+  <text class="small" x="472" y="405">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M412 480 L571 480"/>
+  <text class="small" x="474" y="468">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M412 480 L571 530"/>
+  <text class="small" x="472" y="525">&lt;&lt;extend&gt;&gt;</text>
+
+  <path class="include" d="M424 590 L571 580"/>
+  <text class="small" x="478" y="574">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M424 590 L571 630"/>
+  <text class="small" x="478" y="625">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M416 730 L571 700"/>
+  <text class="small" x="475" y="704">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M416 730 L571 750"/>
+  <text class="small" x="475" y="752">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M416 730 L550 800"/>
+  <text class="small" x="469" y="789">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M416 850 L583 850"/>
+  <text class="small" x="475" y="838">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M416 850 L583 900"/>
+  <text class="small" x="475" y="895">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M416 970 L573 960"/>
+  <text class="small" x="475" y="955">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M416 970 L569 1010"/>
+  <text class="small" x="475" y="1005">&lt;&lt;include&gt;&gt;</text>
+
+  <path class="include" d="M422 1090 L563 1060"/>
+  <text class="small" x="474" y="1064">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M422 1090 L571 1110"/>
+  <text class="small" x="474" y="1112">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M422 1090 L583 1160"/>
+  <text class="small" x="470" y="1150">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M422 1090 L583 1210"/>
+  <text class="small" x="470" y="1198">&lt;&lt;extend&gt;&gt;</text>
+
+  <path class="include" d="M438 1240 L571 1280"/>
+  <text class="small" x="478" y="1268">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M432 1340 L563 1330"/>
+  <text class="small" x="478" y="1326">&lt;&lt;include&gt;&gt;</text>
+  <path class="include" d="M432 1340 L569 1380"/>
+  <text class="small" x="478" y="1374">&lt;&lt;include&gt;&gt;</text>
+</svg>

@@ -1,0 +1,89 @@
+@startuml
+title 成绩评价与过程监控模块总体用例图
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+
+actor 学生 as Student
+actor 教师 as Teacher
+actor 管理员 as Admin
+actor "选题管理模块" as Selection
+actor "考勤管理模块" as Attendance
+actor "信息管理模块" as Info
+
+rectangle "成绩评价与过程监控管理模块" {
+  usecase "查看阶段任务" as UC_ViewTask
+  usecase "提交阶段成果" as UC_SubmitResult
+  usecase "查看反馈并修改成果" as UC_ModifyResult
+  usecase "贡献度评价" as UC_Contribution
+  usecase "查看个人成绩" as UC_MyScore
+
+  usecase "发布阶段任务" as UC_PublishTask
+  usecase "过程监控" as UC_Monitor
+  usecase "阶段成果评价" as UC_Evaluate
+  usecase "综合成绩管理" as UC_ScoreManage
+  usecase "成绩查询与汇总" as UC_ScoreSummary
+  usecase "维护评分规则与权重" as UC_Rule
+
+  usecase "设置任务名称、说明和时间" as UC_TaskBase
+  usecase "设置提交要求和评分权重" as UC_TaskRule
+  usecase "提交过程文档" as UC_Document
+  usecase "填写开发日志" as UC_Log
+  usecase "查看过程文档和开发日志" as UC_ReadProcess
+  usecase "填写阶段评分和教师反馈" as UC_Feedback
+  usecase "记录学生修改情况" as UC_Revision
+  usecase "汇总贡献度" as UC_ContributionSummary
+  usecase "读取考勤成绩" as UC_AttendanceScore
+  usecase "录入平时/阶段/答辩成绩" as UC_InputScore
+  usecase "计算综合成绩" as UC_CalcScore
+  usecase "确认/锁定最终成绩" as UC_ConfirmScore
+  usecase "导出成绩报表" as UC_Export
+  usecase "读取队伍、题目和学生信息" as UC_BaseInfo
+}
+
+Student --> UC_ViewTask
+Student --> UC_SubmitResult
+Student --> UC_ModifyResult
+Student --> UC_Contribution
+Student --> UC_MyScore
+
+Teacher --> UC_PublishTask
+Teacher --> UC_Monitor
+Teacher --> UC_Evaluate
+Teacher --> UC_Contribution
+Teacher --> UC_ScoreManage
+Teacher --> UC_ScoreSummary
+
+Admin --> UC_PublishTask
+Admin --> UC_Monitor
+Admin --> UC_Evaluate
+Admin --> UC_ScoreManage
+Admin --> UC_ScoreSummary
+Admin --> UC_Rule
+
+UC_PublishTask ..> UC_TaskBase : <<include>>
+UC_PublishTask ..> UC_TaskRule : <<include>>
+UC_SubmitResult ..> UC_Document : <<include>>
+UC_SubmitResult ..> UC_Log : <<include>>
+UC_ModifyResult ..> UC_Revision : <<include>>
+UC_Monitor ..> UC_ReadProcess : <<include>>
+UC_Monitor ..> UC_BaseInfo : <<include>>
+UC_Evaluate ..> UC_ReadProcess : <<include>>
+UC_Evaluate ..> UC_Feedback : <<include>>
+UC_Contribution ..> UC_ContributionSummary : <<include>>
+UC_ScoreManage ..> UC_InputScore : <<include>>
+UC_ScoreManage ..> UC_AttendanceScore : <<include>>
+UC_ScoreManage ..> UC_ContributionSummary : <<include>>
+UC_ScoreManage ..> UC_CalcScore : <<include>>
+UC_ScoreManage ..> UC_ConfirmScore : <<include>>
+UC_ScoreManage ..> UC_Export : <<include>>
+UC_ScoreSummary ..> UC_BaseInfo : <<include>>
+
+Selection --> UC_Document
+Selection --> UC_Log
+Selection --> UC_ReadProcess
+Selection --> UC_BaseInfo
+Attendance --> UC_AttendanceScore
+Info --> UC_BaseInfo
+@enduml

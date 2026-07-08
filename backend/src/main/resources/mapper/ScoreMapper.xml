@@ -32,12 +32,13 @@
             defense_score = #{defenseScore},
             total_score = #{totalScore},
             teacher_comment = #{teacherComment},
-            status = #{status}
+            status = #{status},
+            update_time = NOW()
         WHERE score_id = #{scoreId}
     </update>
 
     <update id="updateScoreStatus">
-        UPDATE score SET status = #{status} WHERE score_id = #{scoreId}
+        UPDATE score SET status = #{status}, update_time = NOW() WHERE score_id = #{scoreId}
     </update>
 
     <delete id="deleteStudentScoresByScoreId">
@@ -56,48 +57,122 @@
     </insert>
 
     <select id="selectScorePage" resultType="com.training.system.score.vo.ScoreVO">
-        SELECT s.score_id, s.team_id, ti.team_name, s.teacher_id, t.teacher_name,
-               s.doc_score, s.attendance_score, s.system_score, s.defense_score,
-               s.total_score, s.teacher_comment, s.status, s.create_time, s.update_time
-        FROM score s
-        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        SELECT s.score_id,
+               ti.team_id,
+               ti.team_name,
+               pt.topic_id,
+               pt.topic_name,
+               COALESCE(s.teacher_id, pt.teacher_id) AS teacher_id,
+               COALESCE(t.teacher_name, topic_teacher.teacher_name) AS teacher_name,
+               COALESCE(s.doc_score, ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2)) AS doc_score,
+               COALESCE(s.attendance_score, 0) AS attendance_score,
+               COALESCE(s.system_score, ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2)) AS system_score,
+               COALESCE(s.defense_score, 0) AS defense_score,
+               COALESCE(
+                   s.total_score,
+                   ROUND(
+                       ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2)
+                       + COALESCE(s.attendance_score, 0)
+                       + ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2)
+                       + COALESCE(s.defense_score, 0),
+                       2
+                   )
+               ) AS total_score,
+               COALESCE(pa.total_stage_count, (SELECT COUNT(*) FROM stage_task)) AS total_stage_count,
+               COALESCE(pa.evaluated_stage_count, 0) AS evaluated_stage_count,
+               COALESCE(pa.total_stage_weight, (SELECT COALESCE(SUM(weight), 0) FROM stage_task)) AS total_stage_weight,
+               COALESCE(pa.evaluated_stage_weight, 0) AS evaluated_stage_weight,
+               COALESCE(pa.weighted_stage_score, 0) AS process_score,
+               COALESCE(pa.weighted_doc_score, 0) AS process_doc_score,
+               COALESCE(pa.weighted_system_score, 0) AS process_system_score,
+               ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2) AS suggested_doc_score,
+               ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2) AS suggested_system_score,
+               s.teacher_comment,
+               COALESCE(s.status, 0) AS status,
+               s.create_time,
+               s.update_time
+        FROM team_info ti
+        INNER JOIN (
+            SELECT team_id, MAX(selection_id) AS selection_id
+            FROM topic_selection
+            WHERE audit_status = 1
+            GROUP BY team_id
+        ) selected ON selected.team_id = ti.team_id
+        INNER JOIN topic_selection ts ON ts.selection_id = selected.selection_id
+        LEFT JOIN project_topic pt ON ts.topic_id = pt.topic_id
+        LEFT JOIN score s ON s.team_id = ti.team_id
         LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
-        WHERE 1 = 1
+        LEFT JOIN teacher topic_teacher ON pt.teacher_id = topic_teacher.teacher_id
+        LEFT JOIN (
+            SELECT se.team_id,
+                   (SELECT COUNT(*) FROM stage_task) AS total_stage_count,
+                   COUNT(DISTINCT se.stage_id) AS evaluated_stage_count,
+                   (SELECT COALESCE(SUM(weight), 0) FROM stage_task) AS total_stage_weight,
+                   COALESCE(SUM(st.weight), 0) AS evaluated_stage_weight,
+                   ROUND(COALESCE(AVG(se.total_score), 0), 2) AS average_stage_score,
+                   ROUND(COALESCE(SUM(se.total_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_stage_score,
+                   ROUND(COALESCE(SUM(se.doc_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_doc_score,
+                   ROUND(
+                       COALESCE(
+                           SUM(((se.completion_score + COALESCE(se.innovation_score, 0) + COALESCE(se.tech_score, 0)) / 3) * st.weight)
+                           / NULLIF((SELECT SUM(weight) FROM stage_task), 0),
+                           0
+                       ),
+                       2
+                   ) AS weighted_system_score
+            FROM stage_evaluation se
+            INNER JOIN stage_task st ON se.stage_id = st.stage_id
+            GROUP BY se.team_id
+        ) pa ON pa.team_id = ti.team_id
+        WHERE ti.is_deleted = 0
+          AND ti.team_status &lt;&gt; 3
         <if test="keyword != null and keyword != ''">
             AND (ti.team_name LIKE CONCAT('%', #{keyword}, '%')
-                 OR t.teacher_name LIKE CONCAT('%', #{keyword}, '%'))
+                 OR pt.topic_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR COALESCE(t.teacher_name, topic_teacher.teacher_name) LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="teamId != null">
-            AND s.team_id = #{teamId}
+            AND ti.team_id = #{teamId}
         </if>
         <if test="teacherId != null">
-            AND s.teacher_id = #{teacherId}
+            AND (s.teacher_id = #{teacherId} OR pt.teacher_id = #{teacherId})
         </if>
         <if test="status != null">
-            AND s.status = #{status}
+            AND COALESCE(s.status, 0) = #{status}
         </if>
-        ORDER BY s.create_time DESC
+        ORDER BY COALESCE(s.update_time, s.create_time, ti.update_time, ti.create_time) DESC, ti.team_id ASC
         LIMIT #{offset}, #{limit}
     </select>
 
     <select id="countScorePage" resultType="long">
         SELECT COUNT(*)
-        FROM score s
-        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        FROM team_info ti
+        INNER JOIN (
+            SELECT team_id, MAX(selection_id) AS selection_id
+            FROM topic_selection
+            WHERE audit_status = 1
+            GROUP BY team_id
+        ) selected ON selected.team_id = ti.team_id
+        INNER JOIN topic_selection ts ON ts.selection_id = selected.selection_id
+        LEFT JOIN project_topic pt ON ts.topic_id = pt.topic_id
+        LEFT JOIN score s ON s.team_id = ti.team_id
         LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
-        WHERE 1 = 1
+        LEFT JOIN teacher topic_teacher ON pt.teacher_id = topic_teacher.teacher_id
+        WHERE ti.is_deleted = 0
+          AND ti.team_status &lt;&gt; 3
         <if test="keyword != null and keyword != ''">
             AND (ti.team_name LIKE CONCAT('%', #{keyword}, '%')
-                 OR t.teacher_name LIKE CONCAT('%', #{keyword}, '%'))
+                 OR pt.topic_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR COALESCE(t.teacher_name, topic_teacher.teacher_name) LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="teamId != null">
-            AND s.team_id = #{teamId}
+            AND ti.team_id = #{teamId}
         </if>
         <if test="teacherId != null">
-            AND s.teacher_id = #{teacherId}
+            AND (s.teacher_id = #{teacherId} OR pt.teacher_id = #{teacherId})
         </if>
         <if test="status != null">
-            AND s.status = #{status}
+            AND COALESCE(s.status, 0) = #{status}
         </if>
     </select>
 
@@ -117,36 +192,129 @@
                ti.team_name,
                pt.topic_id,
                pt.topic_name,
-               (SELECT COUNT(*) FROM stage_task) AS total_stage_count,
-               COUNT(DISTINCT se.stage_id) AS evaluated_stage_count,
-               COALESCE(AVG(se.total_score), 0) AS average_stage_score
+               COALESCE(pa.total_stage_count, (SELECT COUNT(*) FROM stage_task)) AS total_stage_count,
+               COALESCE(pa.evaluated_stage_count, 0) AS evaluated_stage_count,
+               COALESCE(pa.total_stage_weight, (SELECT COALESCE(SUM(weight), 0) FROM stage_task)) AS total_stage_weight,
+               COALESCE(pa.evaluated_stage_weight, 0) AS evaluated_stage_weight,
+               COALESCE(pa.average_stage_score, 0) AS average_stage_score,
+               COALESCE(pa.weighted_stage_score, 0) AS weighted_stage_score,
+               COALESCE(pa.weighted_doc_score, 0) AS process_doc_score,
+               COALESCE(pa.weighted_system_score, 0) AS process_system_score
         FROM team_info ti
-        LEFT JOIN topic_selection ts
-               ON ti.team_id = ts.team_id AND ts.audit_status = 1
-        LEFT JOIN project_topic pt
-               ON ts.topic_id = pt.topic_id
-        LEFT JOIN stage_evaluation se
-               ON ti.team_id = se.team_id
+        INNER JOIN (
+            SELECT team_id, MAX(selection_id) AS selection_id
+            FROM topic_selection
+            WHERE audit_status = 1
+            GROUP BY team_id
+        ) selected ON selected.team_id = ti.team_id
+        INNER JOIN topic_selection ts ON ts.selection_id = selected.selection_id
+        LEFT JOIN project_topic pt ON ts.topic_id = pt.topic_id
+        LEFT JOIN (
+            SELECT se.team_id,
+                   (SELECT COUNT(*) FROM stage_task) AS total_stage_count,
+                   COUNT(DISTINCT se.stage_id) AS evaluated_stage_count,
+                   (SELECT COALESCE(SUM(weight), 0) FROM stage_task) AS total_stage_weight,
+                   COALESCE(SUM(st.weight), 0) AS evaluated_stage_weight,
+                   ROUND(COALESCE(AVG(se.total_score), 0), 2) AS average_stage_score,
+                   ROUND(COALESCE(SUM(se.total_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_stage_score,
+                   ROUND(COALESCE(SUM(se.doc_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_doc_score,
+                   ROUND(
+                       COALESCE(
+                           SUM(((se.completion_score + COALESCE(se.innovation_score, 0) + COALESCE(se.tech_score, 0)) / 3) * st.weight)
+                           / NULLIF((SELECT SUM(weight) FROM stage_task), 0),
+                           0
+                       ),
+                       2
+                   ) AS weighted_system_score
+            FROM stage_evaluation se
+            INNER JOIN stage_task st ON se.stage_id = st.stage_id
+            GROUP BY se.team_id
+        ) pa ON pa.team_id = ti.team_id
         WHERE ti.is_deleted = 0
+          AND ti.team_status &lt;&gt; 3
         <if test="teamId != null">
             AND ti.team_id = #{teamId}
         </if>
-        GROUP BY ti.team_id, ti.team_name, pt.topic_id, pt.topic_name
+        <if test="teacherId != null">
+            AND pt.teacher_id = #{teacherId}
+        </if>
         ORDER BY ti.team_id ASC
     </select>
 
     <select id="selectScoreExport" resultType="com.training.system.score.vo.ScoreVO">
-        SELECT s.score_id, s.team_id, ti.team_name, s.teacher_id, t.teacher_name,
-               s.doc_score, s.attendance_score, s.system_score, s.defense_score,
-               s.total_score, s.teacher_comment, s.status, s.create_time, s.update_time
-        FROM score s
-        LEFT JOIN team_info ti ON s.team_id = ti.team_id
+        SELECT s.score_id,
+               ti.team_id,
+               ti.team_name,
+               pt.topic_id,
+               pt.topic_name,
+               COALESCE(s.teacher_id, pt.teacher_id) AS teacher_id,
+               COALESCE(t.teacher_name, topic_teacher.teacher_name) AS teacher_name,
+               COALESCE(s.doc_score, ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2)) AS doc_score,
+               COALESCE(s.attendance_score, 0) AS attendance_score,
+               COALESCE(s.system_score, ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2)) AS system_score,
+               COALESCE(s.defense_score, 0) AS defense_score,
+               COALESCE(
+                   s.total_score,
+                   ROUND(
+                       ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2)
+                       + COALESCE(s.attendance_score, 0)
+                       + ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2)
+                       + COALESCE(s.defense_score, 0),
+                       2
+                   )
+               ) AS total_score,
+               COALESCE(pa.total_stage_count, (SELECT COUNT(*) FROM stage_task)) AS total_stage_count,
+               COALESCE(pa.evaluated_stage_count, 0) AS evaluated_stage_count,
+               COALESCE(pa.total_stage_weight, (SELECT COALESCE(SUM(weight), 0) FROM stage_task)) AS total_stage_weight,
+               COALESCE(pa.evaluated_stage_weight, 0) AS evaluated_stage_weight,
+               COALESCE(pa.weighted_stage_score, 0) AS process_score,
+               COALESCE(pa.weighted_doc_score, 0) AS process_doc_score,
+               COALESCE(pa.weighted_system_score, 0) AS process_system_score,
+               ROUND(COALESCE(pa.weighted_doc_score, 0) * 0.15, 2) AS suggested_doc_score,
+               ROUND(COALESCE(pa.weighted_system_score, 0) * 0.50, 2) AS suggested_system_score,
+               s.teacher_comment,
+               COALESCE(s.status, 0) AS status,
+               s.create_time,
+               s.update_time
+        FROM team_info ti
+        INNER JOIN (
+            SELECT team_id, MAX(selection_id) AS selection_id
+            FROM topic_selection
+            WHERE audit_status = 1
+            GROUP BY team_id
+        ) selected ON selected.team_id = ti.team_id
+        INNER JOIN topic_selection ts ON ts.selection_id = selected.selection_id
+        LEFT JOIN project_topic pt ON ts.topic_id = pt.topic_id
+        LEFT JOIN score s ON s.team_id = ti.team_id
         LEFT JOIN teacher t ON s.teacher_id = t.teacher_id
-        WHERE 1 = 1
+        LEFT JOIN teacher topic_teacher ON pt.teacher_id = topic_teacher.teacher_id
+        LEFT JOIN (
+            SELECT se.team_id,
+                   (SELECT COUNT(*) FROM stage_task) AS total_stage_count,
+                   COUNT(DISTINCT se.stage_id) AS evaluated_stage_count,
+                   (SELECT COALESCE(SUM(weight), 0) FROM stage_task) AS total_stage_weight,
+                   COALESCE(SUM(st.weight), 0) AS evaluated_stage_weight,
+                   ROUND(COALESCE(AVG(se.total_score), 0), 2) AS average_stage_score,
+                   ROUND(COALESCE(SUM(se.total_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_stage_score,
+                   ROUND(COALESCE(SUM(se.doc_score * st.weight) / NULLIF((SELECT SUM(weight) FROM stage_task), 0), 0), 2) AS weighted_doc_score,
+                   ROUND(
+                       COALESCE(
+                           SUM(((se.completion_score + COALESCE(se.innovation_score, 0) + COALESCE(se.tech_score, 0)) / 3) * st.weight)
+                           / NULLIF((SELECT SUM(weight) FROM stage_task), 0),
+                           0
+                       ),
+                       2
+                   ) AS weighted_system_score
+            FROM stage_evaluation se
+            INNER JOIN stage_task st ON se.stage_id = st.stage_id
+            GROUP BY se.team_id
+        ) pa ON pa.team_id = ti.team_id
+        WHERE ti.is_deleted = 0
+          AND ti.team_status &lt;&gt; 3
         <if test="teacherId != null">
-            AND s.teacher_id = #{teacherId}
+            AND (s.teacher_id = #{teacherId} OR pt.teacher_id = #{teacherId})
         </if>
-        ORDER BY s.total_score DESC
+        ORDER BY total_score DESC, ti.team_id ASC
     </select>
 </mapper>
 

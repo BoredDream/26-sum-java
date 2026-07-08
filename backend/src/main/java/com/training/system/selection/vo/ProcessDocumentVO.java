@@ -15,6 +15,9 @@ public class ProcessDocumentVO {
     private String status;
     private String teacherFeedback;
     private Long feedbackTeacherId;
+    private Long stageId;
+    private String remark;
+    private String stageName;
     private LocalDateTime uploadTime;
     private LocalDateTime feedbackTime;
 
@@ -42,6 +45,12 @@ public class ProcessDocumentVO {
     public void setTeacherFeedback(String teacherFeedback) { this.teacherFeedback = teacherFeedback; }
     public Long getFeedbackTeacherId() { return feedbackTeacherId; }
     public void setFeedbackTeacherId(Long feedbackTeacherId) { this.feedbackTeacherId = feedbackTeacherId; }
+    public Long getStageId() { return stageId; }
+    public void setStageId(Long stageId) { this.stageId = stageId; }
+    public String getRemark() { return remark; }
+    public void setRemark(String remark) { this.remark = remark; }
+    public String getStageName() { return stageName; }
+    public void setStageName(String stageName) { this.stageName = stageName; }
     public LocalDateTime getUploadTime() { return uploadTime; }
     public void setUploadTime(LocalDateTime uploadTime) { this.uploadTime = uploadTime; }
     public LocalDateTime getFeedbackTime() { return feedbackTime; }

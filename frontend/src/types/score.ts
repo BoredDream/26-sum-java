@@ -121,10 +121,12 @@ export interface ContributionQuery extends PageQuery {
 }
 
 export interface ScoreVO {
-  scoreId: number
+  scoreId?: number | null
   teamId: number
   teamName: string
-  teacherId: number
+  topicId?: number
+  topicName?: string
+  teacherId?: number | null
   teacherName?: string
   aiReportId?: number
   docScore: number
@@ -132,6 +134,15 @@ export interface ScoreVO {
   systemScore: number
   defenseScore: number
   totalScore: number
+  totalStageCount?: number
+  evaluatedStageCount?: number
+  totalStageWeight?: number
+  evaluatedStageWeight?: number
+  processScore?: number
+  processDocScore?: number
+  processSystemScore?: number
+  suggestedDocScore?: number
+  suggestedSystemScore?: number
   teacherComment?: string
   status: number
   statusText?: string
@@ -206,7 +217,12 @@ export interface ProgressVO {
   topicName?: string
   totalStageCount: number
   evaluatedStageCount: number
+  totalStageWeight?: number
+  evaluatedStageWeight?: number
   averageStageScore?: number
+  weightedStageScore?: number
+  processDocScore?: number
+  processSystemScore?: number
 }
 
 export interface ProgressStageVO {
