@@ -69,6 +69,18 @@ export function downloadNoticeAttachment(noticeId: number) {
   return downloadByUrl(getNoticeDownloadUrl(noticeId))
 }
 
+export function getUnreadNoticeCount() {
+  return get<number>('/notices/unread-count')
+}
+
+export function markNoticeRead(noticeId: number) {
+  return post<void>(`/notices/${noticeId}/read`)
+}
+
+export function getReadNoticeIds() {
+  return get<number[]>('/notices/read-ids')
+}
+
 // 学生管理
 export function queryStudentPage(query: {
   keyword?: string

@@ -110,6 +110,16 @@ public class AttendanceRecordServiceImpl implements AttendanceRecordService {
     }
 
     @Override
+    public java.util.List<Long> getSignedTaskIds(Long studentId) {
+        return attendanceRecordMapper.selectSignedTaskIds(studentId);
+    }
+
+    @Override
+    public long countUnsignedTasks(Long studentId) {
+        return attendanceRecordMapper.countUnsignedTasks(studentId);
+    }
+
+    @Override
     public List<AttendanceRecordVO> listForExport(AttendanceRecordQueryDTO dto, CurrentUserDTO user) {
         if (!user.isTeacher() && !user.isAdmin()) {
             throw new BusinessException(ResultCode.FORBIDDEN, "无权限导出考勤报表");

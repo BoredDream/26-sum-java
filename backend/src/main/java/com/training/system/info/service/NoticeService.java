@@ -27,4 +27,19 @@ public interface NoticeService {
     String getAttachmentPath(Long noticeId);
 
     long count();
+
+    /**
+     * 获取当前学生的未读公告数量
+     */
+    long getUnreadCount(Long userId);
+
+    /**
+     * 标记某条公告为已读
+     */
+    void markAsRead(Long noticeId, Long userId);
+
+    /**
+     * 获取用户已读的公告ID列表
+     */
+    java.util.List<Long> getReadNoticeIds(Long userId);
 }

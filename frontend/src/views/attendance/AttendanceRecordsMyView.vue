@@ -19,6 +19,15 @@
               <div>结束时间：{{ formatDateTime(task.endTime) }}</div>
             </div>
             <el-button
+              v-if="signedTaskIds.has(task.taskId)"
+              type="info"
+              disabled
+              style="width: 100%"
+            >
+              已签到
+            </el-button>
+            <el-button
+              v-else
               type="primary"
               :loading="signingId === task.taskId"
               style="width: 100%"
@@ -35,7 +44,7 @@
     <el-card v-loading="loading">
       <template #header><span>考勤记录</span></template>
       <el-empty v-if="!loading && records.length === 0 && !error" description="暂无考勤记录" />
-      <el-table v-else :data="records" border>
+      <el-table v-else :data="records" border :row-class-name="getRowClass">
         <el-table-column prop="taskTitle" label="签到任务" show-overflow-tooltip />
         <el-table-column label="签到时间" width="170">
           <template #default="scope">{{
@@ -107,6 +116,21 @@ const pageSize = ref(10)
 
 const pendingTasks = computed(() => tasks.value.filter((t) => t.status === 1))
 
+const signedTaskIds = ref<Set<number>>(new Set())
+
+async function loadSignedTaskIds() {
+  try {
+    const ids = await attendanceApi.getSignedTaskIds()
+    signedTaskIds.value = new Set(ids)
+  } catch {
+    // 静默失败
+  }
+}
+
+function getRowClass({ row }: { row: AttendanceRecordVO }) {
+  return row.signStatus === 0 ? 'row-unsigned' : ''
+}
+
 async function loadRecords() {
   loading.value = true
   error.value = ''
@@ -160,6 +184,7 @@ async function confirmSign() {
       remark: signForm.remark,
     })
     ElMessage.success('签到成功')
+    signedTaskIds.value.add(currentTaskId.value)
     signVisible.value = false
     loadRecords()
     loadTasks()
@@ -174,6 +199,7 @@ async function confirmSign() {
 onMounted(() => {
   loadRecords()
   loadTasks()
+  loadSignedTaskIds()
 })
 </script>
 
@@ -205,6 +231,13 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+  }
+
+  :deep(.row-unsigned) {
+    background-color: #fef0f0 !important;
+    td {
+      background-color: #fef0f0 !important;
+    }
   }
 }
 </style>

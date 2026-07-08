@@ -37,6 +37,24 @@ public class AttendanceRecordController {
         this.attendanceRecordService = attendanceRecordService;
     }
 
+    @GetMapping("/signed-task-ids")
+    public Result<java.util.List<Long>> signedTaskIds(HttpSession session) {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        if (!user.isStudent()) {
+            return Result.success(java.util.Collections.emptyList());
+        }
+        return Result.success(attendanceRecordService.getSignedTaskIds(user.getRelatedId()));
+    }
+
+    @GetMapping("/unsigned-count")
+    public Result<Long> unsignedCount(HttpSession session) {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        if (!user.isStudent()) {
+            return Result.success(0L);
+        }
+        return Result.success(attendanceRecordService.countUnsignedTasks(user.getRelatedId()));
+    }
+
     @PostMapping("/record/sign")
     public Result<AttendanceRecordVO> sign(@Valid @RequestBody AttendanceSignDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);

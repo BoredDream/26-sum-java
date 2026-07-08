@@ -17,4 +17,14 @@ public interface MakeupSignApplyService {
     void reviewMakeup(Long applyId, MakeupReviewDTO dto, CurrentUserDTO user);
 
     PageResult<MakeupApplyVO> page(MakeupApplyQueryDTO dto, CurrentUserDTO user);
+
+    /**
+     * 统计学生未查看的补签审核结果数
+     */
+    long countUnviewedResults(Long studentId);
+
+    /**
+     * 将学生所有已审核的补签申请标记为已查看
+     */
+    void markResultsViewed(Long studentId);
 }

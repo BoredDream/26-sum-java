@@ -182,6 +182,17 @@ public class MakeupSignApplyServiceImpl implements MakeupSignApplyService {
         return new PageResult<>(list, total, dto.getPageNum(), dto.getPageSize());
     }
 
+    @Override
+    public long countUnviewedResults(Long studentId) {
+        return makeupSignApplyMapper.countUnviewedResults(studentId);
+    }
+
+    @Override
+    @Transactional
+    public void markResultsViewed(Long studentId) {
+        makeupSignApplyMapper.markResultsViewed(studentId);
+    }
+
     private void fillMakeupVoNames(List<MakeupApplyVO> list) {
         // 收集所有需要补填教师姓名的审核教师ID
         List<Long> teacherIds = list.stream()

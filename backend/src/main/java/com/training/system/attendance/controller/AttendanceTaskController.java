@@ -43,6 +43,14 @@ public class AttendanceTaskController {
         return Result.success();
     }
 
+    @OperationLog(type = "DELETE", description = "删除签到任务")
+    @DeleteMapping("/{taskId}")
+    public Result<Void> delete(@PathVariable Long taskId, HttpSession session) {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        attendanceTaskService.deleteTask(taskId, user);
+        return Result.success();
+    }
+
     @GetMapping("/page")
     public Result<PageResult<AttendanceTaskVO>> page(AttendanceTaskQueryDTO dto, HttpSession session) {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);

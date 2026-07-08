@@ -11,12 +11,20 @@
         active-text-color="#409eff"
         :collapse-transition="false"
       >
-        <el-menu-item v-for="menu in menus" :key="menu.path" :index="menu.path">
-          <el-icon>
-            <component :is="menu.icon" />
-          </el-icon>
-          <span>{{ menu.title }}</span>
-        </el-menu-item>
+        <template v-for="menu in menus" :key="menu.path">
+          <el-menu-item :index="menu.path">
+            <el-icon>
+              <component :is="menu.icon" />
+            </el-icon>
+            <template v-if="getBadgeCount(menu.path) > 0">
+              <span class="badge-wrap">
+                {{ menu.title }}
+                <span class="badge-dot">{{ getBadgeCount(menu.path) > 99 ? '99+' : getBadgeCount(menu.path) }}</span>
+              </span>
+            </template>
+            <span v-else>{{ menu.title }}</span>
+          </el-menu-item>
+        </template>
       </el-menu>
     </el-aside>
 
@@ -42,10 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { menusByRole, getMenuByPath, roleTextMap } from '@/utils/permission'
+import * as infoApi from '@/api/info'
+import * as attendanceApi from '@/api/attendance'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,6 +69,68 @@ const menus = computed(() => {
 const activePath = computed(() => route.path)
 const currentMenu = computed(() => getMenuByPath(route.path))
 const roleText = computed(() => (auth.role ? roleTextMap[auth.role] : ''))
+
+const unreadNoticeCount = ref(0)
+
+async function fetchUnreadCount() {
+  if (!auth.isStudent) return
+  try {
+    unreadNoticeCount.value = await infoApi.getUnreadNoticeCount()
+  } catch {
+    unreadNoticeCount.value = 0
+  }
+}
+
+const unsignedTaskCount = ref(0)
+const unviewedMakeupCount = ref(0)
+
+function getBadgeCount(path: string): number {
+  if (path === '/notices') return unreadNoticeCount.value
+  if (path === '/attendance/records/my') return unsignedTaskCount.value
+  if (path === '/attendance/makeup/my') return unviewedMakeupCount.value
+  return 0
+}
+
+async function fetchUnsignedTaskCount() {
+  if (!auth.isStudent) return
+  try {
+    unsignedTaskCount.value = await attendanceApi.getUnsignedTaskCount()
+  } catch {
+    unsignedTaskCount.value = 0
+  }
+}
+
+async function fetchUnviewedMakeupCount() {
+  if (!auth.isStudent) return
+  try {
+    unviewedMakeupCount.value = await attendanceApi.getUnviewedMakeupCount()
+  } catch {
+    unviewedMakeupCount.value = 0
+  }
+}
+
+async function fetchAttendanceCounts() {
+  await Promise.all([fetchUnsignedTaskCount(), fetchUnviewedMakeupCount()])
+}
+
+onMounted(() => {
+  fetchUnreadCount()
+  fetchAttendanceCounts()
+})
+
+// 离开相关页面时刷新未读数
+watch(
+  () => route.path,
+  (_newPath, oldPath) => {
+    if (!auth.isStudent) return
+    if (oldPath === '/notices') {
+      fetchUnreadCount()
+    }
+    if (oldPath === '/attendance/records/my' || oldPath === '/attendance/makeup/my') {
+      fetchAttendanceCounts()
+    }
+  }
+)
 
 async function handleLogout() {
   await auth.logout()
@@ -123,6 +195,27 @@ async function handleLogout() {
 .layout-main {
   padding: 20px;
   overflow-y: auto;
+}
+
+.badge-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.badge-dot {
+  position: absolute;
+  top: 10px;
+  right: -16px;
+  height: 16px;
+  min-width: 16px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  color: #fff;
+  background: #f56c6c;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .fade-enter-active,
