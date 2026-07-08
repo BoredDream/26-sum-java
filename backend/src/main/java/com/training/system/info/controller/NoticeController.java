@@ -54,6 +54,22 @@ public class NoticeController {
         return Result.success();
     }
 
+    @GetMapping("/read-ids")
+    public Result<java.util.List<Long>> readIds(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        return Result.success(noticeService.getReadNoticeIds(userId));
+    }
+
+    @GetMapping("/unread-count")
+    public Result<Long> unreadCount(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+        if (!"STUDENT".equals(role)) {
+            return Result.success(0L);
+        }
+        return Result.success(noticeService.getUnreadCount(userId));
+    }
+
     @GetMapping("/{noticeId}")
     public Result<NoticeVO> detail(@PathVariable Long noticeId) {
         return Result.success(noticeService.getNoticeDetail(noticeId));
@@ -68,6 +84,17 @@ public class NoticeController {
     @PostMapping("/{noticeId}/top")
     public Result<Void> toggleTop(@PathVariable Long noticeId) {
         noticeService.toggleTop(noticeId);
+        return Result.success();
+    }
+
+    @PostMapping("/{noticeId}/read")
+    public Result<Void> markRead(@PathVariable Long noticeId, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        String role = (String) session.getAttribute("role");
+        if (!"STUDENT".equals(role)) {
+            return Result.success();
+        }
+        noticeService.markAsRead(noticeId, userId);
         return Result.success();
     }
 

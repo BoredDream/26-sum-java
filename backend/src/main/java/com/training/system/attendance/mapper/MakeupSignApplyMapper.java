@@ -41,4 +41,14 @@ public interface MakeupSignApplyMapper {
                                    @Param("teacherId") Long teacherId,
                                    @Param("offset") int offset,
                                    @Param("limit") int limit);
+
+    /**
+     * 统计学生未查看的补签审核结果数
+     */
+    long countUnviewedResults(@Param("studentId") Long studentId);
+
+    /**
+     * 将学生所有已审核的补签申请标记为已查看
+     */
+    int markResultsViewed(@Param("studentId") Long studentId);
 }

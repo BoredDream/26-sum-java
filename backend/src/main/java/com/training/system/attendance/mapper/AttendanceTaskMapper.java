@@ -39,4 +39,13 @@ public interface AttendanceTaskMapper {
                                       @Param("limit") int limit);
 
     AttendanceTaskDetailVO selectDetailById(@Param("taskId") Long taskId);
+
+    @Delete("DELETE FROM attendance_record WHERE task_id = #{taskId}")
+    int deleteRecordsByTaskId(@Param("taskId") Long taskId);
+
+    @Delete("DELETE FROM makeup_sign_apply WHERE task_id = #{taskId}")
+    int deleteMakeupByTaskId(@Param("taskId") Long taskId);
+
+    @Delete("DELETE FROM attendance_task WHERE task_id = #{taskId}")
+    int deleteById(@Param("taskId") Long taskId);
 }

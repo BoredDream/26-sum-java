@@ -301,6 +301,7 @@ CREATE TABLE makeup_sign_apply (
   audit_teacher_id BIGINT NULL COMMENT '审核教师ID',
   audit_comment TEXT NULL COMMENT '审核意见',
   audit_time DATETIME NULL COMMENT '审核时间',
+  result_viewed TINYINT NOT NULL DEFAULT 0 COMMENT '学生是否已查看审核结果：0-未查看，1-已查看',
   create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
   update_time DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   CONSTRAINT fk_makeup_task FOREIGN KEY (task_id) REFERENCES attendance_task(task_id),

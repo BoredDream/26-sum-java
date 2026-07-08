@@ -69,6 +69,25 @@ public class MakeupSignApplyController {
         return Result.success(pageResult);
     }
 
+    @GetMapping("/unviewed-count")
+    public Result<Long> unviewedCount(HttpSession session) {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        if (!user.isStudent()) {
+            return Result.success(0L);
+        }
+        return Result.success(makeupSignApplyService.countUnviewedResults(user.getRelatedId()));
+    }
+
+    @PostMapping("/mark-viewed")
+    public Result<Void> markViewed(HttpSession session) {
+        CurrentUserDTO user = SessionUtil.getCurrentUser(session);
+        if (!user.isStudent()) {
+            return Result.success();
+        }
+        makeupSignApplyService.markResultsViewed(user.getRelatedId());
+        return Result.success();
+    }
+
     @PostMapping("/upload")
     public Result<String> upload(@RequestParam("file") MultipartFile file, HttpSession session) throws IOException {
         CurrentUserDTO user = SessionUtil.getCurrentUser(session);

@@ -124,6 +124,24 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
     }
 
     @Override
+    @Transactional
+    public void deleteTask(Long taskId, CurrentUserDTO user) {
+        if (!user.isTeacher() && !user.isAdmin()) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "无权限删除签到任务");
+        }
+        AttendanceTask task = attendanceTaskMapper.selectById(taskId);
+        if (task == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "签到任务不存在");
+        }
+        if (user.isTeacher() && !task.getTeacherId().equals(user.getRelatedId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN, "只能删除本人发布的任务");
+        }
+        attendanceTaskMapper.deleteRecordsByTaskId(taskId);
+        attendanceTaskMapper.deleteMakeupByTaskId(taskId);
+        attendanceTaskMapper.deleteById(taskId);
+    }
+
+    @Override
     public PageResult<AttendanceTaskVO> page(AttendanceTaskQueryDTO dto, CurrentUserDTO user) {
         Long teacherId = user.isTeacher() ? user.getRelatedId() : null;
         Long studentId = user.isStudent() ? user.getRelatedId() : null;

@@ -60,4 +60,15 @@ public interface AttendanceRecordMapper {
                                                        @Param("startDate") String startDate,
                                                        @Param("endDate") String endDate,
                                                        @Param("teacherId") Long teacherId);
+
+    /**
+     * 统计学生未签到的进行中任务数
+     */
+    long countUnsignedTasks(@Param("studentId") Long studentId);
+
+    /**
+     * 查询学生已签到的任务ID列表
+     */
+    @Select("SELECT DISTINCT r.task_id FROM attendance_record r JOIN attendance_task t ON r.task_id = t.task_id WHERE r.student_id = #{studentId} AND r.sign_status != 0 AND t.status != 2 AND t.start_time <= NOW() AND t.end_time >= NOW()")
+    java.util.List<Long> selectSignedTaskIds(@Param("studentId") Long studentId);
 }

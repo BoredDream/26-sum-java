@@ -19,4 +19,6 @@ public interface AttendanceTaskService {
     PageResult<AttendanceTaskVO> page(AttendanceTaskQueryDTO dto, CurrentUserDTO user);
 
     AttendanceTaskDetailVO detail(Long taskId, CurrentUserDTO user);
+
+    void deleteTask(Long taskId, CurrentUserDTO user);
 }

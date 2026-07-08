@@ -218,6 +218,8 @@ async function handleSubmit() {
 onMounted(() => {
   loadApplications()
   loadTaskOptions()
+  // 标记已查看所有补签审核结果
+  attendanceApi.markMakeupResultsViewed().catch(() => {})
 })
 </script>
 

@@ -18,4 +18,14 @@ public interface AttendanceRecordService {
     PageResult<AttendanceRecordVO> page(AttendanceRecordQueryDTO dto, CurrentUserDTO user);
 
     List<AttendanceRecordVO> listForExport(AttendanceRecordQueryDTO dto, CurrentUserDTO user);
+
+    /**
+     * 统计学生未签到的进行中任务数
+     */
+    long countUnsignedTasks(Long studentId);
+
+    /**
+     * 查询学生已签到的进行中任务ID列表
+     */
+    java.util.List<Long> getSignedTaskIds(Long studentId);
 }

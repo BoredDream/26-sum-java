@@ -1,4 +1,4 @@
-import { get, post, uploadFile, downloadFile } from '@/utils/request'
+import { get, post, del, uploadFile, downloadFile } from '@/utils/request'
 import type { PageResult } from '@/types/api'
 import type {
   AttendanceTaskVO,
@@ -23,6 +23,10 @@ export function createAttendanceTask(data: AttendanceTaskCreateDTO) {
 
 export function finishAttendanceTask(taskId: number) {
   return post<void>(`/attendance/task/${taskId}/finish`)
+}
+
+export function deleteAttendanceTask(taskId: number) {
+  return del<void>(`/attendance/task/${taskId}`)
 }
 
 export function getAttendanceTaskDetail(taskId: number) {
@@ -68,4 +72,21 @@ export function uploadMakeupProof(file: File) {
 // 考勤统计
 export function getAttendanceStatistics(query?: AttendanceStatisticsQuery) {
   return get<AttendanceStatisticsVO>('/attendance/statistics', { params: query })
+}
+
+// 未读/未处理计数
+export function getUnsignedTaskCount() {
+  return get<number>('/attendance/unsigned-count')
+}
+
+export function getUnviewedMakeupCount() {
+  return get<number>('/attendance/makeup/unviewed-count')
+}
+
+export function getSignedTaskIds() {
+  return get<number[]>('/attendance/signed-task-ids')
+}
+
+export function markMakeupResultsViewed() {
+  return post<void>('/attendance/makeup/mark-viewed')
 }

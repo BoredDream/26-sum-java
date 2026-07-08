@@ -8,6 +8,7 @@ import com.training.system.info.dto.NoticeUpdateDTO;
 import com.training.system.info.entity.Notice;
 import com.training.system.exception.BusinessException;
 import com.training.system.info.mapper.NoticeMapper;
+import com.training.system.info.mapper.NoticeReadRecordMapper;
 import com.training.system.info.service.NoticeService;
 import com.training.system.info.util.FileValidator;
 import com.training.system.info.vo.NoticeVO;
@@ -30,6 +31,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Autowired
     private NoticeMapper noticeMapper;
+
+    @Autowired
+    private NoticeReadRecordMapper noticeReadRecordMapper;
 
     @Value("${file.upload.dir:./uploads}")
     private String uploadDir;
@@ -124,6 +128,26 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     public long count() {
         return noticeMapper.countPage(null, null);
+    }
+
+    @Override
+    public long getUnreadCount(Long userId) {
+        return noticeReadRecordMapper.countUnread(userId);
+    }
+
+    @Override
+    public java.util.List<Long> getReadNoticeIds(Long userId) {
+        return noticeReadRecordMapper.selectReadNoticeIds(userId);
+    }
+
+    @Override
+    @Transactional
+    public void markAsRead(Long noticeId, Long userId) {
+        Notice notice = noticeMapper.selectById(noticeId);
+        if (notice == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND, "公告不存在");
+        }
+        noticeReadRecordMapper.insert(noticeId, userId);
     }
 
     @Override

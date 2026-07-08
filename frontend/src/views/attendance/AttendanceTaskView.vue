@@ -53,25 +53,36 @@
         </template>
       </el-table-column>
       <el-table-column prop="teacherName" label="发布人" width="120" />
-      <el-table-column label="操作" width="150" fixed="right">
+      <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
-          <el-button
-            type="primary"
-            text
-            size="small"
-            @click="openDetail(scope.row as AttendanceTaskVO)"
-            >详情</el-button
-          >
-          <el-button
-            v-if="(scope.row as AttendanceTaskVO).status !== 2"
-            type="warning"
-            text
-            size="small"
-            :loading="finishId === (scope.row as AttendanceTaskVO).taskId"
-            @click="handleFinish(scope.row as AttendanceTaskVO)"
-          >
-            结束任务
-          </el-button>
+          <div class="action-btns">
+            <el-button
+              type="primary"
+              text
+              size="small"
+              @click="openDetail(scope.row as AttendanceTaskVO)"
+              >详情</el-button
+            >
+            <el-button
+              v-if="(scope.row as AttendanceTaskVO).status !== 2"
+              type="warning"
+              text
+              size="small"
+              :loading="finishId === (scope.row as AttendanceTaskVO).taskId"
+              @click="handleFinish(scope.row as AttendanceTaskVO)"
+            >
+              结束任务
+            </el-button>
+            <el-button
+              type="danger"
+              text
+              size="small"
+              :loading="deleteId === (scope.row as AttendanceTaskVO).taskId"
+              @click="handleDelete(scope.row as AttendanceTaskVO)"
+            >
+              删除
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -366,6 +377,28 @@ async function handleSubmit() {
   }
 }
 
+// 删除任务
+const deleteId = ref(0)
+async function handleDelete(row: AttendanceTaskVO) {
+  try {
+    await ElMessageBox.confirm('确认删除该签到任务？将同时删除关联的考勤记录和补签申请。', '删除确认', {
+      type: 'warning',
+    })
+  } catch {
+    return
+  }
+  deleteId.value = row.taskId
+  try {
+    await attendanceApi.deleteAttendanceTask(row.taskId)
+    ElMessage.success('已删除')
+    loadTasks()
+  } catch (err: any) {
+    ElMessage.error(err?.message || '删除失败')
+  } finally {
+    deleteId.value = 0
+  }
+}
+
 // 结束任务
 const finishId = ref(0)
 async function handleFinish(row: AttendanceTaskVO) {
@@ -448,6 +481,13 @@ onMounted(loadTasks)
     font-size: 16px;
     font-weight: 600;
     color: #303133;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
   }
 }
 </style>

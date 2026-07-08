@@ -11,7 +11,12 @@
     <el-empty v-if="!loading && notices.length === 0 && !error" description="暂无公告" />
 
     <el-table v-loading="loading" :data="notices" border class="data-table">
-      <el-table-column prop="title" label="标题" show-overflow-tooltip />
+      <el-table-column label="标题" show-overflow-tooltip>
+        <template #default="scope">
+          <span v-if="isUnread((scope.row as NoticeVO).noticeId)" class="unread-dot"></span>
+          {{ (scope.row as NoticeVO).title }}
+        </template>
+      </el-table-column>
       <el-table-column prop="type" label="类型" width="120" />
       <el-table-column label="置顶" width="90">
         <template #default="scope">
@@ -141,6 +146,21 @@ const notices = ref<NoticeVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
+const readNoticeIds = ref<Set<number>>(new Set())
+
+function isUnread(noticeId: number): boolean {
+  return !readNoticeIds.value.has(noticeId)
+}
+
+async function loadReadIds() {
+  if (!auth.isStudent) return
+  try {
+    const ids = await infoApi.getReadNoticeIds()
+    readNoticeIds.value = new Set(ids)
+  } catch {
+    // 静默失败
+  }
+}
 
 async function loadNotices() {
   loading.value = true
@@ -163,9 +183,18 @@ async function loadNotices() {
 const detailVisible = ref(false)
 const currentNotice = ref<NoticeVO | null>(null)
 
-function openDetail(row: NoticeVO) {
+async function openDetail(row: NoticeVO) {
   currentNotice.value = row
   detailVisible.value = true
+  // 学生查看公告详情时标记为已读
+  if (auth.isStudent) {
+    readNoticeIds.value.add(row.noticeId)
+    try {
+      await infoApi.markNoticeRead(row.noticeId)
+    } catch {
+      // 静默失败 — 标记已读失败不影响查看公告
+    }
+  }
 }
 
 // 表单
@@ -290,7 +319,10 @@ async function handleToggleTop(row: NoticeVO) {
   }
 }
 
-onMounted(loadNotices)
+onMounted(() => {
+  loadNotices()
+  loadReadIds()
+})
 </script>
 
 <style scoped lang="scss">
@@ -348,6 +380,17 @@ onMounted(loadNotices)
 
   .notice-attachment {
     margin-top: 16px;
+  }
+
+  .unread-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    margin-bottom: 2px;
+    background: #409eff;
+    border-radius: 50%;
+    vertical-align: middle;
   }
 }
 </style>

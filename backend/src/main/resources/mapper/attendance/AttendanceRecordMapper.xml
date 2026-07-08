@@ -75,4 +75,15 @@
         </where>
     </select>
 
+    <select id="countUnsignedTasks" resultType="long">
+        SELECT COUNT(*)
+        FROM attendance_record r
+        JOIN attendance_task t ON r.task_id = t.task_id
+        WHERE r.student_id = #{studentId}
+          AND r.sign_status = 0
+          AND t.status != 2
+          AND t.start_time &lt;= NOW()
+          AND t.end_time &gt;= NOW()
+    </select>
+
 </mapper>
