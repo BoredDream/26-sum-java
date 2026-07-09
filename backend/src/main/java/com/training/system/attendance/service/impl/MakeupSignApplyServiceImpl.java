@@ -188,6 +188,12 @@ public class MakeupSignApplyServiceImpl implements MakeupSignApplyService {
     }
 
     @Override
+    public String getProofPath(Long applyId) {
+        MakeupSignApply apply = makeupSignApplyMapper.selectById(applyId);
+        return apply != null ? apply.getProofFilePath() : null;
+    }
+
+    @Override
     @Transactional
     public void markResultsViewed(Long studentId) {
         makeupSignApplyMapper.markResultsViewed(studentId);

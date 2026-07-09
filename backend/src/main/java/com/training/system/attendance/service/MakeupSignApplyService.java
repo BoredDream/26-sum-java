@@ -27,4 +27,6 @@ public interface MakeupSignApplyService {
      * 将学生所有已审核的补签申请标记为已查看
      */
     void markResultsViewed(Long studentId);
+
+    String getProofPath(Long applyId);
 }

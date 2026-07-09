@@ -63,7 +63,7 @@
             filterable
           >
             <el-option
-              v-for="task in taskOptions"
+              v-for="task in selectableTasks"
               :key="task.taskId"
               :label="task.taskTitle"
               :value="task.taskId"
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules, UploadFile, UploadInstance } from 'element-plus'
 import * as attendanceApi from '@/api/attendance'
@@ -120,6 +120,29 @@ const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
 const taskOptions = ref<AttendanceTaskVO[]>([])
+
+// 补签可选任务 = 缺勤 + 没有待审核申请
+const absentIds = ref<Set<number>>(new Set())
+
+const selectableTasks = computed(() => {
+  const pendingIds = new Set(
+    applications.value.filter((a) => a.auditStatus === 0).map((a) => a.taskId)
+  )
+  return taskOptions.value.filter(
+    (t) => absentIds.value.has(t.taskId) && !pendingIds.has(t.taskId)
+  )
+})
+
+async function loadAbsentIds() {
+  try {
+    const res = await attendanceApi.queryAttendanceRecordPage({
+      pageNum: 1,
+      pageSize: 200,
+      signStatus: 0,
+    })
+    absentIds.value = new Set(res.records.map((r) => r.taskId))
+  } catch { /* 静默 */ }
+}
 
 async function loadApplications() {
   loading.value = true
@@ -218,6 +241,7 @@ async function handleSubmit() {
 onMounted(() => {
   loadApplications()
   loadTaskOptions()
+  loadAbsentIds()
   // 标记已查看所有补签审核结果
   attendanceApi.markMakeupResultsViewed().catch(() => {})
 })
