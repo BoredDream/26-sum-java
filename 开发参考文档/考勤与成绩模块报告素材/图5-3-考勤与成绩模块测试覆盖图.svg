@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Microsoft YaHei",Arial;fill:#111827}
+      .box{fill:#fff;stroke:#2563eb;stroke-width:2;rx:10}
+      .score{fill:#f0fdf4;stroke:#16a34a;stroke-width:2;rx:10}
+      .risk{fill:#fff7ed;stroke:#f97316;stroke-width:2;rx:10}
+      .head{font:700 18px "Microsoft YaHei",Arial;fill:#111827}
+      .text{font:15px "Microsoft YaHei",Arial;fill:#374151}
+      .muted{font:13px "Microsoft YaHei",Arial;fill:#64748b}
+      .line{stroke:#334155;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="720" fill="#ffffff"/>
+  <text x="600" y="48" text-anchor="middle" class="title">考勤与成绩模块测试覆盖图</text>
+
+  <rect x="85" y="110" width="260" height="130" class="box"/>
+  <text x="215" y="145" text-anchor="middle" class="head">考勤任务测试</text>
+  <text x="115" y="178" class="text">A-01 发布签到任务</text>
+  <text x="115" y="204" class="text">A-02 结束签到任务</text>
+  <text x="115" y="230" class="muted">校验时间、范围、权限</text>
+
+  <rect x="465" y="110" width="260" height="130" class="box"/>
+  <text x="595" y="145" text-anchor="middle" class="head">学生签到测试</text>
+  <text x="495" y="178" class="text">A-03 正常/迟到签到</text>
+  <text x="495" y="204" class="text">A-04 定位范围校验</text>
+  <text x="495" y="230" class="muted">防重复、超时、缺少定位</text>
+
+  <rect x="845" y="110" width="260" height="130" class="box"/>
+  <text x="975" y="145" text-anchor="middle" class="head">补签与统计测试</text>
+  <text x="875" y="178" class="text">A-05 补签审核</text>
+  <text x="875" y="204" class="text">A-06 考勤统计</text>
+  <text x="875" y="230" class="muted">出勤率、迟到、缺勤、补签</text>
+
+  <rect x="85" y="330" width="260" height="130" class="score"/>
+  <text x="215" y="365" text-anchor="middle" class="head">阶段任务测试</text>
+  <text x="115" y="398" class="text">G-01 阶段状态判断</text>
+  <text x="115" y="424" class="text">G-02 阶段权重校验</text>
+  <text x="115" y="450" class="muted">未开始、进行中、已结束</text>
+
+  <rect x="465" y="330" width="260" height="130" class="score"/>
+  <text x="595" y="365" text-anchor="middle" class="head">过程评价测试</text>
+  <text x="495" y="398" class="text">G-03 阶段评分保存</text>
+  <text x="495" y="424" class="text">G-04 加权得分计算</text>
+  <text x="495" y="450" class="muted">文档、完成度、创新、技术</text>
+
+  <rect x="845" y="330" width="260" height="130" class="score"/>
+  <text x="975" y="365" text-anchor="middle" class="head">成绩管理测试</text>
+  <text x="875" y="398" class="text">G-05 成绩录入计算</text>
+  <text x="875" y="424" class="text">G-06 成绩确认锁定</text>
+  <text x="875" y="450" class="muted">团队成绩、个人成绩、导出</text>
+
+  <rect x="260" y="565" width="680" height="90" class="risk"/>
+  <text x="600" y="600" text-anchor="middle" class="head">异常与权限覆盖</text>
+  <text x="600" y="628" text-anchor="middle" class="text">学生越权发布、教师审核他人任务、重复签到、无定位签到、已确认成绩再次修改</text>
+
+  <path d="M345 175 H465" class="line"/>
+  <path d="M725 175 H845" class="line"/>
+  <path d="M215 240 V330" class="line"/>
+  <path d="M595 240 V330" class="line"/>
+  <path d="M975 240 V330" class="line"/>
+  <path d="M215 460 C250 535 330 565 430 565" class="line"/>
+  <path d="M595 460 V565" class="line"/>
+  <path d="M975 460 C950 535 870 565 770 565" class="line"/>
+</svg>

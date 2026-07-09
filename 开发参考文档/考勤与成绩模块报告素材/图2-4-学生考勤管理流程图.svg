@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4b5563"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Microsoft YaHei",Arial;fill:#111827}
+      .lane{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}
+      .lane-title{font:700 20px "Microsoft YaHei",Arial;fill:#334155}
+      .box{fill:#ffffff;stroke:#3b82f6;stroke-width:2;rx:10}
+      .decision{fill:#fff7ed;stroke:#f97316;stroke-width:2}
+      .text{font:16px "Microsoft YaHei",Arial;fill:#1f2937}
+      .small{font:13px "Microsoft YaHei",Arial;fill:#64748b}
+      .arrow{stroke:#4b5563;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .bad{fill:#fef2f2;stroke:#ef4444;stroke-width:2;rx:10}
+      .ok{fill:#ecfdf5;stroke:#10b981;stroke-width:2;rx:10}
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1200" height="760" fill="#ffffff"/>
+  <text x="600" y="48" text-anchor="middle" class="title">学生考勤管理模块流程图</text>
+
+  <rect x="40" y="80" width="340" height="620" class="lane"/>
+  <rect x="430" y="80" width="340" height="620" class="lane"/>
+  <rect x="820" y="80" width="340" height="620" class="lane"/>
+  <text x="210" y="115" text-anchor="middle" class="lane-title">教师 / 管理员</text>
+  <text x="600" y="115" text-anchor="middle" class="lane-title">系统</text>
+  <text x="990" y="115" text-anchor="middle" class="lane-title">学生</text>
+
+  <rect x="85" y="145" width="250" height="62" class="box"/>
+  <text x="210" y="170" text-anchor="middle" class="text">发布签到任务</text>
+  <text x="210" y="193" text-anchor="middle" class="small">设置时间、范围、定位半径</text>
+
+  <rect x="475" y="145" width="250" height="62" class="box"/>
+  <text x="600" y="170" text-anchor="middle" class="text">校验任务信息</text>
+  <text x="600" y="193" text-anchor="middle" class="small">时间、类型、范围、签到点</text>
+
+  <polygon points="600,245 725,300 600,355 475,300" class="decision"/>
+  <text x="600" y="296" text-anchor="middle" class="text">校验通过?</text>
+  <text x="600" y="320" text-anchor="middle" class="small">失败则提示修改</text>
+
+  <rect x="475" y="395" width="250" height="62" class="box"/>
+  <text x="600" y="420" text-anchor="middle" class="text">生成初始考勤记录</text>
+  <text x="600" y="443" text-anchor="middle" class="small">范围内学生默认为缺勤</text>
+
+  <rect x="865" y="145" width="250" height="62" class="box"/>
+  <text x="990" y="170" text-anchor="middle" class="text">查看待签到任务</text>
+  <text x="990" y="193" text-anchor="middle" class="small">只显示本人范围内任务</text>
+
+  <rect x="865" y="245" width="250" height="62" class="box"/>
+  <text x="990" y="270" text-anchor="middle" class="text">点击在线签到</text>
+  <text x="990" y="293" text-anchor="middle" class="small">填写备注并确认</text>
+
+  <rect x="865" y="345" width="250" height="62" class="box"/>
+  <text x="990" y="370" text-anchor="middle" class="text">定位签到校验</text>
+  <text x="990" y="393" text-anchor="middle" class="small">获取当前位置并计算距离</text>
+
+  <polygon points="600,490 725,545 600,600 475,545" class="decision"/>
+  <text x="600" y="535" text-anchor="middle" class="text">时间/范围/重复</text>
+  <text x="600" y="559" text-anchor="middle" class="text">校验通过?</text>
+
+  <rect x="865" y="510" width="250" height="62" class="ok"/>
+  <text x="990" y="535" text-anchor="middle" class="text">签到成功</text>
+  <text x="990" y="558" text-anchor="middle" class="small">状态为正常或迟到</text>
+
+  <rect x="85" y="510" width="250" height="62" class="bad"/>
+  <text x="210" y="535" text-anchor="middle" class="text">补签申请与审核</text>
+  <text x="210" y="558" text-anchor="middle" class="small">通过后更新为补签</text>
+
+  <rect x="475" y="635" width="250" height="50" class="box"/>
+  <text x="600" y="665" text-anchor="middle" class="text">生成考勤统计与记录查询</text>
+
+  <path d="M335 176 H475" class="arrow"/>
+  <path d="M600 207 V245" class="arrow"/>
+  <path d="M600 355 V395" class="arrow"/>
+  <path d="M725 426 H865 V207" class="arrow"/>
+  <path d="M990 207 V245" class="arrow"/>
+  <path d="M990 307 V345" class="arrow"/>
+  <path d="M865 376 H725 V500" class="arrow"/>
+  <path d="M725 545 H865" class="arrow"/>
+  <path d="M475 545 H335" class="arrow"/>
+  <path d="M210 572 V660 H475" class="arrow"/>
+  <path d="M990 572 V660 H725" class="arrow"/>
+  <text x="748" y="530" class="small">是</text>
+  <text x="355" y="530" class="small">否/异常</text>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <style>
+    .title{font:700 28px "Microsoft YaHei",Arial;fill:#111827}
+    .nav{fill:#2f4358}
+    .navText{font:16px "Microsoft YaHei",Arial;fill:#dbeafe}
+    .page{fill:#eef2f7}
+    .panel{fill:#fff;stroke:#d1d5db;stroke-width:1.2;rx:8}
+    .head{font:700 20px "Microsoft YaHei",Arial;fill:#111827}
+    .th{font:700 15px "Microsoft YaHei",Arial;fill:#6b7280}
+    .td{font:15px "Microsoft YaHei",Arial;fill:#374151}
+    .line{stroke:#e5e7eb;stroke-width:1}
+    .btn{fill:#409eff;rx:5}
+    .btnText{font:700 14px "Microsoft YaHei",Arial;fill:#fff}
+    .tag{fill:#fff7ed;stroke:#f59e0b;rx:4}
+    .tagText{font:13px "Microsoft YaHei",Arial;fill:#b45309}
+    .summary{fill:#eff6ff;stroke:#bfdbfe;rx:6}
+  </style>
+  <rect width="1200" height="720" fill="#fff"/>
+  <rect width="190" height="720" class="nav"/>
+  <text x="34" y="48" class="navText" style="font-weight:700">综合实训选题系统</text>
+  <text x="34" y="130" class="navText">阶段任务</text>
+  <text x="34" y="180" class="navText">过程评价</text>
+  <text x="34" y="230" class="navText">成绩管理</text>
+  <text x="34" y="280" class="navText">我的成绩</text>
+  <rect x="190" width="1010" height="720" class="page"/>
+  <text x="230" y="50" class="title">成绩管理</text>
+
+  <rect x="230" y="90" width="910" height="255" class="panel"/>
+  <text x="260" y="130" class="th">团队名称</text>
+  <text x="390" y="130" class="th">过程评价</text>
+  <text x="535" y="130" class="th">文档成绩</text>
+  <text x="650" y="130" class="th">考勤成绩</text>
+  <text x="765" y="130" class="th">系统成绩</text>
+  <text x="880" y="130" class="th">答辩成绩</text>
+  <text x="1000" y="130" class="th">总成绩</text>
+  <line x1="250" y1="150" x2="1120" y2="150" class="line"/>
+  <text x="260" y="190" class="td">第一小组</text>
+  <text x="390" y="190" class="td">2/3 阶段，86.5</text>
+  <text x="555" y="190" class="td">13.0</text>
+  <text x="675" y="190" class="td">14.0</text>
+  <text x="790" y="190" class="td">43.2</text>
+  <text x="905" y="190" class="td">18.0</text>
+  <text x="1015" y="190" class="td">88.2</text>
+  <line x1="250" y1="215" x2="1120" y2="215" class="line"/>
+  <text x="260" y="255" class="td">第二小组</text>
+  <text x="390" y="255" class="td">1/3 阶段，79.0</text>
+  <text x="555" y="255" class="td">未生成</text>
+  <text x="675" y="255" class="td">未生成</text>
+  <text x="790" y="255" class="td">未生成</text>
+  <text x="905" y="255" class="td">未生成</text>
+  <rect x="1000" y="235" width="70" height="28" class="tag"/>
+  <text x="1035" y="254" text-anchor="middle" class="tagText">待保存</text>
+
+  <rect x="305" y="375" width="780" height="270" fill="#fff" stroke="#cbd5e1" stroke-width="2" rx="8"/>
+  <text x="335" y="415" class="head">编辑成绩</text>
+  <rect x="335" y="440" width="700" height="58" class="summary"/>
+  <text x="360" y="474" class="td">过程评价：2/3 阶段，过程加权 86.5，建议文档 13.0 / 15，建议系统 43.2 / 50</text>
+  <rect x="850" y="512" width="145" height="34" class="btn"/>
+  <text x="922" y="534" text-anchor="middle" class="btnText">同步过程评价分</text>
+  <text x="360" y="535" class="td">文档编写成绩：13.0 / 15</text>
+  <text x="360" y="575" class="td">考勤成绩：14.0 / 15</text>
+  <text x="600" y="535" class="td">系统实现与测试：43.2 / 50</text>
+  <text x="600" y="575" class="td">答辩成绩：18.0 / 20</text>
+  <text x="360" y="615" class="td">个人成绩调整：按贡献系数生成成员个人成绩明细</text>
+  <rect x="905" y="595" width="90" height="36" class="btn"/>
+  <text x="950" y="618" text-anchor="middle" class="btnText">保存成绩</text>
+</svg>

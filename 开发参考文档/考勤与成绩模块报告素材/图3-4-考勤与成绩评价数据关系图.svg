@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1250" height="780" viewBox="0 0 1250 780">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Microsoft YaHei",Arial;fill:#111827}
+      .group{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;rx:12}
+      .table{fill:#ffffff;stroke:#2563eb;stroke-width:2;rx:8}
+      .score{fill:#f0fdf4;stroke:#16a34a;stroke-width:2;rx:8}
+      .base{fill:#fff7ed;stroke:#f97316;stroke-width:2;rx:8}
+      .head{font:700 17px "Microsoft YaHei",Arial;fill:#0f172a}
+      .field{font:13px "Microsoft YaHei",Arial;fill:#475569}
+      .label{font:700 18px "Microsoft YaHei",Arial;fill:#334155}
+      .rel{stroke:#334155;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2;fill:none;stroke-dasharray:7 5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1250" height="780" fill="#ffffff"/>
+  <text x="625" y="46" text-anchor="middle" class="title">考勤与成绩评价数据关系图</text>
+
+  <rect x="45" y="80" width="540" height="620" class="group"/>
+  <text x="315" y="118" text-anchor="middle" class="label">考勤管理数据</text>
+  <rect x="665" y="80" width="540" height="620" class="group"/>
+  <text x="935" y="118" text-anchor="middle" class="label">成绩评价与过程监控数据</text>
+
+  <rect x="215" y="145" width="210" height="110" class="table"/>
+  <text x="320" y="172" text-anchor="middle" class="head">attendance_task</text>
+  <text x="235" y="198" class="field">task_id 主键</text>
+  <text x="235" y="218" class="field">teacher_id 发布教师</text>
+  <text x="235" y="238" class="field">start_time / end_time</text>
+
+  <rect x="90" y="330" width="210" height="120" class="table"/>
+  <text x="195" y="357" text-anchor="middle" class="head">attendance_record</text>
+  <text x="110" y="383" class="field">record_id 主键</text>
+  <text x="110" y="403" class="field">task_id 外键</text>
+  <text x="110" y="423" class="field">student_id 学生</text>
+  <text x="110" y="443" class="field">sign_status 状态</text>
+
+  <rect x="335" y="330" width="210" height="120" class="table"/>
+  <text x="440" y="357" text-anchor="middle" class="head">makeup_sign_apply</text>
+  <text x="355" y="383" class="field">apply_id 主键</text>
+  <text x="355" y="403" class="field">record_id 考勤记录</text>
+  <text x="355" y="423" class="field">audit_status 审核状态</text>
+  <text x="355" y="443" class="field">audit_opinion 审核意见</text>
+
+  <rect x="190" y="535" width="260" height="95" class="base"/>
+  <text x="320" y="562" text-anchor="middle" class="head">attendance_statistics</text>
+  <text x="210" y="590" class="field">根据记录动态统计</text>
+  <text x="210" y="612" class="field">正常、迟到、缺勤、补签、出勤率</text>
+
+  <rect x="820" y="145" width="210" height="110" class="score"/>
+  <text x="925" y="172" text-anchor="middle" class="head">stage_task</text>
+  <text x="840" y="198" class="field">stage_id 主键</text>
+  <text x="840" y="218" class="field">start_time / end_time</text>
+  <text x="840" y="238" class="field">weight 阶段权重</text>
+
+  <rect x="695" y="330" width="210" height="120" class="score"/>
+  <text x="800" y="357" text-anchor="middle" class="head">stage_evaluation</text>
+  <text x="715" y="383" class="field">evaluation_id 主键</text>
+  <text x="715" y="403" class="field">stage_id 阶段任务</text>
+  <text x="715" y="423" class="field">team_id 团队</text>
+  <text x="715" y="443" class="field">total_score 阶段得分</text>
+
+  <rect x="945" y="330" width="210" height="120" class="score"/>
+  <text x="1050" y="357" text-anchor="middle" class="head">contribution</text>
+  <text x="965" y="383" class="field">team_id 团队</text>
+  <text x="965" y="403" class="field">student_id 学生</text>
+  <text x="965" y="423" class="field">contribution_score</text>
+  <text x="965" y="443" class="field">workload_ratio</text>
+
+  <rect x="695" y="535" width="210" height="120" class="score"/>
+  <text x="800" y="562" text-anchor="middle" class="head">score_record</text>
+  <text x="715" y="588" class="field">team_id 团队成绩</text>
+  <text x="715" y="608" class="field">doc / attendance / system</text>
+  <text x="715" y="628" class="field">defense / total_score</text>
+  <text x="715" y="648" class="field">status 确认状态</text>
+
+  <rect x="945" y="535" width="210" height="120" class="score"/>
+  <text x="1050" y="562" text-anchor="middle" class="head">student_score</text>
+  <text x="965" y="588" class="field">score_id 团队成绩</text>
+  <text x="965" y="608" class="field">student_id 学生</text>
+  <text x="965" y="628" class="field">contribution_factor</text>
+  <text x="965" y="648" class="field">personal_score</text>
+
+  <rect x="505" y="700" width="240" height="58" class="base"/>
+  <text x="625" y="725" text-anchor="middle" class="head">基础数据</text>
+  <text x="625" y="746" text-anchor="middle" class="field">student、team_info、project_topic</text>
+
+  <path d="M320 255 V330" class="rel"/>
+  <path d="M300 390 H335" class="rel"/>
+  <path d="M195 450 C195 500 260 520 320 535" class="rel"/>
+  <path d="M925 255 V330 H800" class="rel"/>
+  <path d="M905 390 H945" class="rel"/>
+  <path d="M800 450 V535" class="rel"/>
+  <path d="M1050 450 V535" class="rel"/>
+  <path d="M905 595 H945" class="rel"/>
+  <path d="M450 582 C560 540 620 540 695 570" class="dash"/>
+  <path d="M625 700 C520 640 370 620 300 620" class="dash"/>
+  <path d="M625 700 C705 650 760 655 800 655" class="dash"/>
+  <path d="M625 700 C800 690 960 670 1050 655" class="dash"/>
+
+  <text x="548" y="528" class="field">考勤统计作为考勤成绩依据</text>
+  <text x="538" y="680" class="field">学生、团队、题目关联</text>
+</svg>

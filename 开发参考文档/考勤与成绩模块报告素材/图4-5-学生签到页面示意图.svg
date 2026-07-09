@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <style>
+    .title{font:700 28px "Microsoft YaHei",Arial;fill:#111827}
+    .nav{fill:#2f4358}
+    .navText{font:16px "Microsoft YaHei",Arial;fill:#dbeafe}
+    .page{fill:#eef2f7}
+    .card{fill:#fff;stroke:#d1d5db;stroke-width:1.5;rx:8}
+    .head{font:700 20px "Microsoft YaHei",Arial;fill:#111827}
+    .text{font:15px "Microsoft YaHei",Arial;fill:#374151}
+    .muted{font:13px "Microsoft YaHei",Arial;fill:#6b7280}
+    .button{fill:#409eff;rx:5}
+    .buttonText{font:700 15px "Microsoft YaHei",Arial;fill:#fff}
+    .tag{fill:#fff7ed;stroke:#f59e0b;rx:4}
+    .map{fill:#eef6ff;stroke:#bfdbfe;rx:8}
+    .ok{fill:#ecfdf5;stroke:#10b981;rx:4}
+    .line{stroke:#e5e7eb;stroke-width:1}
+  </style>
+  <rect width="1200" height="720" fill="#ffffff"/>
+  <rect x="0" y="0" width="190" height="720" class="nav"/>
+  <text x="34" y="48" class="navText" style="font-weight:700">综合实训选题系统</text>
+  <text x="34" y="130" class="navText">题目浏览</text>
+  <text x="34" y="180" class="navText">我的题目</text>
+  <text x="34" y="230" class="navText">过程文档</text>
+  <text x="34" y="280" class="navText">签到任务</text>
+  <text x="34" y="330" class="navText">考勤记录</text>
+  <text x="34" y="380" class="navText">补签申请</text>
+  <rect x="190" y="0" width="1010" height="720" class="page"/>
+  <text x="230" y="50" class="title">我的考勤</text>
+
+  <rect x="230" y="90" width="880" height="195" class="card"/>
+  <text x="260" y="128" class="head">待签到任务</text>
+  <rect x="260" y="150" width="390" height="105" class="card"/>
+  <text x="285" y="180" class="head" style="font-size:17px">第 3 周阶段签到</text>
+  <rect x="470" y="160" width="86" height="28" class="tag"/>
+  <text x="513" y="180" text-anchor="middle" class="muted" fill="#92400e">定位签到</text>
+  <text x="285" y="210" class="text">适用范围：第一小组</text>
+  <text x="285" y="235" class="text">时间：2026-07-09 08:00 至 09:00</text>
+  <rect x="535" y="210" width="90" height="34" class="button"/>
+  <text x="580" y="232" text-anchor="middle" class="buttonText">立即签到</text>
+
+  <rect x="690" y="150" width="390" height="105" class="card"/>
+  <text x="715" y="180" class="head" style="font-size:17px">项目例会签到</text>
+  <text x="715" y="210" class="text">适用范围：软件 1 班</text>
+  <text x="715" y="235" class="text">状态：已签到</text>
+  <rect x="965" y="210" width="90" height="34" fill="#909399" rx="5"/>
+  <text x="1010" y="232" text-anchor="middle" class="buttonText">已签到</text>
+
+  <rect x="315" y="315" width="580" height="340" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" rx="8"/>
+  <text x="345" y="355" class="head">签到确认</text>
+  <rect x="345" y="380" width="500" height="160" class="map"/>
+  <text x="595" y="465" text-anchor="middle" class="text">地图显示签到点、允许半径和我的位置</text>
+  <line x1="345" y1="565" x2="845" y2="565" class="line"/>
+  <text x="365" y="595" class="text">签到地点：实训楼 A305</text>
+  <text x="365" y="622" class="text">允许半径：500 米</text>
+  <text x="565" y="595" class="text">我的位置：114.357963, 30.474376</text>
+  <rect x="565" y="612" width="150" height="28" class="ok"/>
+  <text x="640" y="631" text-anchor="middle" class="muted">在签到范围内</text>
+  <rect x="735" y="610" width="90" height="36" class="button"/>
+  <text x="780" y="633" text-anchor="middle" class="buttonText">确认签到</text>
+</svg>

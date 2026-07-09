@@ -314,7 +314,8 @@ function openDetail(row: MakeupApplyVO) {
   detailVisible.value = true
 }
 
-function getFileName(path: string): string {
+function getFileName(path?: string): string {
+  if (!path) return ''
   return path.split('/').pop() || path
 }
 

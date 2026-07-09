@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Microsoft YaHei",Arial;fill:#111827}
+      .actor{fill:#f1f5f9;stroke:#64748b;stroke-width:2}
+      .actorText{font:700 18px "Microsoft YaHei",Arial;fill:#334155}
+      .system{fill:#ffffff;stroke:#94a3b8;stroke-width:2;rx:12}
+      .usecase{fill:#eff6ff;stroke:#2563eb;stroke-width:2}
+      .core{fill:#ecfdf5;stroke:#059669;stroke-width:2}
+      .support{fill:#fff7ed;stroke:#f97316;stroke-width:2}
+      .text{font:16px "Microsoft YaHei",Arial;fill:#1f2937}
+      .small{font:13px "Microsoft YaHei",Arial;fill:#64748b}
+      .line{stroke:#475569;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2;fill:none;stroke-dasharray:7 5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="600" y="48" text-anchor="middle" class="title">成绩评价与过程监控需求图</text>
+
+  <circle cx="100" cy="165" r="26" class="actor"/>
+  <line x1="100" y1="191" x2="100" y2="255" stroke="#64748b" stroke-width="3"/>
+  <line x1="62" y1="218" x2="138" y2="218" stroke="#64748b" stroke-width="3"/>
+  <line x1="100" y1="255" x2="70" y2="310" stroke="#64748b" stroke-width="3"/>
+  <line x1="100" y1="255" x2="130" y2="310" stroke="#64748b" stroke-width="3"/>
+  <text x="100" y="340" text-anchor="middle" class="actorText">学生</text>
+
+  <circle cx="1100" cy="165" r="26" class="actor"/>
+  <line x1="1100" y1="191" x2="1100" y2="255" stroke="#64748b" stroke-width="3"/>
+  <line x1="1062" y1="218" x2="1138" y2="218" stroke="#64748b" stroke-width="3"/>
+  <line x1="1100" y1="255" x2="1070" y2="310" stroke="#64748b" stroke-width="3"/>
+  <line x1="1100" y1="255" x2="1130" y2="310" stroke="#64748b" stroke-width="3"/>
+  <text x="1100" y="340" text-anchor="middle" class="actorText">教师/管理员</text>
+
+  <rect x="220" y="90" width="760" height="610" class="system"/>
+  <text x="600" y="125" text-anchor="middle" class="actorText">成绩评价与过程监控模块</text>
+
+  <ellipse cx="410" cy="190" rx="115" ry="38" class="usecase"/>
+  <text x="410" y="196" text-anchor="middle" class="text">查看阶段任务</text>
+  <ellipse cx="410" cy="295" rx="115" ry="38" class="usecase"/>
+  <text x="410" y="301" text-anchor="middle" class="text">提交过程成果</text>
+  <ellipse cx="410" cy="400" rx="115" ry="38" class="usecase"/>
+  <text x="410" y="406" text-anchor="middle" class="text">查看反馈与成绩</text>
+  <ellipse cx="410" cy="505" rx="115" ry="38" class="usecase"/>
+  <text x="410" y="511" text-anchor="middle" class="text">贡献度评价</text>
+
+  <ellipse cx="790" cy="190" rx="120" ry="38" class="core"/>
+  <text x="790" y="196" text-anchor="middle" class="text">发布阶段任务</text>
+  <ellipse cx="790" cy="295" rx="120" ry="38" class="core"/>
+  <text x="790" y="301" text-anchor="middle" class="text">过程评价评分</text>
+  <ellipse cx="790" cy="400" rx="120" ry="38" class="core"/>
+  <text x="790" y="406" text-anchor="middle" class="text">成绩管理确认</text>
+  <ellipse cx="790" cy="505" rx="120" ry="38" class="core"/>
+  <text x="790" y="511" text-anchor="middle" class="text">导出成绩报表</text>
+
+  <ellipse cx="600" cy="610" rx="145" ry="40" class="support"/>
+  <text x="600" y="606" text-anchor="middle" class="text">关联数据</text>
+  <text x="600" y="628" text-anchor="middle" class="small">团队、过程文档、开发日志、考勤统计</text>
+
+  <path d="M145 210 C210 190 250 188 295 190" class="line"/>
+  <path d="M145 245 C220 285 260 295 295 295" class="line"/>
+  <path d="M145 280 C220 385 260 400 295 400" class="line"/>
+  <path d="M145 315 C220 500 260 505 295 505" class="line"/>
+
+  <path d="M1055 205 C1000 190 955 190 910 190" class="line"/>
+  <path d="M1055 245 C1000 295 955 295 910 295" class="line"/>
+  <path d="M1055 285 C1000 400 955 400 910 400" class="line"/>
+  <path d="M1055 320 C1000 505 955 505 910 505" class="line"/>
+
+  <path d="M525 295 C575 310 620 310 670 295" class="dash"/>
+  <path d="M790 438 C760 560 710 605 745 610" class="dash"/>
+  <path d="M410 543 C450 585 500 608 455 610" class="dash"/>
+  <text x="570" y="280" class="small">作为评价依据</text>
+  <text x="765" y="585" class="small">成绩计算读取</text>
+</svg>

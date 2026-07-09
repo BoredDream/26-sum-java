@@ -47,9 +47,6 @@
       <el-table-column label="文档成绩" width="110">
         <template #default="scope">{{ formatScore((scope.row as ScoreVO).docScore) }}</template>
       </el-table-column>
-      <el-table-column label="考勤成绩" width="110">
-        <template #default="scope">{{ formatScore((scope.row as ScoreVO).attendanceScore) }}</template>
-      </el-table-column>
       <el-table-column label="系统实现" width="110">
         <template #default="scope">{{ formatScore((scope.row as ScoreVO).systemScore) }}</template>
       </el-table-column>
@@ -131,9 +128,6 @@
           <el-descriptions-item label="文档成绩">{{
             formatScore(currentScore.docScore)
           }}</el-descriptions-item>
-          <el-descriptions-item label="考勤成绩">{{
-            formatScore(currentScore.attendanceScore)
-          }}</el-descriptions-item>
           <el-descriptions-item label="系统实现与测试">{{
             formatScore(currentScore.systemScore)
           }}</el-descriptions-item>
@@ -160,7 +154,11 @@
         <el-table v-else :data="currentScore.studentScores" border>
           <el-table-column prop="studentName" label="姓名" width="120" />
           <el-table-column prop="studentNo" label="学号" width="140" />
-          <el-table-column prop="contributionFactor" label="贡献系数" width="110" />
+          <el-table-column label="贡献系数" width="110">
+            <template #default="scope">
+              {{ formatPercent((scope.row as StudentScoreVO).contributionFactor) }}
+            </template>
+          </el-table-column>
           <el-table-column prop="personalScore" label="个人成绩" width="110" />
           <el-table-column prop="grade" label="等级" width="100" />
           <el-table-column prop="teacherComment" label="评语" show-overflow-tooltip />
@@ -181,38 +179,9 @@
             />
           </el-select>
         </el-form-item>
-        <div v-if="currentEditingScore" class="process-summary">
-          <div class="summary-grid">
-            <div>
-              <span class="summary-label">过程评价</span>
-              <strong>{{ stageProgressText(currentEditingScore) }}</strong>
-            </div>
-            <div>
-              <span class="summary-label">过程加权</span>
-              <strong>{{ formatScore(currentEditingScore.processScore) }}</strong>
-            </div>
-            <div>
-              <span class="summary-label">建议文档</span>
-              <strong>{{ formatScore(currentEditingScore.suggestedDocScore) }} / 15</strong>
-            </div>
-            <div>
-              <span class="summary-label">建议系统</span>
-              <strong>{{ formatScore(currentEditingScore.suggestedSystemScore) }} / 50</strong>
-            </div>
-          </div>
-          <el-button size="small" type="primary" plain @click="syncProcessScores">
-            同步过程评价分
-          </el-button>
-        </div>
         <el-form-item label="文档编写成绩" prop="docScore">
           <div class="score-input-row">
             <el-input-number v-model="form.docScore" :min="0" :max="15" :precision="2" />
-            <span class="form-tip">/ 15</span>
-          </div>
-        </el-form-item>
-        <el-form-item label="考勤成绩" prop="attendanceScore">
-          <div class="score-input-row">
-            <el-input-number v-model="form.attendanceScore" :min="0" :max="15" :precision="2" />
             <span class="form-tip">/ 15</span>
           </div>
         </el-form-item>
@@ -228,9 +197,6 @@
             <span class="form-tip">/ 20</span>
           </div>
         </el-form-item>
-        <el-form-item label="当前总分">
-          <strong>{{ formatScore(formTotal) }}</strong>
-        </el-form-item>
         <el-form-item label="教师总评">
           <el-input
             v-model="form.teacherComment"
@@ -242,20 +208,39 @@
         </el-form-item>
         <el-form-item label="个人成绩调整">
           <el-table :data="form.studentScores" border size="small" class="student-score-table">
-            <el-table-column prop="studentName" label="姓名" width="120" />
-            <el-table-column prop="studentNo" label="学号" width="150" />
-            <el-table-column label="贡献系数" width="170">
+            <el-table-column prop="studentName" label="姓名" width="100" />
+            <el-table-column prop="studentNo" label="学号" width="130" />
+            <el-table-column label="考勤成绩" width="130">
               <template #default="scope">
-                <el-input-number
-                  v-model="(scope.row as StudentScoreFormItem).contributionFactor"
-                  :min="0"
-                  :max="2"
-                  :precision="2"
-                  class="factor-input"
-                />
+                <span class="attendance-info-cell">
+                  <span>{{ formatScore((scope.row as StudentScoreFormItem).attendanceScore) }} / 15</span>
+                  <span class="attendance-rate">
+                    {{ (scope.row as StudentScoreFormItem).attendedCount ?? 0 }}/{{ (scope.row as StudentScoreFormItem).totalTaskCount ?? 0 }} 次签到
+                  </span>
+                </span>
               </template>
             </el-table-column>
-            <el-table-column label="评语">
+            <el-table-column label="贡献系数" width="170">
+              <template #default="scope">
+                <div class="percent-input-row">
+                  <el-input-number
+                    v-model="(scope.row as StudentScoreFormItem).contributionPercent"
+                    :min="0"
+                    :max="200"
+                    :precision="0"
+                    :step="1"
+                    class="factor-input"
+                  />
+                  <span class="form-tip">%</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="总分" width="80">
+              <template #default>
+                <strong>{{ formatScore(formTotal) }}</strong>
+              </template>
+            </el-table-column>
+            <el-table-column label="评语" min-width="160">
               <template #default="scope">
                 <el-input
                   v-model="(scope.row as StudentScoreFormItem).teacherComment"
@@ -281,6 +266,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import * as scoreApi from '@/api/score'
 import * as selectionApi from '@/api/selection'
+import * as attendanceApi from '@/api/attendance'
 import type {
   ScoreVO,
   ScoreListVO,
@@ -296,7 +282,12 @@ interface StudentScoreFormItem {
   studentName?: string
   studentNo?: string
   contributionFactor?: number
+  contributionPercent?: number
   teacherComment?: string
+  attendanceRate?: number
+  attendanceScore?: number
+  attendedCount?: number
+  totalTaskCount?: number
 }
 
 const loading = ref(false)
@@ -317,6 +308,13 @@ function formatScore(value?: number | null) {
     return '0.00'
   }
   return Number(value).toFixed(2)
+}
+
+function formatPercent(value?: number | null) {
+  if (value === undefined || value === null || Number.isNaN(Number(value))) {
+    return '100%'
+  }
+  return Math.round(Number(value) * 100) + '%'
 }
 
 function stageProgressText(score: Pick<ScoreVO, 'evaluatedStageCount' | 'totalStageCount' | 'evaluatedStageWeight' | 'totalStageWeight'>) {
@@ -426,20 +424,36 @@ const formVisible = ref(false)
 const submitting = ref(false)
 const formRef = ref<FormInstance>()
 const currentEditingScore = ref<ScoreVO | null>(null)
-const form = reactive<ScoreSaveDTO & { studentScores: StudentScoreFormItem[] }>({
+interface ScoreFormModel {
+  teamId: number
+  docScore: number
+  systemScore: number
+  defenseScore: number
+  teacherComment: string
+  studentScores: StudentScoreFormItem[]
+}
+
+const form = reactive<ScoreFormModel>({
   teamId: undefined as unknown as number,
   docScore: 0,
-  attendanceScore: 0,
   systemScore: 0,
   defenseScore: 0,
   teacherComment: '',
   studentScores: [],
 })
 
+const computedAttendanceScore = computed(() => {
+  const students = form.studentScores
+  if (students.length === 0) return 0
+  // 取所有学生考勤分数的平均值作为团队考勤分
+  const totalScore = students.reduce((sum, s) => sum + (s.attendanceScore ?? 0), 0)
+  return parseFloat((totalScore / students.length).toFixed(2))
+})
+
 const formTotal = computed(
   () =>
     Number(form.docScore || 0) +
-    Number(form.attendanceScore || 0) +
+    Number(computedAttendanceScore.value || 0) +
     Number(form.systemScore || 0) +
     Number(form.defenseScore || 0)
 )
@@ -447,7 +461,6 @@ const formTotal = computed(
 const rules: FormRules = {
   teamId: [{ required: true, message: '请选择团队', trigger: 'change' }],
   docScore: [{ required: true, message: '请输入文档编写成绩', trigger: 'change' }],
-  attendanceScore: [{ required: true, message: '请输入考勤成绩', trigger: 'change' }],
   systemScore: [{ required: true, message: '请输入系统实现与测试成绩', trigger: 'change' }],
   defenseScore: [{ required: true, message: '请输入答辩成绩', trigger: 'change' }],
 }
@@ -456,9 +469,9 @@ async function openEdit(row: ScoreVO) {
   await loadTeamOptions()
   currentEditingScore.value = row
   form.teamId = row.teamId
-  form.docScore = row.docScore
-  form.attendanceScore = row.attendanceScore
-  form.systemScore = row.systemScore
+  // 过程评价分直接同步到文档编写成绩
+  form.docScore = Number(row.suggestedDocScore ?? row.docScore ?? 0)
+  form.systemScore = Number(row.suggestedSystemScore ?? row.systemScore ?? 0)
   form.defenseScore = row.defenseScore
   form.teacherComment = row.teacherComment || ''
   form.studentScores = []
@@ -467,23 +480,44 @@ async function openEdit(row: ScoreVO) {
     const team: TeamVO = await selectionApi.getTeam(row.teamId)
     const members = team.members ?? []
     const scoreId = row.scoreId
-    const existingScores = scoreId
-      ? await Promise.all(
-          members.map((m: TeamMemberVO) =>
-            scoreApi
-              .queryStudentScore(m.studentId)
-              .then((list) => list.find((item) => item.scoreId === scoreId))
+    const [existingScores, attendanceStats] = await Promise.all([
+      scoreId
+        ? Promise.all(
+            members.map((m: TeamMemberVO) =>
+              scoreApi
+                .queryStudentScore(m.studentId)
+                .then((list) => list.find((item) => item.scoreId === scoreId))
+            )
           )
+        : Promise.resolve([]),
+      Promise.all(
+        members.map((m: TeamMemberVO) =>
+          attendanceApi.getAttendanceStatistics({ studentId: m.studentId, teamId: row.teamId }).catch(() => null)
         )
-      : []
+      ),
+    ])
     form.studentScores = members.map((m: TeamMemberVO, index: number) => {
       const existing = existingScores[index]
+      const stats = attendanceStats[index]
+      // 考勤自适应：根据实际签到记录折算，每次签到权重 = 15 / 总签到次数
+      const totalTaskCount = stats?.totalCount ?? 0
+      const attendedCount = (stats?.normalCount ?? 0) + (stats?.makeupCount ?? 0)
+      const attendanceRate = stats?.attendanceRate ?? 0
+      const attendanceScore = totalTaskCount > 0
+        ? parseFloat(((attendedCount / totalTaskCount) * 15).toFixed(2))
+        : 0
+      const factor = existing?.contributionFactor ?? 1
       return {
         studentId: m.studentId,
         studentName: `学生${m.studentId}`,
         studentNo: '-',
-        contributionFactor: existing?.contributionFactor ?? 1,
+        contributionFactor: factor,
+        contributionPercent: Math.round(Number(factor) * 100),
         teacherComment: existing?.teacherComment || '',
+        attendanceRate,
+        attendanceScore,
+        attendedCount,
+        totalTaskCount,
       }
     })
   } catch (err: any) {
@@ -491,12 +525,6 @@ async function openEdit(row: ScoreVO) {
   }
 
   formVisible.value = true
-}
-
-function syncProcessScores() {
-  if (!currentEditingScore.value) return
-  form.docScore = Number(currentEditingScore.value.suggestedDocScore ?? 0)
-  form.systemScore = Number(currentEditingScore.value.suggestedSystemScore ?? 0)
 }
 
 async function handleSubmit() {
@@ -508,16 +536,17 @@ async function handleSubmit() {
   }
   submitting.value = true
   try {
+    const attendanceScore = computedAttendanceScore.value
     const payload: ScoreSaveDTO = {
       teamId: form.teamId,
       docScore: form.docScore,
-      attendanceScore: form.attendanceScore,
+      attendanceScore,
       systemScore: form.systemScore,
       defenseScore: form.defenseScore,
       teacherComment: form.teacherComment,
       studentScores: form.studentScores.map((item): StudentScoreSaveDTO => ({
         studentId: item.studentId,
-        contributionFactor: item.contributionFactor,
+        contributionFactor: (item.contributionPercent ?? 100) / 100,
         teacherComment: item.teacherComment,
       })),
     }
@@ -655,31 +684,6 @@ onMounted(() => {
     }
   }
 
-  .process-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin: 0 0 16px 140px;
-    padding: 12px;
-    border: 1px solid #dcdfe6;
-    border-radius: 4px;
-    background: #f8fafc;
-  }
-
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(100px, 1fr));
-    gap: 12px;
-    flex: 1;
-
-    > div {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-  }
-
   .score-input-row {
     display: flex;
     align-items: center;
@@ -694,17 +698,31 @@ onMounted(() => {
     width: 100%;
 
     .factor-input {
-      width: 130px;
+      width: 110px;
+    }
+
+    .percent-input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .attendance-info-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      line-height: 1.3;
+
+      .attendance-rate {
+        font-size: 12px;
+        color: #909399;
+      }
     }
   }
 
-  .summary-label,
   .form-tip {
     color: #909399;
     font-size: 13px;
-  }
-
-  .form-tip {
     min-width: 36px;
   }
 }

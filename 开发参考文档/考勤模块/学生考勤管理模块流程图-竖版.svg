@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="2780" viewBox="0 0 860 2780">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L8,3 z" fill="#333"/>
+    </marker>
+    <style>
+      .title{font:700 28px "Microsoft YaHei",SimSun,Arial;fill:#111}
+      .box{fill:#fff;stroke:#888;stroke-width:1.5}
+      .decision{fill:#fff;stroke:#888;stroke-width:1.5}
+      .text{font:22px "Microsoft YaHei",SimSun,Arial;fill:#222}
+      .small{font:18px "Microsoft YaHei",SimSun,Arial;fill:#222}
+      .line{stroke:#333;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .node{fill:#1f1f1f;stroke:#1f1f1f}
+      .finalOuter{fill:#fff;stroke:#222;stroke-width:2}
+      .finalInner{fill:#222;stroke:#222}
+    </style>
+  </defs>
+
+  <rect width="860" height="2780" fill="#fff"/>
+  <text x="430" y="58" text-anchor="middle" class="title">学生考勤管理模块流程图</text>
+
+  <!-- 开始 -->
+  <circle cx="430" cy="105" r="22" class="node"/>
+  <path d="M430 127 V150" class="line"/>
+
+  <rect x="280" y="150" width="300" height="64" rx="18" class="box"/>
+  <text x="430" y="190" text-anchor="middle" class="text">教师发布签到任务</text>
+  <path d="M430 214 V245" class="line"/>
+
+  <rect x="230" y="245" width="400" height="64" rx="18" class="box"/>
+  <text x="430" y="285" text-anchor="middle" class="text">系统校验任务时间和范围</text>
+  <path d="M430 309 V340" class="line"/>
+
+  <polygon points="430,340 560,400 430,460 300,400" class="decision"/>
+  <text x="430" y="407" text-anchor="middle" class="text">任务是否合法?</text>
+
+  <path d="M560 400 H700 V430" class="line"/>
+  <text x="585" y="390" class="small">否</text>
+  <rect x="590" y="430" width="220" height="64" rx="18" class="box"/>
+  <text x="700" y="470" text-anchor="middle" class="text">提示修改任务</text>
+  <path d="M700 494 V530" class="line"/>
+  <circle cx="700" cy="555" r="23" class="finalOuter"/>
+  <circle cx="700" cy="555" r="14" class="finalInner"/>
+
+  <path d="M430 460 V515" class="line"/>
+  <text x="395" y="490" class="small">是</text>
+  <rect x="205" y="515" width="450" height="64" rx="18" class="box"/>
+  <text x="430" y="555" text-anchor="middle" class="text">生成学生初始考勤记录</text>
+  <path d="M430 579 V610" class="line"/>
+
+  <rect x="255" y="610" width="350" height="64" rx="18" class="box"/>
+  <text x="430" y="650" text-anchor="middle" class="text">学生查看待签到任务</text>
+  <path d="M430 674 V705" class="line"/>
+
+  <polygon points="430,705 560,765 430,825 300,765" class="decision"/>
+  <text x="430" y="758" text-anchor="middle" class="text">是否在签到</text>
+  <text x="430" y="785" text-anchor="middle" class="text">时间内?</text>
+
+  <path d="M560 765 H725 V850" class="line"/>
+  <text x="585" y="755" class="small">否</text>
+  <rect x="610" y="850" width="230" height="64" rx="18" class="box"/>
+  <text x="725" y="890" text-anchor="middle" class="text">记录保持缺勤</text>
+  <path d="M840 882 H850 V1945 H560" class="line"/>
+
+  <path d="M430 825 V875" class="line"/>
+  <text x="395" y="855" class="small">是</text>
+  <rect x="290" y="875" width="280" height="64" rx="18" class="box"/>
+  <text x="430" y="915" text-anchor="middle" class="text">学生点击签到</text>
+  <path d="M430 939 V970" class="line"/>
+
+  <polygon points="430,970 560,1030 430,1090 300,1030" class="decision"/>
+  <text x="430" y="1023" text-anchor="middle" class="text">是否需要</text>
+  <text x="430" y="1050" text-anchor="middle" class="text">定位校验?</text>
+
+  <path d="M300 1030 H145 V1370 H260" class="line"/>
+  <text x="265" y="1020" class="small">否</text>
+
+  <path d="M430 1090 V1135" class="line"/>
+  <text x="395" y="1120" class="small">是</text>
+  <rect x="265" y="1135" width="330" height="64" rx="18" class="box"/>
+  <text x="430" y="1175" text-anchor="middle" class="text">获取学生当前位置</text>
+  <path d="M430 1199 V1230" class="line"/>
+
+  <polygon points="430,1230 560,1290 430,1350 300,1290" class="decision"/>
+  <text x="430" y="1283" text-anchor="middle" class="text">是否在签到</text>
+  <text x="430" y="1310" text-anchor="middle" class="text">范围内?</text>
+
+  <path d="M560 1290 H725 V1390" class="line"/>
+  <text x="585" y="1280" class="small">否</text>
+  <rect x="600" y="1390" width="250" height="64" rx="18" class="box"/>
+  <text x="725" y="1430" text-anchor="middle" class="text">提示超出签到范围</text>
+  <path d="M850 1422 V1945 H560" class="line"/>
+
+  <path d="M430 1350 V1370" class="line"/>
+  <text x="395" y="1368" class="small">是</text>
+  <rect x="260" y="1370" width="340" height="64" rx="18" class="box"/>
+  <text x="430" y="1410" text-anchor="middle" class="text">校验是否重复签到</text>
+  <path d="M430 1434 V1470" class="line"/>
+
+  <polygon points="430,1470 560,1530 430,1590 300,1530" class="decision"/>
+  <text x="430" y="1537" text-anchor="middle" class="text">是否已签到?</text>
+
+  <path d="M300 1530 H150 V1620" class="line"/>
+  <text x="265" y="1520" class="small">是</text>
+  <rect x="45" y="1620" width="210" height="64" rx="18" class="box"/>
+  <text x="150" y="1660" text-anchor="middle" class="text">提示已完成签到</text>
+  <path d="M150 1684 V1720" class="line"/>
+  <circle cx="150" cy="1745" r="23" class="finalOuter"/>
+  <circle cx="150" cy="1745" r="14" class="finalInner"/>
+
+  <path d="M430 1590 V1635" class="line"/>
+  <text x="395" y="1620" class="small">否</text>
+  <rect x="250" y="1635" width="360" height="64" rx="18" class="box"/>
+  <text x="430" y="1675" text-anchor="middle" class="text">判定正常或迟到状态</text>
+  <path d="M430 1699 V1730" class="line"/>
+
+  <rect x="250" y="1730" width="360" height="64" rx="18" class="box"/>
+  <text x="430" y="1770" text-anchor="middle" class="text">保存签到时间和状态</text>
+  <path d="M430 1794 V1825" class="line"/>
+
+  <rect x="245" y="1825" width="370" height="64" rx="18" class="box"/>
+  <text x="430" y="1865" text-anchor="middle" class="text">学生查看本人考勤记录</text>
+  <path d="M430 1889 V1915" class="line"/>
+
+  <polygon points="430,1915 560,1975 430,2035 300,1975" class="decision"/>
+  <text x="430" y="1968" text-anchor="middle" class="text">是否提交</text>
+  <text x="430" y="1995" text-anchor="middle" class="text">补签申请?</text>
+
+  <path d="M560 1975 H705 V2070" class="line"/>
+  <text x="585" y="1965" class="small">否</text>
+  <rect x="585" y="2070" width="240" height="64" rx="18" class="box"/>
+  <text x="705" y="2110" text-anchor="middle" class="text">进入考勤统计</text>
+  <path d="M825 2102 H850 V2630 H630" class="line"/>
+
+  <path d="M300 1975 H155 V2070" class="line"/>
+  <text x="265" y="1965" class="small">是</text>
+  <rect x="35" y="2070" width="240" height="64" rx="18" class="box"/>
+  <text x="155" y="2110" text-anchor="middle" class="text">提交补签申请</text>
+  <path d="M155 2134 V2190 H260" class="line"/>
+
+  <rect x="260" y="2190" width="340" height="64" rx="18" class="box"/>
+  <text x="430" y="2230" text-anchor="middle" class="text">教师审核补签申请</text>
+  <path d="M430 2254 V2285" class="line"/>
+
+  <polygon points="430,2285 560,2345 430,2405 300,2345" class="decision"/>
+  <text x="430" y="2338" text-anchor="middle" class="text">补签审核</text>
+  <text x="430" y="2365" text-anchor="middle" class="text">是否通过?</text>
+
+  <path d="M300 2345 H155 V2440" class="line"/>
+  <text x="265" y="2335" class="small">是</text>
+  <rect x="35" y="2440" width="240" height="64" rx="18" class="box"/>
+  <text x="155" y="2480" text-anchor="middle" class="text">考勤状态改为补签</text>
+  <path d="M155 2504 V2565 H390" class="line"/>
+
+  <path d="M560 2345 H705 V2440" class="line"/>
+  <text x="585" y="2335" class="small">否</text>
+  <rect x="585" y="2440" width="240" height="64" rx="18" class="box"/>
+  <text x="705" y="2467" text-anchor="middle" class="text">记录审核意见</text>
+  <text x="705" y="2494" text-anchor="middle" class="text">保持原状态</text>
+  <path d="M705 2504 V2565 H470" class="line"/>
+
+  <polygon points="430,2530 470,2570 430,2610 390,2570" class="decision"/>
+  <path d="M430 2610 V2645" class="line"/>
+
+  <rect x="230" y="2645" width="400" height="64" rx="18" class="box"/>
+  <text x="430" y="2685" text-anchor="middle" class="text">生成考勤统计与记录查询</text>
+  <path d="M430 2709 V2735" class="line"/>
+  <circle cx="430" cy="2755" r="23" class="finalOuter"/>
+  <circle cx="430" cy="2755" r="14" class="finalInner"/>
+</svg>
