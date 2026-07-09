@@ -31,8 +31,36 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     @Transactional
     public TeacherVO createTeacher(TeacherCreateDTO dto) {
-        if (teacherMapper.selectByTeacherNo(dto.getTeacherNo()) != null) {
-            throw new BusinessException(ResultCode.CONFLICT, "该工号已存在");
+        Teacher existing = teacherMapper.selectByTeacherNo(dto.getTeacherNo());
+        if (existing != null) {
+            // 已存在 → 删除旧账号，复用教师记录
+            UserAccount existAccount = userAccountMapper.selectByRelatedIdAndRole(existing.getTeacherId(), "TEACHER");
+            if (existAccount == null) {
+                existAccount = userAccountMapper.selectByRelatedIdAndRole(existing.getTeacherId(), "ADMIN");
+            }
+            if (existAccount != null && "ADMIN".equals(existAccount.getRole())) {
+                throw new BusinessException(ResultCode.FORBIDDEN, "该工号为管理员账号，不允许覆盖");
+            }
+            if (existAccount != null) {
+                userAccountMapper.deleteByUserId(existAccount.getUserId());
+            }
+            // 更新教师信息
+            existing.setTeacherName(dto.getTeacherName());
+            existing.setOffice(dto.getOffice());
+            existing.setTitle(dto.getTitle());
+            existing.setPhone(dto.getPhone());
+            existing.setEmail(dto.getEmail());
+            teacherMapper.update(existing);
+
+            // 新建账号
+            UserAccount account = new UserAccount();
+            account.setUsername(dto.getTeacherNo());
+            account.setPassword(encoder.encode(dto.getPassword() != null ? dto.getPassword() : "123456"));
+            account.setRole("TEACHER");
+            account.setRelatedId(existing.getTeacherId());
+            account.setStatus(1);
+            userAccountMapper.insert(account);
+            return toVO(existing, account);
         }
         Teacher teacher = new Teacher();
         teacher.setTeacherNo(dto.getTeacherNo());

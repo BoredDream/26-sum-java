@@ -31,8 +31,30 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public StudentVO createStudent(StudentCreateDTO dto) {
-        if (studentMapper.selectByStudentNo(dto.getStudentNo()) != null) {
-            throw new BusinessException(ResultCode.CONFLICT, "该学号已存在");
+        Student existing = studentMapper.selectByStudentNo(dto.getStudentNo());
+        if (existing != null) {
+            // 已存在 → 删除旧账号，复用学生记录
+            UserAccount existAccount = userAccountMapper.selectByRelatedIdAndRole(existing.getStudentId(), "STUDENT");
+            if (existAccount != null) {
+                userAccountMapper.deleteByUserId(existAccount.getUserId());
+            }
+            // 更新学生信息
+            existing.setStudentName(dto.getStudentName());
+            existing.setMajor(dto.getMajor());
+            existing.setClassName(dto.getClassName());
+            existing.setPhone(dto.getPhone());
+            existing.setEmail(dto.getEmail());
+            studentMapper.update(existing);
+
+            // 新建账号
+            UserAccount account = new UserAccount();
+            account.setUsername(dto.getStudentNo());
+            account.setPassword(encoder.encode(dto.getPassword() != null ? dto.getPassword() : "123456"));
+            account.setRole("STUDENT");
+            account.setRelatedId(existing.getStudentId());
+            account.setStatus(1);
+            userAccountMapper.insert(account);
+            return toVO(existing, account);
         }
         Student student = new Student();
         student.setStudentNo(dto.getStudentNo());
