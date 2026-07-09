@@ -11,7 +11,6 @@
       <el-table-column prop="teamId" label="所属团队ID" />
       <el-table-column prop="documentType" label="文档类型" />
       <el-table-column prop="projectStage" label="项目阶段" />
-      <el-table-column prop="versionNo" label="版本号" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
           <status-tag category="document" :value="scope.row.status" />

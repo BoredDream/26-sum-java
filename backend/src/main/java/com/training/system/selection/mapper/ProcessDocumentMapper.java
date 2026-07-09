@@ -36,14 +36,28 @@ public interface ProcessDocumentMapper {
             "CASE d.audit_status WHEN 1 THEN 'REVIEWED' WHEN 2 THEN 'RETURNED' ELSE 'SUBMITTED' END AS status, " +
             "d.teacher_feedback, d.feedback_teacher_id, d.stage_id, d.remark, d.upload_time, d.update_time AS feedback_time " +
             "FROM process_document d INNER JOIN project_topic tp ON tp.topic_id = d.topic_id " +
-            "WHERE tp.teacher_id = #{teacherId} AND d.is_deleted = 0 ORDER BY d.upload_time DESC")
+            "WHERE tp.teacher_id = #{teacherId} AND d.is_deleted = 0 " +
+            "AND NOT EXISTS (" +
+            "  SELECT 1 FROM process_document newer " +
+            "  WHERE newer.is_deleted = 0 AND newer.team_id = d.team_id " +
+            "    AND ((d.stage_id IS NOT NULL AND newer.stage_id = d.stage_id) " +
+            "      OR (d.stage_id IS NULL AND newer.stage_id IS NULL AND newer.document_type = d.document_type AND newer.project_stage = d.project_stage)) " +
+            "    AND (newer.upload_time > d.upload_time OR (newer.upload_time = d.upload_time AND newer.document_id > d.document_id))" +
+            ") ORDER BY d.upload_time DESC")
     List<ProcessDocumentEntity> findByTeacherId(@Param("teacherId") Long teacherId);
 
-    @Select("SELECT document_id AS id, team_id, topic_id, document_name, document_type, project_stage, version_no, " +
-            "file_path AS original_filename, file_path AS stored_path, file_size, uploader_id, " +
-            "CASE audit_status WHEN 1 THEN 'REVIEWED' WHEN 2 THEN 'RETURNED' ELSE 'SUBMITTED' END AS status, " +
-            "teacher_feedback, feedback_teacher_id, stage_id, remark, upload_time, update_time AS feedback_time " +
-            "FROM process_document WHERE is_deleted = 0 ORDER BY upload_time DESC")
+    @Select("SELECT d.document_id AS id, d.team_id, d.topic_id, d.document_name, d.document_type, d.project_stage, d.version_no, " +
+            "d.file_path AS original_filename, d.file_path AS stored_path, d.file_size, d.uploader_id, " +
+            "CASE d.audit_status WHEN 1 THEN 'REVIEWED' WHEN 2 THEN 'RETURNED' ELSE 'SUBMITTED' END AS status, " +
+            "d.teacher_feedback, d.feedback_teacher_id, d.stage_id, d.remark, d.upload_time, d.update_time AS feedback_time " +
+            "FROM process_document d WHERE d.is_deleted = 0 " +
+            "AND NOT EXISTS (" +
+            "  SELECT 1 FROM process_document newer " +
+            "  WHERE newer.is_deleted = 0 AND newer.team_id = d.team_id " +
+            "    AND ((d.stage_id IS NOT NULL AND newer.stage_id = d.stage_id) " +
+            "      OR (d.stage_id IS NULL AND newer.stage_id IS NULL AND newer.document_type = d.document_type AND newer.project_stage = d.project_stage)) " +
+            "    AND (newer.upload_time > d.upload_time OR (newer.upload_time = d.upload_time AND newer.document_id > d.document_id))" +
+            ") ORDER BY d.upload_time DESC")
     List<ProcessDocumentEntity> findAll();
 
     @Update("UPDATE process_document SET audit_status = CASE WHEN #{status} = 'RETURNED' THEN 2 WHEN #{status} = 'REVIEWED' THEN 1 ELSE 0 END, " +

@@ -90,7 +90,6 @@ export interface UploadDocumentForm {
   documentName: string
   documentType: string
   projectStage: string
-  versionNo: string
   file: File
 }
 

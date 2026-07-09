@@ -10,6 +10,8 @@ public class AttendanceRecordVO {
     private Long recordId;
     private Long taskId;
     private String taskTitle;
+    private LocalDateTime taskStartTime;
+    private LocalDateTime taskEndTime;
     private Long studentId;
     private String studentNo;
     private String studentName;
@@ -43,6 +45,22 @@ public class AttendanceRecordVO {
 
     public void setTaskTitle(String taskTitle) {
         this.taskTitle = taskTitle;
+    }
+
+    public LocalDateTime getTaskStartTime() {
+        return taskStartTime;
+    }
+
+    public void setTaskStartTime(LocalDateTime taskStartTime) {
+        this.taskStartTime = taskStartTime;
+    }
+
+    public LocalDateTime getTaskEndTime() {
+        return taskEndTime;
+    }
+
+    public void setTaskEndTime(LocalDateTime taskEndTime) {
+        this.taskEndTime = taskEndTime;
     }
 
     public Long getStudentId() {

@@ -85,13 +85,20 @@ public class AttendanceTaskServiceImpl implements AttendanceTaskService {
         if ((scopeType == 1 || scopeType == 2) && (scopeValue == null || scopeValue.isBlank())) {
             throw new BusinessException(ResultCode.BAD_REQUEST, "请至少选择一个班级或团队");
         }
-        if (Integer.valueOf(1).equals(dto.getRequireLocation())) {
+        int requireLocation = Integer.valueOf(1).equals(dto.getRequireLocation()) ? 1 : 0;
+        dto.setRequireLocation(requireLocation);
+        if (requireLocation == 1) {
             if (dto.getLocationLng() == null || dto.getLocationLat() == null) {
                 throw new BusinessException(ResultCode.BAD_REQUEST, "定位签到必须设置签到位置");
             }
             if (dto.getLocationRadius() == null) {
                 dto.setLocationRadius(500);
             }
+        } else {
+            dto.setLocationLng(null);
+            dto.setLocationLat(null);
+            dto.setLocationRadius(null);
+            dto.setLocationName(null);
         }
 
         List<Long> studentIds = resolveScopeStudents(scopeType, scopeValue);

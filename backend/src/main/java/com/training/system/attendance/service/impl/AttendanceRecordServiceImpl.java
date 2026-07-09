@@ -168,6 +168,8 @@ public class AttendanceRecordServiceImpl implements AttendanceRecordService {
 
         if (task != null) {
             vo.setTaskTitle(task.getTaskTitle());
+            vo.setTaskStartTime(task.getStartTime());
+            vo.setTaskEndTime(task.getEndTime());
         }
         Student student = studentMapper.selectById(record.getStudentId());
         if (student != null) {

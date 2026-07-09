@@ -65,10 +65,11 @@
           formatDateTime((scope.row as MakeupApplyVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="220" fixed="right">
         <template #default="scope">
-          <template v-if="(scope.row as MakeupApplyVO).auditStatus === 0">
+          <div class="table-actions">
             <el-button
+              v-if="(scope.row as MakeupApplyVO).auditStatus === 0"
               type="success"
               text
               size="small"
@@ -78,6 +79,7 @@
               通过
             </el-button>
             <el-button
+              v-if="(scope.row as MakeupApplyVO).auditStatus === 0"
               type="danger"
               text
               size="small"
@@ -86,15 +88,15 @@
             >
               驳回
             </el-button>
-          </template>
-          <el-button
-            type="primary"
-            text
-            size="small"
-            @click="openDetail(scope.row as MakeupApplyVO)"
-          >
-            详情
-          </el-button>
+            <el-button
+              type="primary"
+              text
+              size="small"
+              @click="openDetail(scope.row as MakeupApplyVO)"
+            >
+              详情
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -330,6 +332,18 @@ onMounted(() => {
 
   .data-table {
     margin-top: 8px;
+  }
+
+  .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    white-space: nowrap;
+
+    :deep(.el-button) {
+      margin-left: 0;
+    }
   }
 
   .pagination-wrapper {

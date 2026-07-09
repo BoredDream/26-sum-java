@@ -197,7 +197,10 @@ class AttendanceTaskServiceImplTest {
 
             assertNotNull(taskId);
             assertEquals(99L, taskId);
-            verify(attendanceTaskMapper).insert(any(AttendanceTask.class));
+            verify(attendanceTaskMapper).insert(argThat(task ->
+                    Integer.valueOf(0).equals(task.getRequireLocation())
+                            && task.getLocationLng() == null
+                            && task.getLocationLat() == null));
             verify(attendanceRecordMapper, times(3)).insertInitRecord(eq(99L), anyLong());
         }
 

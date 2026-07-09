@@ -31,10 +31,9 @@
         <el-button
           type="primary"
           size="small"
-          :disabled="isTaskSubmitted(task.stageId)"
           @click="openStageSubmit(task)"
         >
-          {{ isTaskSubmitted(task.stageId) ? '已提交' : '提交' }}
+          {{ isTaskSubmitted(task.stageId) ? '再次提交' : '提交' }}
         </el-button>
       </div>
     </el-card>
@@ -45,7 +44,6 @@
       <el-table-column prop="documentName" label="文档名称" show-overflow-tooltip />
       <el-table-column prop="documentType" label="文档类型" />
       <el-table-column prop="projectStage" label="项目阶段" />
-      <el-table-column prop="versionNo" label="版本号" />
       <el-table-column label="审核状态" width="120">
         <template #default="scope">
           <status-tag category="document" :value="scope.row.status" />
@@ -204,7 +202,6 @@ function openStageSubmit(task: StageTaskVO) {
     documentName: task.stageName,
     documentType: '设计文档',
     projectStage: task.stageName,
-    versionNo: 'v1.0',
     file: null,
     remark: '',
   }
@@ -258,7 +255,6 @@ const uploadForm = ref({
   documentName: '',
   documentType: '',
   projectStage: '',
-  versionNo: 'v1.0',
   file: null as File | null,
   remark: '',
 })
@@ -278,7 +274,6 @@ async function openUpload() {
     documentName: '',
     documentType: '',
     projectStage: '',
-    versionNo: 'v1.0',
     file: null,
     remark: '',
   }

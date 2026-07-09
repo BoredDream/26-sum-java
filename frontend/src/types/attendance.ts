@@ -64,6 +64,8 @@ export interface AttendanceRecordVO {
   recordId: number
   taskId: number
   taskTitle: string
+  taskStartTime?: string
+  taskEndTime?: string
   studentId: number
   studentNo: string
   studentName: string

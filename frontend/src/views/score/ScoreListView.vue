@@ -26,13 +26,17 @@
 
     <el-empty v-if="!loading && scores.length === 0 && !error" description="暂无可管理团队" />
 
-    <el-table v-loading="loading" :data="scores" border class="data-table">
-      <el-table-column prop="teamName" label="团队名称" show-overflow-tooltip />
-      <el-table-column prop="topicName" label="选题" min-width="180" show-overflow-tooltip>
+    <el-table v-loading="loading" :data="scores" border class="data-table score-table">
+      <el-table-column prop="teamName" label="团队名称" width="140" show-overflow-tooltip>
+        <template #default="scope">
+          <span class="team-name-cell">{{ (scope.row as ScoreVO).teamName || '-' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="topicName" label="选题" min-width="220" show-overflow-tooltip>
         <template #default="scope">{{ (scope.row as ScoreVO).topicName || '-' }}</template>
       </el-table-column>
       <el-table-column prop="teacherName" label="评分教师" width="120" />
-      <el-table-column label="过程评价" width="190">
+      <el-table-column label="过程评价" width="220">
         <template #default="scope">
           <div class="process-cell">
             <span>{{ stageProgressText(scope.row as ScoreVO) }}</span>
@@ -70,24 +74,26 @@
           (scope.row as ScoreVO).updateTime ? formatDateTime((scope.row as ScoreVO).updateTime) : '-'
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="190" fixed="right">
         <template #default="scope">
-          <el-button type="primary" text size="small" @click="openDetail(scope.row as ScoreVO)"
-            >详情</el-button
-          >
-          <el-button type="primary" text size="small" @click="openEdit(scope.row as ScoreVO)"
-            >编辑</el-button
-          >
-          <el-button
-            v-if="(scope.row as ScoreVO).scoreId && (scope.row as ScoreVO).status !== 2"
-            type="success"
-            text
-            size="small"
-            :loading="confirmingId === (scope.row as ScoreVO).scoreId"
-            @click="handleConfirm(scope.row as ScoreVO)"
-          >
-            确认
-          </el-button>
+          <div class="table-actions">
+            <el-button type="primary" text size="small" @click="openDetail(scope.row as ScoreVO)"
+              >详情</el-button
+            >
+            <el-button type="primary" text size="small" @click="openEdit(scope.row as ScoreVO)"
+              >编辑</el-button
+            >
+            <el-button
+              v-if="(scope.row as ScoreVO).scoreId && (scope.row as ScoreVO).status !== 2"
+              type="success"
+              text
+              size="small"
+              :loading="confirmingId === (scope.row as ScoreVO).scoreId"
+              @click="handleConfirm(scope.row as ScoreVO)"
+            >
+              确认
+            </el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -163,8 +169,8 @@
     </el-dialog>
 
     <!-- 编辑成绩 -->
-    <el-dialog v-model="formVisible" title="编辑成绩" width="760px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
+    <el-dialog v-model="formVisible" title="编辑成绩" width="860px" class="score-edit-dialog">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="140px" class="score-form">
         <el-form-item label="团队" prop="teamId">
           <el-select v-model="form.teamId" placeholder="请选择团队" style="width: 100%" disabled>
             <el-option
@@ -199,44 +205,28 @@
           </el-button>
         </div>
         <el-form-item label="文档编写成绩" prop="docScore">
-          <el-input-number
-            v-model="form.docScore"
-            :min="0"
-            :max="15"
-            :precision="2"
-            style="width: 200px"
-          />
-          <span class="form-tip">/ 15</span>
+          <div class="score-input-row">
+            <el-input-number v-model="form.docScore" :min="0" :max="15" :precision="2" />
+            <span class="form-tip">/ 15</span>
+          </div>
         </el-form-item>
         <el-form-item label="考勤成绩" prop="attendanceScore">
-          <el-input-number
-            v-model="form.attendanceScore"
-            :min="0"
-            :max="15"
-            :precision="2"
-            style="width: 200px"
-          />
-          <span class="form-tip">/ 15</span>
+          <div class="score-input-row">
+            <el-input-number v-model="form.attendanceScore" :min="0" :max="15" :precision="2" />
+            <span class="form-tip">/ 15</span>
+          </div>
         </el-form-item>
         <el-form-item label="系统实现与测试" prop="systemScore">
-          <el-input-number
-            v-model="form.systemScore"
-            :min="0"
-            :max="50"
-            :precision="2"
-            style="width: 200px"
-          />
-          <span class="form-tip">/ 50</span>
+          <div class="score-input-row">
+            <el-input-number v-model="form.systemScore" :min="0" :max="50" :precision="2" />
+            <span class="form-tip">/ 50</span>
+          </div>
         </el-form-item>
         <el-form-item label="答辩成绩" prop="defenseScore">
-          <el-input-number
-            v-model="form.defenseScore"
-            :min="0"
-            :max="20"
-            :precision="2"
-            style="width: 200px"
-          />
-          <span class="form-tip">/ 20</span>
+          <div class="score-input-row">
+            <el-input-number v-model="form.defenseScore" :min="0" :max="20" :precision="2" />
+            <span class="form-tip">/ 20</span>
+          </div>
         </el-form-item>
         <el-form-item label="当前总分">
           <strong>{{ formatScore(formTotal) }}</strong>
@@ -251,17 +241,17 @@
           />
         </el-form-item>
         <el-form-item label="个人成绩调整">
-          <el-table :data="form.studentScores" border size="small">
+          <el-table :data="form.studentScores" border size="small" class="student-score-table">
             <el-table-column prop="studentName" label="姓名" width="120" />
-            <el-table-column prop="studentNo" label="学号" width="140" />
-            <el-table-column label="贡献系数" width="160">
+            <el-table-column prop="studentNo" label="学号" width="150" />
+            <el-table-column label="贡献系数" width="170">
               <template #default="scope">
                 <el-input-number
                   v-model="(scope.row as StudentScoreFormItem).contributionFactor"
                   :min="0"
                   :max="2"
                   :precision="2"
-                  style="width: 120px"
+                  class="factor-input"
                 />
               </template>
             </el-table-column>
@@ -588,11 +578,43 @@ onMounted(() => {
     margin-top: 8px;
   }
 
+  .score-table {
+    :deep(.el-table__header th) {
+      background: #f8fafc;
+      color: #606266;
+      font-weight: 600;
+    }
+  }
+
+  .team-name-cell {
+    display: inline-block;
+    max-width: 100%;
+    color: #303133;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
   .process-cell {
     display: flex;
     flex-direction: column;
     gap: 4px;
     line-height: 1.35;
+
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  .table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    white-space: nowrap;
+
+    :deep(.el-button) {
+      margin-left: 0;
+    }
   }
 
   .pagination-wrapper {
@@ -627,12 +649,18 @@ onMounted(() => {
     color: #303133;
   }
 
+  .score-form {
+    :deep(.el-form-item__label) {
+      white-space: nowrap;
+    }
+  }
+
   .process-summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin: 0 0 16px 120px;
+    margin: 0 0 16px 140px;
     padding: 12px;
     border: 1px solid #dcdfe6;
     border-radius: 4px;
@@ -652,6 +680,24 @@ onMounted(() => {
     }
   }
 
+  .score-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    :deep(.el-input-number) {
+      width: 220px;
+    }
+  }
+
+  .student-score-table {
+    width: 100%;
+
+    .factor-input {
+      width: 130px;
+    }
+  }
+
   .summary-label,
   .form-tip {
     color: #909399;
@@ -659,7 +705,7 @@ onMounted(() => {
   }
 
   .form-tip {
-    margin-left: 8px;
+    min-width: 36px;
   }
 }
 </style>

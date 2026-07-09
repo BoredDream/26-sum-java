@@ -16,6 +16,12 @@
               <el-tag v-if="task.requireLocation === 1" type="warning" size="small" effect="plain">
                 📍 定位签到
               </el-tag>
+              <el-tag v-if="isTaskNotStarted(task)" type="info" size="small" effect="plain">
+                未开始签到
+              </el-tag>
+              <el-tag v-else-if="isTaskInProgress(task)" type="success" size="small" effect="plain">
+                进行中
+              </el-tag>
             </div>
             <div class="task-card-meta">
               <div>签到类型：{{ task.taskTypeName }}</div>
@@ -31,6 +37,9 @@
               style="width: 100%"
             >
               已签到
+            </el-button>
+            <el-button v-else-if="isTaskNotStarted(task)" type="info" disabled style="width: 100%">
+              未开始签到
             </el-button>
             <el-button
               v-else
@@ -59,7 +68,16 @@
         </el-table-column>
         <el-table-column label="状态" width="110">
           <template #default="scope">
+            <el-tag
+              v-if="isRecordNotStarted(scope.row as AttendanceRecordVO)"
+              type="info"
+              effect="plain"
+              size="small"
+            >
+              未开始签到
+            </el-tag>
             <status-tag
+              v-else
               category="attendanceSign"
               :value="(scope.row as AttendanceRecordVO).signStatus"
             />
@@ -160,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import * as attendanceApi from '@/api/attendance'
 import type { AttendanceRecordVO, AttendanceTaskVO } from '@/types/attendance'
@@ -176,10 +194,50 @@ const tasks = ref<AttendanceTaskVO[]>([])
 const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
+const nowTick = ref(Date.now())
 
-const pendingTasks = computed(() => tasks.value.filter((t) => t.status === 1))
+const taskById = computed(() => new Map(tasks.value.map((task) => [task.taskId, task])))
+const pendingTasks = computed(() =>
+  tasks.value.filter((task) => getEffectiveTaskStatus(task) !== 2)
+)
 
 const signedTaskIds = ref<Set<number>>(new Set())
+
+function parseTaskTime(value?: string) {
+  if (!value) return Number.NaN
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T')
+  return new Date(normalized).getTime()
+}
+
+function getEffectiveTaskStatus(task: AttendanceTaskVO) {
+  const startTime = parseTaskTime(task.startTime)
+  const endTime = parseTaskTime(task.endTime)
+  const currentTime = nowTick.value
+
+  if (Number.isFinite(startTime) && currentTime < startTime) return 0
+  if (Number.isFinite(endTime) && currentTime > endTime) return 2
+  if (task.status === 2) return 2
+  if (!Number.isFinite(startTime) && task.status === 0) return 0
+  return 1
+}
+
+function isTaskNotStarted(task: AttendanceTaskVO) {
+  return getEffectiveTaskStatus(task) === 0
+}
+
+function isTaskInProgress(task: AttendanceTaskVO) {
+  return getEffectiveTaskStatus(task) === 1
+}
+
+function getRecordTaskStartTime(record: AttendanceRecordVO) {
+  return record.taskStartTime || taskById.value.get(record.taskId)?.startTime
+}
+
+function isRecordNotStarted(record: AttendanceRecordVO) {
+  if (record.signStatus !== 0) return false
+  const startTime = parseTaskTime(getRecordTaskStartTime(record))
+  return Number.isFinite(startTime) && nowTick.value < startTime
+}
 
 async function loadSignedTaskIds() {
   try {
@@ -191,7 +249,7 @@ async function loadSignedTaskIds() {
 }
 
 function getRowClass({ row }: { row: AttendanceRecordVO }) {
-  return row.signStatus === 0 ? 'row-unsigned' : ''
+  return row.signStatus === 0 && !isRecordNotStarted(row) ? 'row-unsigned' : ''
 }
 
 async function loadRecords() {
@@ -333,6 +391,17 @@ function handleSign(taskId: number) {
   mapReady.value = false
 
   currentSignTask.value = tasks.value.find((t) => t.taskId === taskId) || null
+  if (!currentSignTask.value) return
+
+  if (isTaskNotStarted(currentSignTask.value)) {
+    ElMessage.warning('签到尚未开始，请在开始时间后再签到')
+    return
+  }
+
+  if (!isTaskInProgress(currentSignTask.value)) {
+    ElMessage.warning('当前签到任务已结束')
+    return
+  }
 
   // 先打开弹窗，再获取位置
   if (currentSignTask.value?.requireLocation === 1) {
@@ -570,10 +639,21 @@ watch(
   }
 )
 
+let nowTimer: number | undefined
+
 onMounted(() => {
   loadRecords()
   loadTasks()
   loadSignedTaskIds()
+  nowTimer = window.setInterval(() => {
+    nowTick.value = Date.now()
+  }, 30000)
+})
+
+onBeforeUnmount(() => {
+  if (nowTimer !== undefined) {
+    window.clearInterval(nowTimer)
+  }
 })
 </script>
 

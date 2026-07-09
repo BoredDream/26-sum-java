@@ -635,14 +635,14 @@ async function handleSubmit() {
   try {
     const payload: AttendanceTaskCreateDTO = {
       ...form,
+      requireLocation: locationEnabled.value ? 1 : 0,
       scopeValue: form.scopeType === 3 ? undefined : String(form.scopeValue),
     }
     if (!locationEnabled.value) {
-      delete payload.requireLocation
-      delete payload.locationLng
-      delete payload.locationLat
-      delete payload.locationRadius
-      delete payload.locationName
+      payload.locationLng = undefined
+      payload.locationLat = undefined
+      payload.locationRadius = undefined
+      payload.locationName = undefined
     }
     await attendanceApi.createAttendanceTask(payload)
     ElMessage.success('任务发布成功')

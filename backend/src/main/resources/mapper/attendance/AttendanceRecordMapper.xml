@@ -37,7 +37,9 @@
     </select>
 
     <select id="selectPage" resultType="com.training.system.attendance.vo.AttendanceRecordVO">
-        SELECT r.record_id, r.task_id, t.task_title, r.student_id, s.student_no, s.student_name, s.class_name,
+        SELECT r.record_id, r.task_id, t.task_title,
+               t.start_time AS taskStartTime, t.end_time AS taskEndTime,
+               r.student_id, s.student_no, s.student_name, s.class_name,
                r.sign_time, r.sign_status, r.is_makeup, r.remark, r.create_time
         <include refid="baseJoin"/>
         <include refid="baseWhere"/>
@@ -46,7 +48,9 @@
     </select>
 
     <select id="selectListForExport" resultType="com.training.system.attendance.vo.AttendanceRecordVO">
-        SELECT r.record_id, r.task_id, t.task_title, r.student_id, s.student_no, s.student_name, s.class_name,
+        SELECT r.record_id, r.task_id, t.task_title,
+               t.start_time AS taskStartTime, t.end_time AS taskEndTime,
+               r.student_id, s.student_no, s.student_name, s.class_name,
                r.sign_time, r.sign_status, r.is_makeup, r.remark, r.create_time
         <include refid="baseJoin"/>
         <include refid="baseWhere"/>
