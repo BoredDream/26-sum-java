@@ -97,6 +97,31 @@
         <div v-if="currentTopic.developTools" class="content-block">
           {{ currentTopic.developTools }}
         </div>
+
+        <h4 class="section-title">资料文件</h4>
+        <el-empty
+          v-if="!currentTopic.files || currentTopic.files.length === 0"
+          description="暂无资料文件"
+        />
+        <el-table v-else :data="currentTopic.files" border class="data-table">
+          <el-table-column prop="fileName" label="文件名" show-overflow-tooltip />
+          <el-table-column prop="fileSizeText" label="大小" width="120" />
+          <el-table-column prop="uploadUserName" label="上传人" width="120" />
+          <el-table-column prop="uploadTime" label="上传时间" width="180">
+            <template #default="{ row }">{{ formatDateTime(row.uploadTime) }}</template>
+          </el-table-column>
+          <el-table-column label="操作" width="100" fixed="right">
+            <template #default="scope">
+              <el-button
+                type="primary"
+                link
+                size="small"
+                @click="handleDownload(scope.row as TopicFileVO)"
+                >下载</el-button
+              >
+            </template>
+          </el-table-column>
+        </el-table>
       </template>
     </el-dialog>
 
@@ -148,9 +173,10 @@ import { Search } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import * as topicApi from '@/api/topic'
 import * as selectionApi from '@/api/selection'
-import type { TopicListVO, TopicDetailVO } from '@/types/topic'
+import type { TopicListVO, TopicDetailVO, TopicFileVO } from '@/types/topic'
 import type { TeamVO } from '@/types/selection'
 import { formatDateTime } from '@/utils/format'
+import { downloadByUrl } from '@/utils/download'
 
 const auth = useAuthStore()
 const loading = ref(false)
@@ -226,6 +252,11 @@ async function openDetail(topic: TopicListVO) {
   } finally {
     detailLoading.value = false
   }
+}
+
+function handleDownload(row: TopicFileVO) {
+  const url = topicApi.getTopicFileDownloadUrl(row.fileId)
+  downloadByUrl(url, {}, row.fileName)
 }
 
 async function openApply(topic: TopicListVO) {
@@ -345,6 +376,10 @@ onMounted(loadTopics)
     color: #606266;
     line-height: 1.6;
     white-space: pre-wrap;
+  }
+
+  .data-table {
+    margin-top: 8px;
   }
 }
 </style>
