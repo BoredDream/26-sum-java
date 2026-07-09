@@ -121,4 +121,27 @@ public class MakeupSignApplyController {
 
         return Result.success(relativeDir + "/" + newName);
     }
+
+    @GetMapping("/{applyId}/download")
+    public void download(@PathVariable Long applyId, jakarta.servlet.http.HttpServletResponse response) {
+        String proofPath = makeupSignApplyService.getProofPath(applyId);
+        if (proofPath == null) {
+            try { response.sendError(404, "证明材料不存在"); } catch (IOException ignored) {}
+            return;
+        }
+        Path file = Paths.get(uploadPath, proofPath);
+        if (!Files.exists(file)) {
+            try { response.sendError(404, "文件未找到"); } catch (IOException ignored) {}
+            return;
+        }
+        try {
+            String encoded = java.net.URLEncoder.encode(file.getFileName().toString(),
+                    java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20");
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encoded);
+            Files.copy(file, response.getOutputStream());
+        } catch (IOException e) {
+            try { response.sendError(500); } catch (IOException ignored) {}
+        }
+    }
 }

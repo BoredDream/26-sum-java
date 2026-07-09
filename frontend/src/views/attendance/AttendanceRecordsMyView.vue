@@ -443,11 +443,21 @@ function startLocate() {
 }
 
 function convertGpsToAmap(lng: number, lat: number, callback: (lng: number, lat: number) => void) {
-  if (typeof AMap === 'undefined' || typeof AMap.convertFrom !== 'function') {
-    if (typeof AMap === 'undefined') {
-      callback(lng, lat)
-      return
-    }
+  // 优先使用高德官方坐标转换 API
+  if (typeof AMap !== 'undefined' && typeof AMap.convertFrom === 'function') {
+    AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
+      if (status === 'complete' && result.info === 'ok') {
+        const pos = result.locations[0]
+        callback(pos.lng, pos.lat)
+      } else {
+        callback(lng, lat)
+      }
+    })
+    return
+  }
+
+  if (typeof AMap !== 'undefined') {
+    // AMap 已加载但 convertFrom 需要插件
     AMap.plugin('AMap.ConvertFrom', () => {
       AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
         if (status === 'complete' && result.info === 'ok') {
@@ -460,14 +470,54 @@ function convertGpsToAmap(lng: number, lat: number, callback: (lng: number, lat:
     })
     return
   }
-  AMap.convertFrom([lng, lat], 'gps', (status: string, result: any) => {
-    if (status === 'complete' && result.info === 'ok') {
-      const pos = result.locations[0]
-      callback(pos.lng, pos.lat)
-    } else {
-      callback(lng, lat)
-    }
-  })
+
+  // 高德未加载时，用纯算法做 WGS-84 → GCJ-02 转换，避免直接用 GPS 坐标产生偏移
+  callback(wgs84ToGcj02_lng(lng, lat), wgs84ToGcj02_lat(lng, lat))
+}
+
+/** WGS-84 → GCJ-02 坐标转换（纯算法，不依赖任何 SDK） */
+function wgs84ToGcj02_lng(wgLng: number, wgLat: number): number {
+  const { lng } = wgs84ToGcj02(wgLng, wgLat)
+  return lng
+}
+function wgs84ToGcj02_lat(wgLng: number, wgLat: number): number {
+  const { lat } = wgs84ToGcj02(wgLng, wgLat)
+  return lat
+}
+function wgs84ToGcj02(wgLng: number, wgLat: number): { lng: number; lat: number } {
+  const PI = Math.PI
+  const a = 6378245.0
+  const ee = 0.00669342162296594323
+
+  function transformLat(x: number, y: number): number {
+    let ret = -100.0 + 2.0 * x + 3.0 * y + 0.2 * y * y + 0.1 * x * y + 0.2 * Math.sqrt(Math.abs(x))
+    ret += ((20.0 * Math.sin(6.0 * x * PI) + 20.0 * Math.sin(2.0 * x * PI)) * 2.0) / 3.0
+    ret += ((20.0 * Math.sin(y * PI) + 40.0 * Math.sin((y / 3.0) * PI)) * 2.0) / 3.0
+    ret += ((160.0 * Math.sin((y / 12.0) * PI) + 320.0 * Math.sin((y * PI) / 30.0)) * 2.0) / 3.0
+    return ret
+  }
+
+  function transformLng(x: number, y: number): number {
+    let ret = 300.0 + x + 2.0 * y + 0.1 * x * x + 0.1 * x * y + 0.1 * Math.sqrt(Math.abs(x))
+    ret += ((20.0 * Math.sin(6.0 * x * PI) + 20.0 * Math.sin(2.0 * x * PI)) * 2.0) / 3.0
+    ret += ((20.0 * Math.sin(x * PI) + 40.0 * Math.sin((x / 3.0) * PI)) * 2.0) / 3.0
+    ret += ((150.0 * Math.sin((x / 12.0) * PI) + 300.0 * Math.sin((x / 30.0) * PI)) * 2.0) / 3.0
+    return ret
+  }
+
+  const dLat = transformLat(wgLng - 105.0, wgLat - 35.0)
+  const dLng = transformLng(wgLng - 105.0, wgLat - 35.0)
+  const radLat = (wgLat / 180.0) * PI
+  let magic = Math.sin(radLat)
+  magic = 1 - ee * magic * magic
+  const sqrtMagic = Math.sqrt(magic)
+  const dLatFinal = (dLat * 180.0) / (((a * (1 - ee)) / (magic * sqrtMagic)) * PI)
+  const dLngFinal = (dLng * 180.0) / ((a / sqrtMagic) * Math.cos(radLat) * PI)
+
+  return {
+    lng: wgLng + dLngFinal,
+    lat: wgLat + dLatFinal,
+  }
 }
 
 function tryAmapLocate() {

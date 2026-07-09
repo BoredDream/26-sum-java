@@ -40,16 +40,16 @@
       <el-table-column prop="studentName" label="学生" width="120" />
       <el-table-column prop="studentNo" label="学号" width="140" />
       <el-table-column prop="applyReason" label="补签原因" show-overflow-tooltip />
-      <el-table-column label="证明材料" width="220" show-overflow-tooltip>
+      <el-table-column label="证明材料" width="200" show-overflow-tooltip>
         <template #default="scope">
-          <el-tooltip
-            v-if="(scope.row as MakeupApplyVO).proofFilePath"
-            effect="dark"
-            :content="(scope.row as MakeupApplyVO).proofFilePath"
-            placement="top"
-          >
-            <span class="proof-path">{{ (scope.row as MakeupApplyVO).proofFilePath }}</span>
-          </el-tooltip>
+          <template v-if="(scope.row as MakeupApplyVO).proofFilePath">
+            <a
+              :href="getMakeupDownloadUrl((scope.row as MakeupApplyVO).applyId)"
+              class="proof-link"
+            >
+              {{ getFileName((scope.row as MakeupApplyVO).proofFilePath) }}
+            </a>
+          </template>
           <span v-else>-</span>
         </template>
       </el-table-column>
@@ -65,29 +65,29 @@
           formatDateTime((scope.row as MakeupApplyVO).createTime)
         }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="220" fixed="right">
+      <el-table-column label="操作" width="240" fixed="right">
         <template #default="scope">
-          <div class="table-actions">
-            <el-button
-              v-if="(scope.row as MakeupApplyVO).auditStatus === 0"
-              type="success"
-              text
-              size="small"
-              :loading="auditId === (scope.row as MakeupApplyVO).applyId && auditAction === 1"
-              @click="openAudit(scope.row as MakeupApplyVO, 1)"
-            >
-              通过
-            </el-button>
-            <el-button
-              v-if="(scope.row as MakeupApplyVO).auditStatus === 0"
-              type="danger"
-              text
-              size="small"
-              :loading="auditId === (scope.row as MakeupApplyVO).applyId && auditAction === 2"
-              @click="openAudit(scope.row as MakeupApplyVO, 2)"
-            >
-              驳回
-            </el-button>
+          <div class="action-btns">
+            <template v-if="(scope.row as MakeupApplyVO).auditStatus === 0">
+              <el-button
+                type="success"
+                text
+                size="small"
+                :loading="auditId === (scope.row as MakeupApplyVO).applyId && auditAction === 1"
+                @click="openAudit(scope.row as MakeupApplyVO, 1)"
+              >
+                通过
+              </el-button>
+              <el-button
+                type="danger"
+                text
+                size="small"
+                :loading="auditId === (scope.row as MakeupApplyVO).applyId && auditAction === 2"
+                @click="openAudit(scope.row as MakeupApplyVO, 2)"
+              >
+                驳回
+              </el-button>
+            </template>
             <el-button
               type="primary"
               text
@@ -314,6 +314,14 @@ function openDetail(row: MakeupApplyVO) {
   detailVisible.value = true
 }
 
+function getFileName(path: string): string {
+  return path.split('/').pop() || path
+}
+
+function getMakeupDownloadUrl(applyId: number): string {
+  return attendanceApi.getMakeupDownloadUrl(applyId)
+}
+
 onMounted(() => {
   loadApplications()
   loadTaskOptions()
@@ -350,6 +358,19 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
+  }
+
+  .action-btns {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .proof-link {
+    color: #409eff;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
   }
 
   .reason-text {

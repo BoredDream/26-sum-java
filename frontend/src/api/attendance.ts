@@ -90,3 +90,8 @@ export function getSignedTaskIds() {
 export function markMakeupResultsViewed() {
   return post<void>('/attendance/makeup/mark-viewed')
 }
+
+export function getMakeupDownloadUrl(applyId: number) {
+  return `/api/attendance/makeup/${applyId}/download`
+}
+
