@@ -118,7 +118,7 @@ public class StudentServiceImpl implements StudentService {
         }
         UserAccount account = userAccountMapper.selectByRelatedIdAndRole(studentId, "STUDENT");
         if (account != null) {
-            userAccountMapper.deleteByUserId(account.getUserId());
+            userAccountMapper.updateStatus(account.getUserId(), 0);
         }
     }
 

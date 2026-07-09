@@ -21,4 +21,8 @@ public interface BackupService {
     void cleanupOldBackups();
 
     long count();
+
+    boolean isRestoring();
+
+    String getRestoreMessage();
 }

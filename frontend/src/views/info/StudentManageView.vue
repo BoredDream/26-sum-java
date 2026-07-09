@@ -156,7 +156,7 @@ const total = ref(0)
 const pageNum = ref(1)
 const pageSize = ref(10)
 const keyword = ref('')
-const filterStatus = ref<number | undefined>(undefined)
+const filterStatus = ref<number | undefined>(1)
 const actionId = ref(0)
 
 async function loadStudents() {

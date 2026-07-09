@@ -132,7 +132,7 @@ export function changeStudentPassword(studentId: number, oldPwd: string, newPwd:
 }
 
 // 教师管理
-export function queryTeacherPage(query: { keyword?: string; pageNum?: number; pageSize?: number }) {
+export function queryTeacherPage(query: { keyword?: string; status?: number; pageNum?: number; pageSize?: number }) {
   return get<PageResult<TeacherVO>>('/teachers/page', { params: query })
 }
 
@@ -176,11 +176,11 @@ export function queryBackupPage(query: { pageNum?: number; pageSize?: number }) 
 }
 
 export function createBackup(_dto?: BackupCreateDTO) {
-  return post<BackupVO>('/backups')
+  return post<BackupVO>('/backups', null, { timeout: 60000 })
 }
 
 export function restoreBackup(backupId: number) {
-  return post<void>(`/backups/${backupId}/restore`)
+  return post<void>(`/backups/${backupId}/restore`, null, { timeout: 120000 })
 }
 
 export function deleteBackup(backupId: number) {

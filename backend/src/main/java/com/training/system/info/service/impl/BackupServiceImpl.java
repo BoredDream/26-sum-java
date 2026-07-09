@@ -44,6 +44,7 @@ public class BackupServiceImpl implements BackupService {
     private int retentionDays;
 
     private final AtomicBoolean restoring = new AtomicBoolean(false);
+    private volatile String restoreMessage = null;
 
     @Override
     @Transactional
@@ -100,6 +101,8 @@ public class BackupServiceImpl implements BackupService {
             writer.newLine();
             writer.write("SET NAMES utf8mb4;");
             writer.newLine();
+            writer.write("SET FOREIGN_KEY_CHECKS=0;");
+            writer.newLine();
 
             String[] tables = {"student", "teacher", "user_account", "notice", "data_backup", "operate_log"};
             for (String table : tables) {
@@ -149,39 +152,57 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    @Transactional
     public void restoreBackup(Long backupId) {
-        if (!restoring.compareAndSet(false, true)) {
-            throw new BusinessException(ResultCode.CONFLICT, "已有恢复操作正在进行中");
+        if (restoring.get()) {
+            throw new BusinessException(ResultCode.CONFLICT,
+                restoreMessage != null ? restoreMessage : "已有恢复操作正在进行中");
         }
-        try {
-            DataBackup backup = backupMapper.selectById(backupId);
-            if (backup == null) throw new BusinessException(ResultCode.NOT_FOUND, "备份记录不存在");
-            Path filepath = Paths.get(backup.getFilePath());
-            if (!Files.exists(filepath)) throw new BusinessException(ResultCode.NOT_FOUND, "备份文件不存在");
+        DataBackup backup = backupMapper.selectById(backupId);
+        if (backup == null) throw new BusinessException(ResultCode.NOT_FOUND, "备份记录不存在");
+        Path filepath = Paths.get(backup.getFilePath());
+        if (!Files.exists(filepath)) throw new BusinessException(ResultCode.NOT_FOUND, "备份文件不存在");
 
-            String sql = new String(Files.readAllBytes(filepath));
-            try (Connection conn = dataSource.getConnection();
-                 Statement stmt = conn.createStatement()) {
-                StringBuilder statementBuilder = new StringBuilder();
-                for (String line : sql.split("\n")) {
-                    String trimmed = line.trim();
-                    if (trimmed.isEmpty() || trimmed.startsWith("--")) continue;
-                    statementBuilder.append(line);
-                    if (trimmed.endsWith(";")) {
-                        try { stmt.execute(statementBuilder.toString().trim()); }
-                        catch (Exception e) { log.warn("跳过SQL: {}", e.getMessage()); }
-                        statementBuilder.setLength(0);
-                    } else {
-                        statementBuilder.append("\n");
-                    }
+        restoring.set(true);
+        restoreMessage = "正在恢复备份...";
+        new Thread(() -> {
+            try {
+                Path wrappedSql = Files.createTempFile("restore_", ".sql");
+                String header = "SET FOREIGN_KEY_CHECKS=0;\n";
+                String footer = "\nSET FOREIGN_KEY_CHECKS=1;\n";
+                Files.write(wrappedSql, (header + new String(Files.readAllBytes(filepath)) + footer).getBytes());
+
+                ProcessBuilder pb = new ProcessBuilder(
+                    "mysql", "-u", "root", "-pwbl1124", "training_selection_system"
+                );
+                pb.redirectInput(wrappedSql.toFile());
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    String err = new String(process.getInputStream().readAllBytes());
+                    restoreMessage = "恢复失败：" + err;
+                    log.error("恢复备份失败: {}", err);
+                } else {
+                    restoreMessage = null;
+                    log.info("备份恢复成功");
                 }
+            } catch (Exception e) {
+                restoreMessage = "恢复失败：" + e.getMessage();
+                log.error("恢复备份异常", e);
+            } finally {
+                restoring.set(false);
             }
-        } catch (Exception e) {
-            throw new BusinessException(ResultCode.ERROR, "恢复失败：" + e.getMessage());
-        } finally {
-            restoring.set(false);
-        }
+        }, "backup-restore").start();
+    }
+
+    @Override
+    public boolean isRestoring() {
+        return restoring.get();
+    }
+
+    @Override
+    public String getRestoreMessage() {
+        return restoreMessage;
     }
 
     @Override

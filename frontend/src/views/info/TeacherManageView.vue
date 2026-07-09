@@ -148,6 +148,7 @@ async function loadTeachers() {
       pageNum: pageNum.value,
       pageSize: pageSize.value,
       keyword: keyword.value || undefined,
+      status: 1,
     })
     teachers.value = res.records
     total.value = res.total
